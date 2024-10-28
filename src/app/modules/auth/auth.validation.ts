@@ -49,6 +49,12 @@ const verifyResetOtpValidationSchema = z.object({
   }),
 });
 
+const resendResetCodeValidationSchema = z.object({
+  body: z.object({
+    phoneNumber: z.string({ required_error: 'Phone number is required' }),
+  }),
+});
+
 const authValidations = {
   loginValidationSchema,
   changePasswordValidationSchema,
@@ -56,6 +62,7 @@ const authValidations = {
   forgetPasswordValidationSchema,
   resetPasswordValidationSchema,
   verifyResetOtpValidationSchema,
+  resendResetCodeValidationSchema,
 };
 
 export default authValidations;

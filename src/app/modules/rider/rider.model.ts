@@ -24,7 +24,7 @@ const riderSchema = new Schema<IRider>(
       type: String,
       default: '',
     },
-    phoneNumber: { type: String, required: true },
+    phoneNumber: { type: String, required: true, unique: true },
     location: {
       type: locationSchema,
       default: null,

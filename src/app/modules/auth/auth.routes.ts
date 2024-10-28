@@ -70,4 +70,10 @@ router.post(
   authControllers.verifyResetOtp,
 );
 
+router.post(
+  '/resend-reset-code',
+  validateRequest(authValidations.resendResetCodeValidationSchema),
+  authControllers.resendResetCode,
+);
+
 export const authRoutes = router;

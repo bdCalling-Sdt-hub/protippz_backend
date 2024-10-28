@@ -14,6 +14,7 @@ router.patch(
   uploadFile(),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
+
     next();
   },
   validateRequest(vendorValidations.updateVendorProfileValidationSchema),

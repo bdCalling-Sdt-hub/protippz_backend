@@ -3,10 +3,12 @@
 import axios from 'axios';
 import { Response } from 'express';
 import { RequestExtended } from './generatePaymentToken';
-import { timestamp } from '../utilities/timestamp';
+import { generateTimestamp } from '../utilities/timestamp';
+// import { timestamp } from '../utilities/timestamp';
 
 const handleStkPush = async (req: RequestExtended, res: Response) => {
   const { phone, amount } = req.body;
+  const timestamp = generateTimestamp();
 
   const BUSINESS_SHORT_CODE = process.env.MPESA_BUSINESS_SHORT_CODE as string;
 
@@ -14,6 +16,7 @@ const handleStkPush = async (req: RequestExtended, res: Response) => {
     BUSINESS_SHORT_CODE + process.env.MPESA_PASS_KEY + timestamp,
   ).toString('base64');
 
+    
   const payload = {
     BusinessShortCode: BUSINESS_SHORT_CODE,
     Password: password,
@@ -24,7 +27,9 @@ const handleStkPush = async (req: RequestExtended, res: Response) => {
     PartyB: process.env.MPESA_BUSINESS_SHORT_CODE,
     PhoneNumber: phone,
     // CallBackURL: 'https://buysasaOnline.com/',
-    CallBackURL: 'https://0339-103-161-9-100.ngrok-free.app',
+    // CallBackURL: 'https://0339-103-161-9-100.ngrok-free.app',
+    // CallBackURL: 'http://192.168.10.153:8000/callback',
+    CallBackURL: 'https://396c-103-161-9-100.ngrok-free.app/callback',
     AccountReference: 'BuySasa online shop',
     TransactionDesc: 'Payment',
   };

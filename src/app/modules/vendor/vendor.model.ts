@@ -22,7 +22,7 @@ const vendorSchema = new Schema<IVendor>(
       ref: 'User',
     },
     storeName: { type: String, required: true },
-    phoneNumber: { type: String, default: '' },
+    phoneNumber: { type: String, required: true, unique: true },
     storeLocation: {
       type: locationSchema,
       default: null,

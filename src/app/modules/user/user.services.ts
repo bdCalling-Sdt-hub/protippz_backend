@@ -215,7 +215,7 @@ const resendVerifyCode = async (phoneNumber: string) => {
   const verifyCode = generateVerifyCode();
   const updateUser = await User.findOneAndUpdate(
     { phoneNumber: phoneNumber },
-    { verifyCode: verifyCode },
+    { verifyCode: verifyCode, codeExpireIn: new Date(Date.now() + 5 * 60000) },
   );
   const smsMessage = `Your verification code is: ${updateUser?.verifyCode}`;
   await sendSMS(user?.phoneNumber, smsMessage);
