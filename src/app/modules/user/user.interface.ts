@@ -3,14 +3,13 @@ import { Model } from 'mongoose';
 import { USER_ROLE } from './user.constant';
 
 export interface TUser {
-  // profileId: string;
-  // id: string;
   _id: string;
+  username:string;
   email: string;
   phoneNumber: string;
   password: string;
   passwordChangedAt?: Date;
-  role: 'customer' | 'rider' | 'vendor' | 'superAdmin';
+  role: 'user' | 'team' | 'player' | 'superAdmin';
   status: 'in-progress' | 'blocked';
   verifyCode: number;
   resetCode: number;

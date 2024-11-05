@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\.6f5e35bcb5c93b4b95b3249d6fc4525ac5b0e6b9-audit.json",
+    "files": [
+        {
+            "date": 1730785591941,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-11-05-11-success.log",
+            "hash": "f43be25c3a072270be69ee2d7f4dfd962f5cf47671087d86346426c7f3e1033d"
+        },
+        {
+            "date": 1730795765684,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-11-05-14-success.log",
+            "hash": "aa2f813b2c6a26b9c0603f6f1c7b36d9d765a88cf23a7d9ea4591c8cd6b5cd27"
+        }
+    ],
+    "hashType": "sha256"
+}

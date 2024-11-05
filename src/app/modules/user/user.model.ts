@@ -5,9 +5,15 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new Schema<TUser>(
   {
+    username:{
+      type:String,
+      required:true
+    },
     email: {
       type: String,
-      // required: true,
+      required: function () {
+        return this.role === 'user';  // Only required if the role is 'user'
+      },
       unique: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
@@ -16,7 +22,6 @@ const userSchema = new Schema<TUser>(
     },
     phoneNumber: {
       type: String,
-      required: true,
       unique: true,
     },
     password: {
@@ -28,7 +33,7 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      enum: ['customer', 'rider', 'vendor', 'superAdmin'],
+      enum: ['user', 'team', 'player', 'superAdmin'],
       required: true,
     },
     status: {
@@ -92,6 +97,7 @@ userSchema.statics.isPasswordMatched = async function (
 ) {
   return await bcrypt.compare(plainPasswords, hashPassword);
 };
+
 userSchema.statics.isJWTIssuedBeforePasswordChange = async function (
   passwordChangeTimeStamp,
   jwtIssuedTimeStamp,
@@ -100,4 +106,5 @@ userSchema.statics.isJWTIssuedBeforePasswordChange = async function (
 
   return passwordChangeTime > jwtIssuedTimeStamp;
 };
+
 export const User = model<TUser, UserModel>('User', userSchema);

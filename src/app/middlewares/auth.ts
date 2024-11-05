@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import catchAsync from '../utilities/catchasync';
 import AppError from '../error/appError';
@@ -6,10 +7,6 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
-import { USER_ROLE } from '../modules/user/user.constant';
-import Customer from '../modules/customer/customer.model';
-import Rider from '../modules/rider/rider.model';
-import Vendor from '../modules/vendor/vendor.model';
 
 // make costume interface
 
@@ -33,6 +30,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     } catch (err) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Token is expired');
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, role, phoneNumber, iat } = decoded;
 
     if (!decoded) {
@@ -57,16 +55,16 @@ const auth = (...requiredRoles: TUserRole[]) => {
       );
     }
 
-    let profileData;
-    if (role === USER_ROLE.customer) {
-      profileData = await Customer.findOne({ user: id }).select('_id');
-    } else if (role === USER_ROLE.rider) {
-      profileData = await Rider.findOne({ user: id }).select('_id');
-    } else if (role === USER_ROLE.vendor) {
-      profileData = await Vendor.findOne({ user: id }).select('_id');
-    }
+    // let profileData;
+    // if (role === USER_ROLE.user) {
+    //   profileData = await Customer.findOne({ user: id }).select('_id');
+    // } else if (role === USER_ROLE.rider) {
+    //   profileData = await Rider.findOne({ user: id }).select('_id');
+    // } else if (role === USER_ROLE.vendor) {
+    //   profileData = await Vendor.findOne({ user: id }).select('_id');
+    // }
 
-    decoded.profileId = profileData?._id;
+    // decoded.profileId = profileData?._id;
     if (
       user?.passwordChangedAt &&
       (await User.isJWTIssuedBeforePasswordChange(
