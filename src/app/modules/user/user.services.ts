@@ -111,6 +111,7 @@ const resendVerifyCode = async (email: string) => {
   const updateUser = await User.findOneAndUpdate(
     { email: email },
     { verifyCode: verifyCode, codeExpireIn: new Date(Date.now() + 5 * 60000) },
+    {new:true,runValidators:true}
   );
   if (!updateUser) {
     throw new AppError(

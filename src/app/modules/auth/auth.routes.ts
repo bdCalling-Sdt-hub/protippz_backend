@@ -16,9 +16,9 @@ router.post(
 router.post(
   '/change-password',
   auth(
-    USER_ROLE.customer,
-    USER_ROLE.rider,
-    USER_ROLE.vendor,
+    USER_ROLE.user,
+    USER_ROLE.player,
+    USER_ROLE.team,
     USER_ROLE.superAdmin,
   ),
   validateRequest(authValidations.changePasswordValidationSchema),
@@ -27,9 +27,9 @@ router.post(
 router.post(
   '/refresh-token',
   auth(
-    USER_ROLE.customer,
-    USER_ROLE.rider,
-    USER_ROLE.vendor,
+    USER_ROLE.user,
+    USER_ROLE.player,
+    USER_ROLE.team,
     USER_ROLE.superAdmin,
   ),
   validateRequest(authValidations.refreshTokenValidationSchema),
