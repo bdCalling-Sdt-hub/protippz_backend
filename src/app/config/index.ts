@@ -26,4 +26,8 @@ export default {
     authToken: process.env.TWILIO_AUTH_TOKEN,
     phoneNumber: process.env.TWILIO_PHONE_NUMBER,
   },
+  smtp:{
+    smtp_host:process.env.SMTP_HOST,
+    smtp_pass:process.env.SMTP_PASS
+  }
 };

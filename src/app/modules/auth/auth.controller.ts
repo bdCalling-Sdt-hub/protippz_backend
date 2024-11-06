@@ -38,12 +38,12 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 const forgetPassword = catchAsync(async (req, res) => {
-  const phoneNumber = req.body.phoneNumber;
-  const result = await authServices.forgetPassword(phoneNumber);
+  const email = req.body.email;
+  const result = await authServices.forgetPassword(email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Password reset code send to the phone number',
+    message: 'Password reset code send to the email',
     data: result,
   });
 });
@@ -64,7 +64,7 @@ const resetPassword = catchAsync(async (req, res) => {
 });
 const verifyResetOtp = catchAsync(async (req, res) => {
   const result = await authServices.verifyResetOtp(
-    req.body.phoneNumber,
+    req.body.email,
     req.body.resetCode,
   );
   sendResponse(res, {
@@ -76,7 +76,7 @@ const verifyResetOtp = catchAsync(async (req, res) => {
 });
 
 const resendResetCode = catchAsync(async (req, res) => {
-  const result = await authServices.resendResetCode(req?.body.phoneNumber);
+  const result = await authServices.resendResetCode(req?.body.email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

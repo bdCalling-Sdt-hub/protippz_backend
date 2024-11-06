@@ -6,7 +6,7 @@ export interface TUser {
   _id: string;
   username:string;
   email: string;
-  phoneNumber: string;
+  phone: string;
   password: string;
   passwordChangedAt?: Date;
   role: 'user' | 'team' | 'player' | 'superAdmin';

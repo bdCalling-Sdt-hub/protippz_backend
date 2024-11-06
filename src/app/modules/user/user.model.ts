@@ -20,7 +20,7 @@ const userSchema = new Schema<TUser>(
         'Please provide a valid email address',
       ],
     },
-    phoneNumber: {
+    phone: {
       type: String,
       unique: true,
     },

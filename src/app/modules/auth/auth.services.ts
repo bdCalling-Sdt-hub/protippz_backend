@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { User } from '../user/user.model';
@@ -7,14 +8,20 @@ import { createToken, verifyToken } from '../user/user.utils';
 import config from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import sendSMS from '../../helper/sendSms';
+import { sendEmail } from '../../utilities/sendEmail';
+import resetPasswordEmailBody from '../../mailTemplate/resetPasswordEmailBody';
 // import { sendEmail } from '../../utilities/sendEmail';
 // import generateResetPasswordEmail from '../../helper/generateResetPasswordEmail';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
 const loginUserIntoDB = async (payload: TLoginUser) => {
-  const user = await User.isUserExists(payload.phoneNumber);
+  const user = await User.findOne({
+    $or: [
+      { email: payload.userNameOrEmail },
+      { username: payload.userNameOrEmail },
+    ],
+  });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -30,8 +37,8 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
   }
   const jwtPayload = {
     id: user?._id,
-    // email: user?.email,
-    phoneNumber: user?.phoneNumber,
+    username: user.username,
+    email: user?.email,
     role: user?.role as TUserRole,
   };
   const accessToken = createToken(
@@ -55,7 +62,9 @@ const changePasswordIntoDB = async (
   userData: JwtPayload,
   payload: { oldPassword: string; newPassword: string },
 ) => {
-  const user = await User.isUserExists(userData.phoneNumber);
+  const user = await User.findOne({
+    $or: [{ email: userData?.email }, { username: userData.username }],
+  });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -89,9 +98,12 @@ const changePasswordIntoDB = async (
 
 const refreshToken = async (token: string) => {
   const decoded = verifyToken(token, config.jwt_refresh_secret as string);
-  const { phoneNumber, iat } = decoded;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { username, email, iat } = decoded;
 
-  const user = await User.isUserExists(phoneNumber);
+  const user = await User.findOne({
+    $or: [{ email: email }, { username: username }],
+  });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -101,19 +113,19 @@ const refreshToken = async (token: string) => {
   if (user.status === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
   }
-  if (
-    user?.passwordChangedAt &&
-    (await User.isJWTIssuedBeforePasswordChange(
-      user?.passwordChangedAt,
-      iat as number,
-    ))
-  ) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
-  }
+  // if (
+  //   user?.passwordChangedAt &&
+  //   (await User.isJWTIssuedBeforePasswordChange(
+  //     user?.passwordChangedAt,
+  //     iat as number,
+  //   ))
+  // ) {
+  //   throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized');
+  // }
   const jwtPayload = {
     id: user?._id,
-    // email: user?.email,
-    phoneNumber: user?.phoneNumber,
+    username: user.username,
+    email: user?.email,
     role: user?.role as TUserRole,
   };
   const accessToken = createToken(
@@ -125,8 +137,8 @@ const refreshToken = async (token: string) => {
 };
 
 // forgot password
-const forgetPassword = async (phoneNumber: string) => {
-  const user = await User.isUserExists(phoneNumber);
+const forgetPassword = async (email: string) => {
+  const user = await User.findOne({ email: email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -139,15 +151,20 @@ const forgetPassword = async (phoneNumber: string) => {
 
   const resetCode = generateVerifyCode();
   await User.findOneAndUpdate(
-    { phoneNumber: phoneNumber },
+    { email: email },
     {
       resetCode: resetCode,
       isResetVerified: false,
       codeExpireIn: new Date(Date.now() + 5 * 60000),
     },
   );
-  const smsMessage = `Your reset password code is: ${resetCode}`;
-  await sendSMS(phoneNumber, smsMessage);
+
+  sendEmail(
+    user.email,
+    'Reset password code',
+    resetPasswordEmailBody(user.username, resetCode),
+  );
+
   return null;
 
   // const jwtPayload = {
@@ -169,8 +186,8 @@ const forgetPassword = async (phoneNumber: string) => {
 
 // verify forgot otp
 
-const verifyResetOtp = async (phoneNumber: string, resetCode: number) => {
-  const user = await User.isUserExists(phoneNumber);
+const verifyResetOtp = async (email: string, resetCode: number) => {
+  const user = await User.findOne({ email: email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -188,7 +205,7 @@ const verifyResetOtp = async (phoneNumber: string, resetCode: number) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Reset code is invalid');
   }
   await User.findOneAndUpdate(
-    { phoneNumber: phoneNumber },
+    { email: email },
     { isResetVerified: true },
     { new: true, runValidators: true },
   );
@@ -197,7 +214,7 @@ const verifyResetOtp = async (phoneNumber: string, resetCode: number) => {
 
 // reset password
 const resetPassword = async (payload: {
-  phoneNumber: string;
+  email: string;
   password: string;
   confirmPassword: string;
 }) => {
@@ -207,7 +224,7 @@ const resetPassword = async (payload: {
       "Password and confirm password doesn't match",
     );
   }
-  const user = await User.isUserExists(payload.phoneNumber);
+  const user = await User.findOne({ email: payload.email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -245,7 +262,7 @@ const resetPassword = async (payload: {
   // update the new password
   await User.findOneAndUpdate(
     {
-      phoneNumber: payload.phoneNumber,
+      email: payload.email,
     },
     {
       password: newHashedPassword,
@@ -254,8 +271,8 @@ const resetPassword = async (payload: {
   );
   const jwtPayload = {
     id: user?._id,
-    // email: user?.email,
-    phoneNumber: user?.phoneNumber,
+    username: user.username,
+    email: user?.email,
     role: user?.role as TUserRole,
   };
   const accessToken = createToken(
@@ -272,8 +289,8 @@ const resetPassword = async (payload: {
   return { accessToken, refreshToken };
 };
 
-const resendResetCode = async (phoneNumber: string) => {
-  const user = await User.isUserExists(phoneNumber);
+const resendResetCode = async (email: string) => {
+  const user = await User.findOne({ email: email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }
@@ -286,15 +303,19 @@ const resendResetCode = async (phoneNumber: string) => {
 
   const resetCode = generateVerifyCode();
   await User.findOneAndUpdate(
-    { phoneNumber: phoneNumber },
+    { email: email },
     {
       resetCode: resetCode,
       isResetVerified: false,
       codeExpireIn: new Date(Date.now() + 5 * 60000),
     },
   );
-  const smsMessage = `Your reset password code is: ${resetCode}`;
-  await sendSMS(phoneNumber, smsMessage);
+  sendEmail(
+    user.email,
+    'Reset password code',
+    resetPasswordEmailBody(user.username, resetCode),
+  );
+
   return null;
 };
 
