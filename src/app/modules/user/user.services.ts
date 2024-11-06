@@ -11,6 +11,9 @@ import NormalUser from '../normalUser/normalUser.model';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import cron from 'node-cron';
 import sendEmail from '../../utilities/sendEmail';
+import { JwtPayload } from 'jsonwebtoken';
+import Player from '../player/player.model';
+import Team from '../team/team.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -90,8 +93,8 @@ const verifyCode = async (email: string, verifyCode: number) => {
   if (user.codeExpireIn < new Date(Date.now())) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Verify code is expired');
   }
-  if(verifyCode !== user.verifyCode){
-    throw new AppError(httpStatus.BAD_REQUEST,"Code doesn't match")
+  if (verifyCode !== user.verifyCode) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Code doesn't match");
   }
   const result = await User.findOneAndUpdate(
     { email: email },
@@ -111,7 +114,7 @@ const resendVerifyCode = async (email: string) => {
   const updateUser = await User.findOneAndUpdate(
     { email: email },
     { verifyCode: verifyCode, codeExpireIn: new Date(Date.now() + 5 * 60000) },
-    {new:true,runValidators:true}
+    { new: true, runValidators: true },
   );
   if (!updateUser) {
     throw new AppError(
@@ -129,6 +132,26 @@ const resendVerifyCode = async (email: string) => {
   });
   return null;
 };
+
+const getMyProfile = async (userData: JwtPayload) => {
+  let result = null;
+  if (userData.role === USER_ROLE.user) {
+    result = await NormalUser.findOne({ email: userData.email });
+  }
+  else if (userData.role === USER_ROLE.player) {
+    result = await Player.findOne({
+      $or: [{ email: userData?.email }, { username: userData?.username }],
+    });
+  }
+  else if (userData.role === USER_ROLE.team) {
+    result = await Team.findOne({
+      $or: [{ email: userData?.email }, { username: userData?.username }],
+    });
+  }
+  return result;
+};
+
+// all cron jobs for users
 
 cron.schedule('* * * * *', async () => {
   try {
@@ -149,6 +172,7 @@ const userServices = {
   registerUser,
   verifyCode,
   resendVerifyCode,
+  getMyProfile,
 };
 
 export default userServices;

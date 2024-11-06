@@ -34,9 +34,21 @@ const resendVerifyCode = catchAsync(async (req, res) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req, res) => {
+  const result = await userServices.getMyProfile(req.user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully retrieved your data',
+    data: result,
+  });
+});
+
 const userController = {
   registerUser,
   verifyCode,
   resendVerifyCode,
+  getMyProfile
 };
 export default userController;

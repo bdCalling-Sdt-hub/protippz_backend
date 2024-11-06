@@ -3,6 +3,8 @@ import userControllers from './user.controller';
 import { Router } from 'express';
 import userValidations from './user.validation';
 import normalUserValidations from '../normalUser/normalUser.validation';
+import auth from '../../middlewares/auth';
+import { USER_ROLE } from './user.constant';
 
 const router = Router();
 
@@ -18,6 +20,17 @@ router.post(
   '/resend-verify-code',
   validateRequest(userValidations.resendVerifyCodeSchema),
   userControllers.resendVerifyCode,
+);
+
+router.get(
+  '/get-my-profile',
+  auth(
+    USER_ROLE.user,
+    USER_ROLE.player,
+    USER_ROLE.team,
+    USER_ROLE.superAdmin,
+  ),
+  userControllers.getMyProfile,
 );
 
 export const userRoutes = router;
