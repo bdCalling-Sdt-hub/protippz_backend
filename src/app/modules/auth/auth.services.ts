@@ -8,8 +8,8 @@ import { createToken, verifyToken } from '../user/user.utils';
 import config from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { sendEmail } from '../../utilities/sendEmail';
 import resetPasswordEmailBody from '../../mailTemplate/resetPasswordEmailBody';
+import sendEmail from '../../utilities/sendEmail';
 // import { sendEmail } from '../../utilities/sendEmail';
 // import generateResetPasswordEmail from '../../helper/generateResetPasswordEmail';
 const generateVerifyCode = (): number => {
@@ -159,11 +159,18 @@ const forgetPassword = async (email: string) => {
     },
   );
 
+  // sendEmail(
+  //   user.email,
+  //   'Reset password code',
+  //   resetPasswordEmailBody(user.username, resetCode),
+  // );
   sendEmail(
-    user.email,
-    'Reset password code',
-    resetPasswordEmailBody(user.username, resetCode),
-  );
+    {
+    email: user.email,
+     subject:'Reset password code',
+     html: resetPasswordEmailBody(user.username, resetCode),
+    }
+   );
 
   return null;
 
@@ -311,10 +318,12 @@ const resendResetCode = async (email: string) => {
     },
   );
   sendEmail(
-    user.email,
-    'Reset password code',
-    resetPasswordEmailBody(user.username, resetCode),
-  );
+    {
+    email: user.email,
+     subject:'Reset password code',
+     html: resetPasswordEmailBody(user.username, resetCode),
+    }
+   );
 
   return null;
 };

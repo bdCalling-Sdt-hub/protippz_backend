@@ -98,7 +98,7 @@ const registrationSuccessEmailBody = (name:string,activationCode:number) => `
     <body>
       <div class="container">
         <div class="header">
-          <h1>Welcome to Bidding Website</h1>
+          <h1>Welcome to Protipzz</h1>
         </div>
         <div class="content">
           <h2>Hello, ${name}</h2>

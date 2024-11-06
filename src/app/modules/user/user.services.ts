@@ -8,9 +8,9 @@ import mongoose from 'mongoose';
 import { TUser } from './user.interface';
 import { USER_ROLE } from './user.constant';
 import NormalUser from '../normalUser/normalUser.model';
-import { sendEmail } from '../../utilities/sendEmail';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
 import cron from 'node-cron';
+import sendEmail from '../../utilities/sendEmail';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -27,8 +27,11 @@ const registerUser = async (
     );
   }
 
-  if(userData.totalAmount || userData.totalPoint){
-    throw new AppError(httpStatus.BAD_REQUEST,"If you want to add total amount or total point manually we will block you")
+  if (userData.totalAmount || userData.totalPoint) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'If you want to add total amount or total point manually we will block you',
+    );
   }
   const usernameExist = await User.findOne({ username: userData.username });
   if (usernameExist) {
@@ -62,11 +65,11 @@ const registerUser = async (
     };
     const result = await NormalUser.create([normalUserPayload], { session });
 
-    sendEmail(
-      userData.email,
-      'Activate Your Account',
-      registrationSuccessEmailBody(result[0].name, user[0].verifyCode),
-    );
+    sendEmail({
+      email: userData.email,
+      subject: 'Activate Your Account',
+      html: registrationSuccessEmailBody(result[0].name, user[0].verifyCode),
+    });
 
     await session.commitTransaction();
     session.endSession();
@@ -87,14 +90,15 @@ const verifyCode = async (email: string, verifyCode: number) => {
   if (user.codeExpireIn < new Date(Date.now())) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Verify code is expired');
   }
-  let result;
-  if (user.verifyCode === verifyCode) {
-    result = await User.findOneAndUpdate(
-      { email: email },
-      { isVerified: true },
-      { new: true, runValidators: true },
-    );
+  if(verifyCode !== user.verifyCode){
+    throw new AppError(httpStatus.BAD_REQUEST,"Code doesn't match")
   }
+  const result = await User.findOneAndUpdate(
+    { email: email },
+    { isVerified: true },
+    { new: true, runValidators: true },
+  );
+
   return result;
 };
 
@@ -108,17 +112,24 @@ const resendVerifyCode = async (email: string) => {
     { email: email },
     { verifyCode: verifyCode, codeExpireIn: new Date(Date.now() + 5 * 60000) },
   );
-  if(!updateUser){
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR,"Something went wrong . Please again resend the code after a few second")
+  if (!updateUser) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Something went wrong . Please again resend the code after a few second',
+    );
   }
-  sendEmail(
-    user.email,
-    'Activate Your Account',
-    registrationSuccessEmailBody(updateUser.username,updateUser.verifyCode),
-  );
+  sendEmail({
+    email: user.email,
+    subject: 'Activate Your Account',
+    html: registrationSuccessEmailBody(
+      updateUser.username,
+      updateUser.verifyCode,
+    ),
+  });
+  return null;
 };
 
-cron.schedule("* * * * *", async () => {
+cron.schedule('* * * * *', async () => {
   try {
     const now = new Date();
     const result = await User.deleteMany({
@@ -126,14 +137,12 @@ cron.schedule("* * * * *", async () => {
       expirationTime: { $lte: now },
     });
     if (result.deletedCount > 0) {
-    console.log(`Deleted ${result.deletedCount} expired inactive users`);
+      console.log(`Deleted ${result.deletedCount} expired inactive users`);
     }
   } catch (error) {
-    console.log("Error deleting expired users:", error);
+    console.log('Error deleting expired users:', error);
   }
 });
-
-
 
 const userServices = {
   registerUser,

@@ -18,7 +18,7 @@ const logDir = path.join(process.cwd(), 'logs', 'winston');
 
 export const logger = createLogger({
   level: 'info',
-  format: combine(label({ label: 'Food Delivery' }), timestamp(), myFormat),
+  format: combine(label({ label: 'Protipzz' }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
     new transports.File({
