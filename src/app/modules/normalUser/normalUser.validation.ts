@@ -22,14 +22,12 @@ export const createNormalUserSchema = z.object({
 });
 export const updateNormalUserData = z.object({
   body: z.object({
-    name: z.string().nonempty('Name is required'),
-    username: z.string().nonempty('Username is required'),
+    name: z.string().nonempty('Name is required').optional(),
     phone: z
       .string()
       .nonempty('Phone number is required')
-      .regex(/^\+?[1-9]\d{1,14}$/, 'Phone number must be a valid format'),
-    email: z.string().email('Invalid email format'),
-    address: z.string().nonempty('Address is required'),
+      .regex(/^\+?[1-9]\d{1,14}$/, 'Phone number must be a valid format').optional(),
+    address: z.string().nonempty('Address is required').optional(),
   }),
 });
 

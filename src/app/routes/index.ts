@@ -8,6 +8,7 @@ import { ManageRoutes } from '../modules/manage-web/manage.routes';
 import { feedbackRoutes } from '../modules/feedback/feedback.routes';
 import { playerBookmarkRoutes } from '../modules/playerBookmark/player.bookmark.routes';
 import { teamBookmarkRoutes } from '../modules/teamBookmark/team.bookmark.routes';
+import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
 
 const router = Router();
 
@@ -19,6 +20,10 @@ const moduleRoutes = [
   {
     path: '/user',
     router: userRoutes,
+  },
+  {
+    path: '/normal-user',
+    router: normalUserRoutes,
   },
 
   {
