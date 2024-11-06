@@ -10,8 +10,6 @@ import { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import resetPasswordEmailBody from '../../mailTemplate/resetPasswordEmailBody';
 import sendEmail from '../../utilities/sendEmail';
-// import { sendEmail } from '../../utilities/sendEmail';
-// import generateResetPasswordEmail from '../../helper/generateResetPasswordEmail';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -30,6 +28,9 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
   }
   if (user.status === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
+  }
+  if (!user.isVerified) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are not verified user . Please verify your email');
   }
   // checking if the password is correct ----
   if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
@@ -74,6 +75,7 @@ const changePasswordIntoDB = async (
   if (user.status === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
   }
+
 
   if (!(await User.isPasswordMatched(payload?.oldPassword, user?.password))) {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');

@@ -1,4 +1,7 @@
+import { Types } from "mongoose";
+
 export interface INormalUser {
+    user:Types.ObjectId;
     name:string;
     username:string;
     phone:string;

@@ -7,6 +7,10 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import { TUserRole } from '../modules/user/user.interface';
 import { User } from '../modules/user/user.model';
+import { USER_ROLE } from '../modules/user/user.constant';
+import NormalUser from '../modules/normalUser/normalUser.model';
+import Player from '../modules/player/player.model';
+import Team from '../modules/team/team.model';
 
 // make costume interface
 
@@ -48,23 +52,23 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (user.status === 'blocked') {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
     }
-    if (!user?.isActive) {
+    if (!user?.isVerified) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        'You have not proper access right now . Contact with admin',
+        'You are not verified user',
       );
     }
 
-    // let profileData;
-    // if (role === USER_ROLE.user) {
-    //   profileData = await Customer.findOne({ user: id }).select('_id');
-    // } else if (role === USER_ROLE.rider) {
-    //   profileData = await Rider.findOne({ user: id }).select('_id');
-    // } else if (role === USER_ROLE.vendor) {
-    //   profileData = await Vendor.findOne({ user: id }).select('_id');
-    // }
+    let profileData;
+    if (role === USER_ROLE.user) {
+      profileData = await NormalUser.findOne({ user: id }).select('_id');
+    } else if (role === USER_ROLE.player) {
+      profileData = await Player.findOne({ user: id }).select('_id');
+    } else if (role === USER_ROLE.team) {
+      profileData = await Team.findOne({ user: id }).select('_id');
+    }
 
-    // decoded.profileId = profileData?._id;
+    decoded.profileId = profileData?._id;
     if (
       user?.passwordChangedAt &&
       (await User.isJWTIssuedBeforePasswordChange(

@@ -2,6 +2,11 @@ import { model, Schema } from "mongoose";
 import { INormalUser } from "./normalUser.interface";
 
 const NormalUserSchema = new Schema<INormalUser>({
+    user:{
+        type:Schema.Types.ObjectId,
+        required:true,
+        ref:"User",
+    },
     name: {
         type: String,
         required: true,
