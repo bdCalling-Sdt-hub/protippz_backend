@@ -1,0 +1,26 @@
+Wed Nov 06 2024 18:4 51 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:4 51 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:9 23 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:9 23 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:9 27 [Protipzz] error: Unhandled Rejection: SuperAdmin validation failed: email: Path `email` is required., username: Path `username` is required., name: Path `name` is required.
+Wed Nov 06 2024 18:10 57 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:10 57 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:11 0 [Protipzz] error: Unhandled Rejection: SuperAdmin validation failed: email: Path `email` is required., username: Path `username` is required., name: Path `name` is required.
+Wed Nov 06 2024 18:11 7 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:11 7 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:11 10 [Protipzz] error: Unhandled Rejection: SuperAdmin validation failed: email: Path `email` is required., username: Path `username` is required., name: Path `name` is required.
+Wed Nov 06 2024 18:11 17 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:11 17 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:11 21 [Protipzz] error: Unhandled Rejection: SuperAdmin validation failed: email: Path `email` is required., username: Path `username` is required., name: Path `name` is required.
+Wed Nov 06 2024 18:11 27 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:11 27 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:11 29 [Protipzz] error: Unhandled Rejection: SuperAdmin validation failed: email: Path `email` is required., username: Path `username` is required., name: Path `name` is required.
+Wed Nov 06 2024 18:11 38 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:11 38 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:11 41 [Protipzz] error: Unhandled Rejection: SuperAdmin validation failed: email: Path `email` is required., username: Path `username` is required., name: Path `name` is required.
+Wed Nov 06 2024 18:11 47 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:11 47 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:12 43 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:12 43 [Protipzz] info: Example app listening on port 5050
+Wed Nov 06 2024 18:13 51 [Protipzz] info: DB Connected Successfully
+Wed Nov 06 2024 18:13 51 [Protipzz] info: Example app listening on port 5050

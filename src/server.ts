@@ -5,6 +5,7 @@ import { Server as HTTPServer } from 'http'; // Import HTTPServer type
 import server from './app';
 import { errorLogger, logger } from './app/shared/logger';
 import config from './app/config';
+import seedSuperAdmin from './app/DB';
 
 let myServer: HTTPServer | undefined;
 
@@ -17,6 +18,7 @@ async function main() {
       typeof config.port === 'number' ? config.port : Number(config.port);
     myServer = server.listen(port, config.base_url as string, () => {
       logger.info(`Example app listening on port ${config.port}`);
+      seedSuperAdmin();
     });
 
     // Global unhandled rejection handler

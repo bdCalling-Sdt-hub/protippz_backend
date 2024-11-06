@@ -18,7 +18,6 @@ const superAdminSchema = new Schema<ISuperAdmin>({
   },
   phone: {
     type: String,
-    required: true,
     // unique: true,
   },
   email: {
@@ -28,13 +27,12 @@ const superAdminSchema = new Schema<ISuperAdmin>({
   },
   address: {
     type: String,
-    required: true,
   },
   profile_image: {
     type: String,
     default: '',
   },
 });
-const NormalUser = model<ISuperAdmin>('SuperAdmin', superAdminSchema);
+const SuperAdmin = model<ISuperAdmin>('SuperAdmin', superAdminSchema);
 
-export default NormalUser;
+export default SuperAdmin;
