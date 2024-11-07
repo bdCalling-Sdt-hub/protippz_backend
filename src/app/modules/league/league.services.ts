@@ -4,6 +4,9 @@ import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/appError";
 import { ILeague } from "./league.interface";
 import League from "./league.model";
+import Team from "../team/team.model";
+import Player from "../player/player.model";
+import mongoose from "mongoose";
 
 const createLeagueIntoDB  = async(payload:ILeague)=>{
     const result = await League.create(payload);
@@ -45,15 +48,29 @@ const updateLeagueIntoDB = async(id:string,payload:Partial<ILeague>)=>{
     return result;
 }
 
-const deleteLeagueFromDB = async (id:string)=>{
-    const league = await League.findById(id);
-    if(!league){
-        throw new AppError(httpStatus.NOT_FOUND,'League not found')
+const deleteLeagueFromDB = async (id: string) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
+    try {
+      const league = await League.findById(id).session(session);
+      if (!league) {
+        throw new AppError(httpStatus.NOT_FOUND, 'League not found');
+      }
+  
+      await League.findByIdAndDelete(id).session(session);
+      await Team.deleteMany({ league: id }).session(session);
+      await Player.deleteMany({ league: id }).session(session);
+  
+      await session.commitTransaction();
+      session.endSession();
+      return league;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
-
-    const result = await League.findByIdAndDelete(id);
-    return result;
-}
+  };
 
 
 

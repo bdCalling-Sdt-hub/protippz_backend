@@ -10,6 +10,7 @@ import { playerBookmarkRoutes } from '../modules/playerBookmark/player.bookmark.
 import { teamBookmarkRoutes } from '../modules/teamBookmark/team.bookmark.routes';
 import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
 import { superAdminRoutes } from '../modules/superAdmin/superAdmin.routes';
+import { leagueRoutes } from '../modules/league/league.routes';
 
 const router = Router();
 
@@ -25,6 +26,10 @@ const moduleRoutes = [
   {
     path: '/normal-user',
     router: normalUserRoutes,
+  },
+  {
+    path: '/league',
+    router: leagueRoutes,
   },
 
   {

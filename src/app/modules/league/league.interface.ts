@@ -1,6 +1,6 @@
 
 export interface ILeague {
     name:string;
-    image:string;
+    league_image:string;
     sport:string;
 }
