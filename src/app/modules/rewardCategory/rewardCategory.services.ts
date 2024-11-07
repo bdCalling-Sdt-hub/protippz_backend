@@ -4,6 +4,8 @@ import AppError from '../../error/appError';
 import { IRewordCategory } from './rewardCategory.interface';
 import RewardCategory from './rewardCategory.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import Reward from '../reward/reward.model';
+import mongoose from 'mongoose';
 
 const createRewardCategoryIntoDB = async ( payload: IRewordCategory) => {
   const result = await RewardCategory.create(payload);
@@ -64,13 +66,26 @@ const getSingleRewardCategoryFromDB = async(id:string)=>{
 
 // delete category
 const deleteRewardCategoryFromDB = async (id: string) => {
- const rewardCategory = await RewardCategory.findById(id);
- if(!rewardCategory){
-  throw new AppError(httpStatus.NOT_FOUND,"Reward Category not found");
- }
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
- const result = await RewardCategory.findByIdAndDelete(id);
- return result;
+  try {
+    const rewardCategory = await RewardCategory.findById(id).session(session);
+    if (!rewardCategory) {
+      throw new AppError(httpStatus.NOT_FOUND, "Reward Category not found");
+    }
+
+    await RewardCategory.findByIdAndDelete(id).session(session);
+    await Reward.deleteMany({ category: id }).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+    return rewardCategory;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };
 
 

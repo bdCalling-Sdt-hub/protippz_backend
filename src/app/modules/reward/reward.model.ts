@@ -6,14 +6,14 @@ import { IReward } from "./reward.interface";
 const RewardSchema = new Schema<IReward>({
     category: {
         type: Schema.Types.ObjectId,
-        ref: "Category", // reference the category collection
+        ref: "RewardCategory", // reference the category collection
         required: true,
     },
     name: {
         type: String,
         required: true,
     },
-    image: {
+    reward_image: {
         type: String,
         default:""
     },

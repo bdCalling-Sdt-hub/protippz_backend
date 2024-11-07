@@ -13,6 +13,7 @@ import { leagueRoutes } from '../modules/league/league.routes';
 import { teamRoutes } from '../modules/team/team.routes';
 import { playerRoutes } from '../modules/player/player.routes';
 import { rewardCategoryRoutes } from '../modules/rewardCategory/rewardCategory.routes';
+import { rewardRoutes } from '../modules/reward/reward.routes';
 
 const router = Router();
 
@@ -45,6 +46,10 @@ const moduleRoutes = [
   {
     path: '/reward-category',
     router: rewardCategoryRoutes,
+  },
+  {
+    path: '/reward',
+    router: rewardRoutes,
   },
   {
     path: '/banner',
