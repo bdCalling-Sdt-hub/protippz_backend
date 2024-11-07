@@ -24,16 +24,54 @@ const createTeamIntoDB = async (payload: ITeam) => {
   return result;
 };
 
+// const getAllTeamsFromDB = async (query: Record<string, any>) => {
+//   const teamQuery = new QueryBuilder(
+//     Team.find().populate({ path: 'league', select: 'name sport' }),
+//     query,
+//   )
+//     .search(['name'])
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   const meta = await teamQuery.countTotal();
+//   const result = await teamQuery.modelQuery;
+
+//   return {
+//     meta,
+//     result,
+//   };
+// };
+
 const getAllTeamsFromDB = async (query: Record<string, any>) => {
+
+  const sortField = query.sort as string;
+  const isLeagueSort = sortField === 'league.sport' || sortField === '-league.sport';
+  console.log(isLeagueSort);
+
   const teamQuery = new QueryBuilder(
-    Team.find().populate({ path: 'league', select: 'name sport' }),
-    query,
+    isLeagueSort
+      ? Team.find()
+      : Team.find().populate({ path: 'league', select: 'name sport' }),
+    query
   )
     .search(['name'])
     .filter()
-    .sort()
     .paginate()
     .fields();
+
+  if (isLeagueSort) {
+    // Apply sorting on the populated field if `league.sport` sorting is requested
+    const order = sortField.startsWith('-') ? -1 : 1;
+    teamQuery.modelQuery = teamQuery.modelQuery.populate({
+      path: 'league',
+      select: 'name sport',
+      options: { sort: { sport: order } },
+    });
+  } else {
+    teamQuery.sort(); // Apply normal sorting otherwise
+  }
 
   const meta = await teamQuery.countTotal();
   const result = await teamQuery.modelQuery;
@@ -43,6 +81,7 @@ const getAllTeamsFromDB = async (query: Record<string, any>) => {
     result,
   };
 };
+
 
 const getSingleTeamFromDB = async (id: string) => {
   const team = await Team.findById(id).populate({

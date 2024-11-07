@@ -25,6 +25,8 @@ const RewardSchema = new Schema<IReward>({
         type: String,
         required: true,
     },
+},{
+    timestamps:true
 });
 
 const Reward = model<IReward>("Reward", RewardSchema);
