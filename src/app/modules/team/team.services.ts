@@ -83,7 +83,6 @@ const deleteTeamFromDB = async (id: string) => {
     if (!team) {
       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
     }
-
     await Team.findByIdAndDelete(id).session(session);
     await Player.deleteMany({ team: id }).session(session);
 
