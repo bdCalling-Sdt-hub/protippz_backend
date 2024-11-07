@@ -12,6 +12,7 @@ import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
 import { superAdminRoutes } from '../modules/superAdmin/superAdmin.routes';
 import { leagueRoutes } from '../modules/league/league.routes';
 import { teamRoutes } from '../modules/team/team.routes';
+import { playerRoutes } from '../modules/player/player.routes';
 
 const router = Router();
 
@@ -35,6 +36,10 @@ const moduleRoutes = [
   {
     path: '/team',
     router: teamRoutes,
+  },
+  {
+    path: '/player',
+    router: playerRoutes,
   },
 
   {

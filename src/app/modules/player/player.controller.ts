@@ -4,6 +4,13 @@ import PlayerServices from "./player.services";
 import catchAsync from "../../utilities/catchasync";
 
 const createPlayer = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'player_image' in files) {
+    req.body.player_image = files['player_image'][0].path;
+  }
+  if (files && typeof files === 'object' && 'player_bg_image' in files) {
+    req.body.player_bg_image = files['player_bg_image'][0].path;
+  }
   const result = await PlayerServices.createPlayerIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -34,6 +41,13 @@ const getSinglePlayer = catchAsync(async (req, res) => {
 });
 
 const updatePlayer = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'player_image' in files) {
+    req.body.player_image = files['player_image'][0].path;
+  }
+  if (files && typeof files === 'object' && 'player_bg_image' in files) {
+    req.body.player_bg_image = files['player_bg_image'][0].path;
+  }
   const result = await PlayerServices.updatePlayerIntoDB(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
