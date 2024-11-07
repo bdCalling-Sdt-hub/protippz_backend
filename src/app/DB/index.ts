@@ -15,6 +15,7 @@ const seedSuperAdmin = async () => {
   const superAdminExits = await User.findOne({ role: USER_ROLE.superAdmin });
   if (superAdminExits) {
     console.log("Admin already exits")
+    return;
   }
   const session = await mongoose.startSession();
   session.startTransaction();

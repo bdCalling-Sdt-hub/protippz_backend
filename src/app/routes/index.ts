@@ -9,6 +9,7 @@ import { feedbackRoutes } from '../modules/feedback/feedback.routes';
 import { playerBookmarkRoutes } from '../modules/playerBookmark/player.bookmark.routes';
 import { teamBookmarkRoutes } from '../modules/teamBookmark/team.bookmark.routes';
 import { normalUserRoutes } from '../modules/normalUser/normalUser.routes';
+import { superAdminRoutes } from '../modules/superAdmin/superAdmin.routes';
 
 const router = Router();
 
@@ -49,6 +50,10 @@ const moduleRoutes = [
   {
     path: '/team-bookmark',
     router: teamBookmarkRoutes,
+  },
+  {
+    path: '/super-admin',
+    router: superAdminRoutes,
   },
 ];
 

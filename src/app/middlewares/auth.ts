@@ -11,6 +11,7 @@ import { USER_ROLE } from '../modules/user/user.constant';
 import NormalUser from '../modules/normalUser/normalUser.model';
 import Player from '../modules/player/player.model';
 import Team from '../modules/team/team.model';
+import SuperAdmin from '../modules/superAdmin/superAdmin.model';
 
 // make costume interface
 
@@ -66,6 +67,9 @@ const auth = (...requiredRoles: TUserRole[]) => {
       profileData = await Player.findOne({ user: id }).select('_id');
     } else if (role === USER_ROLE.team) {
       profileData = await Team.findOne({ user: id }).select('_id');
+    }
+    else if(role === USER_ROLE.superAdmin){
+      profileData = await SuperAdmin.findOne({user:id}).select("_id");
     }
 
     decoded.profileId = profileData?._id;
