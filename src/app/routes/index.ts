@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { userRoutes } from '../modules/user/user.routes';
 import { authRoutes } from '../modules/auth/auth.routes';
 
-import { categoryRoutes } from '../modules/rewardCategory/rewardCategory.routes';
 import { bannerRoutes } from '../modules/banner/banner.routes';
 import { ManageRoutes } from '../modules/manage-web/manage.routes';
 import { feedbackRoutes } from '../modules/feedback/feedback.routes';
@@ -13,6 +12,7 @@ import { superAdminRoutes } from '../modules/superAdmin/superAdmin.routes';
 import { leagueRoutes } from '../modules/league/league.routes';
 import { teamRoutes } from '../modules/team/team.routes';
 import { playerRoutes } from '../modules/player/player.routes';
+import { rewardCategoryRoutes } from '../modules/rewardCategory/rewardCategory.routes';
 
 const router = Router();
 
@@ -43,8 +43,8 @@ const moduleRoutes = [
   },
 
   {
-    path: '/category',
-    router: categoryRoutes,
+    path: '/reward-category',
+    router: rewardCategoryRoutes,
   },
   {
     path: '/banner',

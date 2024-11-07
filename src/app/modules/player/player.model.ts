@@ -10,6 +10,8 @@ const PlayerSchema = new Schema({
   totalTips: { type: Number, required: true, default: 0 },
   paidAmount: { type: Number, required: true, default: 0 },
   dueAmount: { type: Number, required: true, default: 0 },
+},{
+  timestamps:true
 });
 
 

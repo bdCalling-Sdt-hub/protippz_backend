@@ -4,6 +4,10 @@ import sendResponse from '../../utilities/sendResponse';
 import RewardCategoryService from './rewardCategory.services';
 
 const createCategory = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'category_image' in files) {
+    req.body.image = files['category_image'][0].path;
+  }
   const result = await RewardCategoryService.createRewardCategoryIntoDB(
     req.body,
   );
@@ -16,7 +20,18 @@ const createCategory = catchAsync(async (req, res) => {
 });
 
 const getAllCategories = catchAsync(async (req, res) => {
-  const result = await RewardCategoryService.getAllRewardCategories();
+  const result = await RewardCategoryService.getAllRewardCategories(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Category retrieved successfully',
+    data: result,
+  });
+});
+const getSingleCategory = catchAsync(async (req, res) => {
+  const result = await RewardCategoryService.getSingleRewardCategoryFromDB(
+    req.params.id,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -26,6 +41,10 @@ const getAllCategories = catchAsync(async (req, res) => {
 });
 
 const updateCategory = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'category_image' in files) {
+    req.body.image = files['category_image'][0].path;
+  }
   const result = await RewardCategoryService.updateRewardCategoryIntoDB(
     req.params.id,
     req.body,
@@ -55,6 +74,7 @@ const RewardCategoryController = {
   createCategory,
   updateCategory,
   deleteCategory,
+  getSingleCategory,
 
   getAllCategories,
 };

@@ -9,6 +9,8 @@ const TeamSchema = new Schema({
   totalTips: { type: Number, default: 0 },
   paidAmount: { type: Number,  default: 0 },
   dueAmount: { type: Number,  default: 0 },
+},{
+  timestamps:true
 });
 
 const Team = model('Team', TeamSchema);
