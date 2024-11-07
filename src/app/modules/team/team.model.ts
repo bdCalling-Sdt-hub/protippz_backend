@@ -1,14 +1,14 @@
 import { Schema, model, Types } from 'mongoose';
 
 const TeamSchema = new Schema({
+
   name: { type: String, required: true },
-  teamLogo: { type: String, default:"" },
+  team_logo: { type: String, default:"" },
   league: { type: Types.ObjectId, ref: 'League', required: true },
-  sport: { type: String, required: true },
-  bgImage: { type: String, default:"" },
-  totalTips: { type: Number, required: true, default: 0 },
-  paidAmount: { type: Number, required: true, default: 0 },
-  dueAmount: { type: Number, required: true, default: 0 },
+  team_bg_image: { type: String, default:"" },
+  totalTips: { type: Number, default: 0 },
+  paidAmount: { type: Number,  default: 0 },
+  dueAmount: { type: Number,  default: 0 },
 });
 
 const Team = model('Team', TeamSchema);

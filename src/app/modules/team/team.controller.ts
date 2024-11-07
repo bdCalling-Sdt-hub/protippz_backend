@@ -4,6 +4,13 @@ import TeamServices from "./team.services";
 import catchAsync from "../../utilities/catchasync";
 
 const createTeam = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'team_logo' in files) {
+    req.body.team_logo = files['team_logo'][0].path;
+  }
+  if (files && typeof files === 'object' && 'team_bg_image' in files) {
+    req.body.team_bg_image = files['team_bg_image'][0].path;
+  }
   const result = await TeamServices.createTeamIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -34,6 +41,13 @@ const getSingleTeam = catchAsync(async (req, res) => {
 });
 
 const updateTeam = catchAsync(async (req, res) => {
+  const { files } = req;
+  if (files && typeof files === 'object' && 'team_logo' in files) {
+    req.body.team_logo = files['team_logo'][0].path;
+  }
+  if (files && typeof files === 'object' && 'team_bg_image' in files) {
+    req.body.team_bg_image = files['team_bg_image'][0].path;
+  }
   const result = await TeamServices.updateTeamIntoDB(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,

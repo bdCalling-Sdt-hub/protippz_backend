@@ -1,17 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import httpStatus from "http-status";
-import QueryBuilder from "../../builder/QueryBuilder";
-import AppError from "../../error/appError";
-import { ITeam } from "./team.interface";
-import Team from "./team.model";
+import httpStatus from 'http-status';
+import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../error/appError';
+import { ITeam } from './team.interface';
+import Team from './team.model';
+import League from '../league/league.model';
+import Player from '../player/player.model';
+import mongoose from 'mongoose';
 
 const createTeamIntoDB = async (payload: ITeam) => {
+  if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You can not add due amount, total tips and paid amount',
+    );
+  }
+
+  const league = await League.findById(payload.league);
+  if (!league) {
+    throw new AppError(httpStatus.NOT_FOUND, "League doesn't exits");
+  }
   const result = await Team.create(payload);
   return result;
 };
 
 const getAllTeamsFromDB = async (query: Record<string, any>) => {
-  const teamQuery = new QueryBuilder(Team.find(), query)
+  const teamQuery = new QueryBuilder(
+    Team.find().populate({ path: 'league', select: 'name sport' }),
+    query,
+  )
     .search(['name'])
     .filter()
     .sort()
@@ -23,12 +40,15 @@ const getAllTeamsFromDB = async (query: Record<string, any>) => {
 
   return {
     meta,
-    result
+    result,
   };
 };
 
 const getSingleTeamFromDB = async (id: string) => {
-  const team = await Team.findById(id);
+  const team = await Team.findById(id).populate({
+    path: 'league',
+    select: 'name sport',
+  });
   if (!team) {
     throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
   }
@@ -40,17 +60,41 @@ const updateTeamIntoDB = async (id: string, payload: Partial<ITeam>) => {
   if (!team) {
     throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
   }
-  const result = await Team.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+
+  if (payload.league) {
+    const league = await League.findById(payload.league);
+    if (!league) {
+      throw new AppError(httpStatus.NOT_FOUND, 'League not found');
+    }
+  }
+  const result = await Team.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
   return result;
 };
 
 const deleteTeamFromDB = async (id: string) => {
-  const team = await Team.findById(id);
-  if (!team) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const team = await Team.findById(id).session(session);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+
+    await Team.findByIdAndDelete(id).session(session);
+    await Player.deleteMany({ team: id }).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+    return team;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-  const result = await Team.findByIdAndDelete(id);
-  return result;
 };
 
 const TeamServices = {
@@ -58,7 +102,7 @@ const TeamServices = {
   getAllTeamsFromDB,
   getSingleTeamFromDB,
   updateTeamIntoDB,
-  deleteTeamFromDB
+  deleteTeamFromDB,
 };
 
 export default TeamServices;

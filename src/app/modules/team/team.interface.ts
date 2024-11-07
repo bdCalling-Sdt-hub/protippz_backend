@@ -2,10 +2,9 @@ import { Types } from "mongoose";
 
 export interface ITeam {
     name:string;
-    teamLogo:string;
+    team_logo:string;
     league:Types.ObjectId;
-    sport:string;
-    bgImage:string;
+    team_bg_image:string;
     totalTips:number;
     paidAmount:number;
     dueAmount:number;

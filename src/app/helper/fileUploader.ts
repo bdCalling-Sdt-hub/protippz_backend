@@ -14,10 +14,10 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/category';
       } else if (file.fieldname === 'league_image') {
         uploadPath = 'uploads/images/league_image';
-      } else if (file.fieldname === 'shop_banner') {
-        uploadPath = 'uploads/images/shop_banner';
-      } else if (file.fieldname === 'app_banner') {
-        uploadPath = 'uploads/images/app_banner';
+      } else if (file.fieldname === 'team_logo') {
+        uploadPath = 'uploads/images/team_logo';
+      } else if (file.fieldname === 'team_bg_image') {
+        uploadPath = 'uploads/images/team_bg_image';
       } else {
         uploadPath = 'uploads';
       }
@@ -50,8 +50,8 @@ export const uploadFile = () => {
       'profile_image',
       'league_image',
       'category_image',
-      'shop_banner',
-      'app_banner',
+      'team_logo',
+      'team_bg_image',
       'video',
     ];
 
@@ -83,8 +83,8 @@ export const uploadFile = () => {
     { name: 'category_image', maxCount: 1 },
     { name: 'sub_category_image', maxCount: 1 },
     { name: 'league_image', maxCount: 5 },
-    { name: 'shop_banner', maxCount: 1 },
-    { name: 'app_banner', maxCount: 1 },
+    { name: 'team_logo', maxCount: 1 },
+    { name: 'team_bg_image', maxCount: 1 },
     { name: 'video', maxCount: 1 },
   ]);
 
