@@ -36,14 +36,18 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Token is expired');
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, role, phoneNumber, iat } = decoded;
+    const { id, role, email,username, iat } = decoded;
 
     if (!decoded) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Token is expired');
     }
     // get the user if that here ---------
-
-    const user = await User.isUserExists(phoneNumber);
+    const user = await User.findOne({
+      $or: [
+        { email:email },
+        { username: username },
+      ],
+    });
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
     }

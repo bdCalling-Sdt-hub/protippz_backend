@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { UserStatus } from './user.constant';
+import { ENUM_USER_STATUS } from '../../utilities/enum';
 
 // Zod schema for user creation
 export const registerUserValidationSchema = z.object({
@@ -70,6 +71,12 @@ const resendVerifyCodeSchema = z.object({
   }),
 });
 
+const changeUserStatus = z.object({
+  body: z.object({
+    status: z.enum(Object.values(ENUM_USER_STATUS) as [string, ...string[]]),
+  }),
+});
+
 const userValidations = {
   registerUserValidationSchema,
   loginValidationSchema,
@@ -79,6 +86,7 @@ const userValidations = {
   resetPasswordValidationSchema,
   verifyCodeValidationSchema,
   resendVerifyCodeSchema,
+  changeUserStatus
 };
 
 export default userValidations;

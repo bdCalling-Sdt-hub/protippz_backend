@@ -8,7 +8,11 @@ import { USER_ROLE } from './user.constant';
 
 const router = Router();
 
-router.post("/register-user",validateRequest(normalUserValidations.createNormalUserSchema),userControllers.registerUser);
+router.post(
+  '/register-user',
+  validateRequest(normalUserValidations.createNormalUserSchema),
+  userControllers.registerUser,
+);
 
 router.post(
   '/verify-code',
@@ -24,13 +28,15 @@ router.post(
 
 router.get(
   '/get-my-profile',
-  auth(
-    USER_ROLE.user,
-    USER_ROLE.player,
-    USER_ROLE.team,
-    USER_ROLE.superAdmin,
-  ),
+  auth(USER_ROLE.user, USER_ROLE.player, USER_ROLE.team, USER_ROLE.superAdmin),
   userControllers.getMyProfile,
+);
+
+router.patch(
+  '/change-status/:id',
+  auth(USER_ROLE.superAdmin),
+  validateRequest(userValidations.changeUserStatus),
+  userControllers.changeUserStatus,
 );
 
 export const userRoutes = router;

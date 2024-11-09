@@ -4,7 +4,11 @@ import sendResponse from '../../utilities/sendResponse';
 import userServices from './user.services';
 
 const registerUser = catchAsync(async (req, res) => {
-  const result = await userServices.registerUser(req.body.password,req.body.confirmPassword,req.body.userData);
+  const result = await userServices.registerUser(
+    req.body.password,
+    req.body.confirmPassword,
+    req.body.userData,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -44,11 +48,25 @@ const getMyProfile = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const changeUserStatus = catchAsync(async (req, res) => {
+  const result = await userServices.changeUserStatus(
+    req.params.id,
+    req.body.status,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User is ${result?.status}`,
+    data: result,
+  });
+});
 
 const userController = {
   registerUser,
   verifyCode,
   resendVerifyCode,
-  getMyProfile
+  getMyProfile,
+  changeUserStatus,
 };
 export default userController;

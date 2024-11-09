@@ -137,13 +137,11 @@ const getMyProfile = async (userData: JwtPayload) => {
   let result = null;
   if (userData.role === USER_ROLE.user) {
     result = await NormalUser.findOne({ email: userData.email });
-  }
-  else if (userData.role === USER_ROLE.player) {
+  } else if (userData.role === USER_ROLE.player) {
     result = await Player.findOne({
       $or: [{ email: userData?.email }, { username: userData?.username }],
     });
-  }
-  else if (userData.role === USER_ROLE.team) {
+  } else if (userData.role === USER_ROLE.team) {
     result = await Team.findOne({
       $or: [{ email: userData?.email }, { username: userData?.username }],
     });
@@ -168,11 +166,25 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
+const changeUserStatus = async (id: string, status: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const result = await User.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
 const userServices = {
   registerUser,
   verifyCode,
   resendVerifyCode,
   getMyProfile,
+  changeUserStatus
 };
 
 export default userServices;

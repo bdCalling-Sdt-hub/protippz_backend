@@ -13,3 +13,9 @@ export const ENUM_TIP_BY = {
   CREDIT_CARD: 'Credit card',
   PAYPAL: 'Paypal',
 };
+
+
+export const ENUM_USER_STATUS = {
+  IN_PROGRESS:"in-progress",
+  BLOCKED:"blocked"
+}
