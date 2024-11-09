@@ -15,10 +15,16 @@ router.post(
 );
 
 router.patch(
-  '/make-tip-payment-success',
+  '/execute-stipe-payment',
   auth(USER_ROLE.user),
   validateRequest(tipValidations.makeTipPaymentSuccessValidationSchema),
-  TipController.makePaymentSuccessForTip,
+  TipController.paymentSuccessWithStripe,
+);
+router.patch(
+  '/execute-paypal-payment',
+  auth(USER_ROLE.user),
+  validateRequest(tipValidations.executePaypalPaymentValidationSchema),
+  TipController.executePaypalPayment,
 );
 
 router.get(

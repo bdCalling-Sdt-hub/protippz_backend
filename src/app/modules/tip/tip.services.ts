@@ -15,6 +15,8 @@ import paypal from 'paypal-rest-sdk';
 import Team from '../team/team.model';
 import Player from '../player/player.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import cron from 'node-cron';
+
 interface PayPalLink {
   href: string;
   rel: string;
@@ -124,7 +126,7 @@ const tipByCreditCard = async (userId: string, payload: ITip) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  if (user?.totalAmount > payload.amount) {
+  if (user?.totalAmount < payload.amount) {
     throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
   }
 
@@ -166,12 +168,13 @@ const tipByPaypal = async (userId: string, payload: ITip) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  if (user?.totalAmount > payload.amount) {
+  if (user?.totalAmount < payload.amount) {
     throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
   }
 
   const totalPoint = Math.ceil(payload.amount * 10);
   payload.point = totalPoint;
+  payload.paymentStatus = ENUM_PAYMENT_STATUS.PENDING;
   const create_payment_json = {
     intent: 'authorize', // Authorization rather than a sale
     payer: { payment_method: 'paypal' },
@@ -227,7 +230,7 @@ const tipByPaypal = async (userId: string, payload: ITip) => {
 
 // make payment success for tip
 
-const makePaymentSuccessForTip = async (transactionId: string) => {
+const paymentSuccessWithStripe = async (transactionId: string) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -281,10 +284,87 @@ const makePaymentSuccessForTip = async (transactionId: string) => {
   }
 };
 
+// execute payment with paypal
+
+const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
+  const execute_payment_json = { payer_id: payerId };
+  const executePaypalPayment = (paymentId: string, execute_payment_json: any) =>
+    new Promise((resolve, reject) => {
+      paypal.payment.execute(
+        paymentId,
+        execute_payment_json,
+        (error, payment) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(payment);
+          }
+        },
+      );
+    });
+
+  // Await the PayPal payment execution
+  const payment = await executePaypalPayment(paymentId, execute_payment_json);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const tip = await Tip.findOne({ transactionId: payment.id }).session(
+      session,
+    );
+    if (!tip) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Tip not found');
+    }
+
+    const updatedTip = await Tip.findOneAndUpdate(
+      { transactionId: payment.id },
+      { paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS },
+      { new: true, runValidators: true, session },
+    );
+
+    await NormalUser.findByIdAndUpdate(
+      tip.user,
+      { $inc: { totalPoint: tip.point } },
+      { new: true, runValidators: true, session },
+    );
+
+    // Determine whether to update a Team or Player
+    if (updatedTip?.entityType === 'Team') {
+      await Team.findByIdAndUpdate(
+        updatedTip?.entityId,
+        {
+          $inc: { totalTips: updatedTip.amount, dueAmount: updatedTip.amount },
+        },
+        { session },
+      );
+    } else if (updatedTip?.entityType === 'Player') {
+      await Player.findByIdAndUpdate(
+        updatedTip.entityId,
+        {
+          $inc: { totalTips: updatedTip.amount, dueAmount: updatedTip.amount },
+        },
+        { session },
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return updatedTip;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 // Get all tips
 
 const getAllTipsFromDB = async (query: Record<string, any>) => {
-  const tipQuery = new QueryBuilder(Tip.find(), query)
+  const tipQuery = new QueryBuilder(
+    Tip.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
+    query,
+  )
     .search(['name'])
     .filter()
     .sort()
@@ -332,10 +412,95 @@ const getAllTipsFromDB = async (query: Record<string, any>) => {
             if: { $eq: ['$entityType', 'Team'] },
             then: {
               name: { $arrayElemAt: ['$teamEntity.name', 0] },
+              team_logo: { $arrayElemAt: ['$teamEntity.team_logo', 0] },
             },
             else: {
               name: { $arrayElemAt: ['$playerEntity.name', 0] },
               position: { $arrayElemAt: ['$playerEntity.position', 0] },
+              player_image: { $arrayElemAt: ['$playerEntity.player_image', 0] },
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        teamEntity: 0,
+        playerEntity: 0,
+      },
+    },
+  ];
+
+  // Execute the aggregation pipeline
+  const result = await Tip.aggregate(pipeline);
+
+  const meta = await tipQuery.countTotal(); // Count total documents for pagination
+  return {
+    meta,
+    result,
+  };
+};
+const getUserTipsFromDB = async (
+  userId: string,
+  query: Record<string, any>,
+) => {
+  const tipQuery = new QueryBuilder(
+    Tip.find({ user: userId, paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
+    query,
+  )
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const pipeline = [
+    {
+      $match: tipQuery.modelQuery.getFilter(),
+    },
+    {
+      $lookup: {
+        from: 'normalusers',
+        let: { userId: '$user' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+          { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
+        ],
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user',
+    },
+    {
+      $lookup: {
+        from: 'teams',
+        localField: 'entityId',
+        foreignField: '_id',
+        as: 'teamEntity',
+      },
+    },
+    {
+      $lookup: {
+        from: 'players',
+        localField: 'entityId',
+        foreignField: '_id',
+        as: 'playerEntity',
+      },
+    },
+    {
+      $addFields: {
+        entity: {
+          $cond: {
+            if: { $eq: ['$entityType', 'Team'] },
+            then: {
+              name: { $arrayElemAt: ['$teamEntity.name', 0] },
+              team_logo: { $arrayElemAt: ['$teamEntity.team_logo', 0] },
+            },
+            else: {
+              name: { $arrayElemAt: ['$playerEntity.name', 0] },
+              position: { $arrayElemAt: ['$playerEntity.position', 0] },
+              player_image: { $arrayElemAt: ['$playerEntity.player_image', 0] },
             },
           },
         },
@@ -359,14 +524,6 @@ const getAllTipsFromDB = async (query: Record<string, any>) => {
   };
 };
 
-
-
-// Get all tips for a specific user
-const getUserTipsFromDB = async (userId: string) => {
-  const result = await Tip.find({ user: userId });
-  return result;
-};
-
 // Get a single tip by ID
 const getSingleTipFromDB = async (tipId: string) => {
   const tip = await Tip.findById(tipId);
@@ -378,12 +535,29 @@ const getSingleTipFromDB = async (tipId: string) => {
   return tip;
 };
 
+// crone jobs
+cron.schedule('*/30 * * * *', async () => {
+  try {
+    const twentyMinutesAgo = new Date(Date.now() - 20 * 60 * 1000);
+    const result = await Tip.deleteMany({
+      paymentStatus: ENUM_PAYMENT_STATUS.PENDING,
+      createdAt: { $lt: twentyMinutesAgo },
+    });
+    console.log(
+      `Deleted ${result.deletedCount} pending tips older than 20 minutes`,
+    );
+  } catch (error) {
+    console.error('Error deleting old pending tips:', error);
+  }
+});
+
 const TipServices = {
   createTipIntoDB,
   getAllTipsFromDB,
   getUserTipsFromDB,
   getSingleTipFromDB,
-  makePaymentSuccessForTip,
+  paymentSuccessWithStripe,
+  executePaymentWithPaypal,
 };
 
 export default TipServices;

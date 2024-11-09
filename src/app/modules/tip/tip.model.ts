@@ -10,7 +10,7 @@ const tipSchema = new Schema<ITip>({
     amount: { type: Number, required: true },
     paymentStatus: { type: String, enum: Object.values(ENUM_PAYMENT_STATUS), required: true },
     tipBy: { type: String, enum: Object.values(ENUM_TIP_BY), required: true },
-    transactionId:{Type:String}
+    transactionId:{type:String}
   },{
     timestamps:true
   });

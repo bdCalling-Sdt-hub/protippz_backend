@@ -16,10 +16,17 @@ const makeTipPaymentSuccessValidationSchema = z.object({
     transactionId: z.string({ required_error: 'Transaction id is required' }),
   }),
 });
+const executePaypalPaymentValidationSchema = z.object({
+  body: z.object({
+    paymentId: z.string({ required_error: 'Payment id is required' }),
+    payerId: z.string({ required_error: 'Payer id is required' }),
+  }),
+});
 
 const tipValidations = {
   createTipValidationSchema,
   makeTipPaymentSuccessValidationSchema,
+  executePaypalPaymentValidationSchema
 };
 
 export default tipValidations;

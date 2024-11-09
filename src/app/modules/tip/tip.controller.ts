@@ -17,9 +17,22 @@ const createTip = catchAsync(async (req, res) => {
 });
 
 // make payment success for tip
-const makePaymentSuccessForTip = catchAsync(async (req, res) => {
-  const result = await TipServices.makePaymentSuccessForTip(
+const paymentSuccessWithStripe = catchAsync(async (req, res) => {
+  const result = await TipServices.paymentSuccessWithStripe(
     req.body.transactionId,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Tip updated successfully',
+    data: result,
+  });
+});
+const executePaypalPayment = catchAsync(async (req, res) => {
+  const result = await TipServices.executePaymentWithPaypal(
+    req.body.paymentId,
+    req.body.payerId,
   );
 
   sendResponse(res, {
@@ -44,7 +57,7 @@ const getAllTips = catchAsync(async (req, res) => {
 
 // Get all tips for the current user
 const getUserTips = catchAsync(async (req, res) => {
-  const result = await TipServices.getUserTipsFromDB(req?.user?.profileId);
+  const result = await TipServices.getUserTipsFromDB(req?.user?.profileId,req.query);
 
   sendResponse(res, {
     statusCode: 200,
@@ -71,7 +84,8 @@ const TipController = {
   getAllTips,
   getUserTips,
   getSingleTip,
-  makePaymentSuccessForTip,
+  paymentSuccessWithStripe,
+  executePaypalPayment
 };
 
 export default TipController;
