@@ -1,0 +1,27 @@
+import { Schema, model } from 'mongoose';
+import { IRedeemRequest } from './redeemRequest.interface';
+
+const redeemRequestSchema = new Schema<IRedeemRequest>(
+  {
+    reward: { type: Schema.Types.ObjectId, ref: 'Reward', required: true },
+    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    email: { type: String },
+    userName: { type: String },
+    phone: { type: String },
+    streetAddress: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: String },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+const RedeemRequest = model<IRedeemRequest>(
+  'RedeemRequest',
+  redeemRequestSchema,
+);
+
+export default RedeemRequest;
