@@ -6,6 +6,7 @@ import { IPlayer } from './player.interface';
 import Player from './player.model';
 import Team from '../team/team.model';
 import League from '../league/league.model';
+import PlayerBookmark from '../playerBookmark/player.bookmark.model';
 
 const createPlayerIntoDB = async (payload: IPlayer) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
@@ -31,14 +32,18 @@ const createPlayerIntoDB = async (payload: IPlayer) => {
   return result;
 };
 
-const getAllPlayersFromDB = async (query: Record<string, any>) => {
+const getAllPlayersFromDB = async (
+  userId: string,
+  query: Record<string, any>
+) => {
   const playerQuery = new QueryBuilder(
     Player.find()
-      .populate({ path: 'league', select: 'name sport' })
-      .populate({ path: 'team', select: 'name' }),
-    query,
+      .populate({ path: "league", select: "name sport" })
+      .populate({ path: "team", select: "name" })
+      .lean(), // Ensures the result is plain JavaScript objects
+    query
   )
-    .search(['name'])
+    .search(["name"])
     .filter()
     .sort()
     .paginate()
@@ -47,11 +52,20 @@ const getAllPlayersFromDB = async (query: Record<string, any>) => {
   const meta = await playerQuery.countTotal();
   const result = await playerQuery.modelQuery;
 
+  const bookmarks = await PlayerBookmark.find({ user: userId }).select("player");
+  const bookmarkPlayerIds = new Set(bookmarks.map((b) => b?.player?.toString()));
+
+  const enrichedResult = result.map((player) => ({
+    ...player,
+    isBookmark: bookmarkPlayerIds.has((player as any)._id.toString()),
+  }));
+
   return {
     meta,
-    result,
+    result: enrichedResult,
   };
 };
+
 
 const getSinglePlayerFromDB = async (id: string) => {
   const player = await Player.findById(id);

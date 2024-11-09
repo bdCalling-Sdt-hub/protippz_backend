@@ -21,7 +21,7 @@ const createTeam = catchAsync(async (req, res) => {
 });
 
 const getAllTeams = catchAsync(async (req, res) => {
-  const result = await TeamServices.getAllTeamsFromDB(req.query);
+  const result = await TeamServices.getAllTeamsFromDB(req?.user?.profileId,req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

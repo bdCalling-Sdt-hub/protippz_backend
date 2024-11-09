@@ -5,6 +5,7 @@ import PlayerController from './player.controller';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 import { uploadFile } from '../../helper/fileUploader';
+import simpleAuth from '../../middlewares/simpleAuth';
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.post(
   validateRequest(playerValidations.createPlayerValidationSchema),
   PlayerController.createPlayer,
 );
-router.get('/get-all', PlayerController.getAllPlayers);
+router.get('/get-all',simpleAuth, PlayerController.getAllPlayers);
 router.get('/get-single/:id', PlayerController.getSinglePlayer);
 router.patch(
   '/update/:id',

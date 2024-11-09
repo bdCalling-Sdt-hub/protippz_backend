@@ -5,6 +5,7 @@ import TeamController from './team.controller';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 import { uploadFile } from '../../helper/fileUploader';
+import simpleAuth from '../../middlewares/simpleAuth';
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.post(
   validateRequest(teamValidations.createTeamSchema),
   TeamController.createTeam,
 );
-router.get('/get-all', TeamController.getAllTeams);
+router.get('/get-all',simpleAuth, TeamController.getAllTeams);
 router.get('/get-single/:id', TeamController.getSingleTeam);
 router.patch(
   '/update/:id',

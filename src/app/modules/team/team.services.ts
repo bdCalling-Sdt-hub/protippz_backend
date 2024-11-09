@@ -7,6 +7,7 @@ import Team from './team.model';
 import League from '../league/league.model';
 import Player from '../player/player.model';
 import mongoose from 'mongoose';
+import TeamBookmark from '../teamBookmark/team.bookmark.model';
 
 const createTeamIntoDB = async (payload: ITeam) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
@@ -24,63 +25,36 @@ const createTeamIntoDB = async (payload: ITeam) => {
   return result;
 };
 
-// const getAllTeamsFromDB = async (query: Record<string, any>) => {
-//   const teamQuery = new QueryBuilder(
-//     Team.find().populate({ path: 'league', select: 'name sport' }),
-//     query,
-//   )
-//     .search(['name'])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const meta = await teamQuery.countTotal();
-//   const result = await teamQuery.modelQuery;
-
-//   return {
-//     meta,
-//     result,
-//   };
-// };
-
-const getAllTeamsFromDB = async (query: Record<string, any>) => {
-
-  const sortField = query.sort as string;
-  const isLeagueSort = sortField === 'league.sport' || sortField === '-league.sport';
-
+const getAllTeamsFromDB = async (userId:string,query: Record<string, any>) => {
   const teamQuery = new QueryBuilder(
-    isLeagueSort
-      ? Team.find()
-      : Team.find().populate({ path: 'league', select: 'name sport' }),
-    query
+    Team.find().populate({ path: 'league', select: 'name sport' }).lean(),
+    query,
   )
     .search(['name'])
     .filter()
+    .sort()
     .paginate()
     .fields();
 
-  if (isLeagueSort) {
-    // Apply sorting on the populated field if `league.sport` sorting is requested
-    const order = sortField.startsWith('-') ? -1 : 1;
-    teamQuery.modelQuery = teamQuery.modelQuery.populate({
-      path: 'league',
-      select: 'name sport',
-      options: { sort: { sport: order } },
-    });
-  } else {
-    teamQuery.sort(); // Apply normal sorting otherwise
-  }
-
   const meta = await teamQuery.countTotal();
   const result = await teamQuery.modelQuery;
+  const bookmarks = await TeamBookmark.find({ user: userId }).select(
+    'team',
+  );
+  const bookmarkTeamIds = new Set(
+    bookmarks.map((b) => b?.team?.toString()),
+  );
+
+  const enrichedResult = result.map((team) => ({
+    ...team,
+    isBookmark: bookmarkTeamIds.has((team as any)._id.toString()),
+  }));
 
   return {
     meta,
-    result,
+    result: enrichedResult,
   };
 };
-
 
 const getSingleTeamFromDB = async (id: string) => {
   const team = await Team.findById(id).populate({
