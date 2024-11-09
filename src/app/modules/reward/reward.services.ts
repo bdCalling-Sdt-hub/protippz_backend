@@ -17,7 +17,7 @@ const createRewardIntoDB = async (payload: IReward) => {
 };
 
 const getAllRewardsFromDB = async (query: Record<string, any>) => {
-  const rewardQuery = new QueryBuilder(Reward.find().populate({path:"category",select:"name"}), query)
+  const rewardQuery = new QueryBuilder(Reward.find().populate({path:"category",select:"name deliveryOption"}), query)
     .search(['name'])
     .filter()
     .sort()

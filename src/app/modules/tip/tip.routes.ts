@@ -8,7 +8,7 @@ import tipValidations from './tip.validation';
 const router = express.Router();
 
 router.post(
-  '/create-tip',
+  '/create',
   auth(USER_ROLE.user),
   validateRequest(tipValidations.createTipValidationSchema),
   TipController.createTip,
@@ -22,7 +22,7 @@ router.patch(
 );
 
 router.get(
-  '/all-tips',
+  '/get-all',
   auth(USER_ROLE.superAdmin), // Assuming only admins can view all tips
   TipController.getAllTips,
 );

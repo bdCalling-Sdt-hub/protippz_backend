@@ -14,6 +14,7 @@ import { teamRoutes } from '../modules/team/team.routes';
 import { playerRoutes } from '../modules/player/player.routes';
 import { rewardCategoryRoutes } from '../modules/rewardCategory/rewardCategory.routes';
 import { rewardRoutes } from '../modules/reward/reward.routes';
+import { tipRoutes } from '../modules/tip/tip.routes';
 
 const router = Router();
 
@@ -74,6 +75,10 @@ const moduleRoutes = [
   {
     path: '/super-admin',
     router: superAdminRoutes,
+  },
+  {
+    path: '/tip',
+    router: tipRoutes,
   },
 ];
 

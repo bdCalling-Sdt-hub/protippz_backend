@@ -5,7 +5,7 @@ import TipServices from './tip.services';
 const createTip = catchAsync(async (req, res) => {
   const result = await TipServices.createTipIntoDB(
     req?.user?.profileId,
-    req.body
+    req.body,
   );
 
   sendResponse(res, {
@@ -18,7 +18,9 @@ const createTip = catchAsync(async (req, res) => {
 
 // make payment success for tip
 const makePaymentSuccessForTip = catchAsync(async (req, res) => {
-  const result = await TipServices.makePaymentSuccessForTip(req.body.transactionId);
+  const result = await TipServices.makePaymentSuccessForTip(
+    req.body.transactionId,
+  );
 
   sendResponse(res, {
     statusCode: 200,
@@ -28,10 +30,9 @@ const makePaymentSuccessForTip = catchAsync(async (req, res) => {
   });
 });
 
-
 // Get all tips
 const getAllTips = catchAsync(async (req, res) => {
-  const result = await TipServices.getAllTipsFromDB();
+  const result = await TipServices.getAllTipsFromDB(req.query);
 
   sendResponse(res, {
     statusCode: 200,
@@ -64,7 +65,6 @@ const getSingleTip = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 const TipController = {
   createTip,

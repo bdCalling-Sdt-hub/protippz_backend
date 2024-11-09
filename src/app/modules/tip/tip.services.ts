@@ -14,6 +14,7 @@ const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 import paypal from 'paypal-rest-sdk';
 import Team from '../team/team.model';
 import Player from '../player/player.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 interface PayPalLink {
   href: string;
   rel: string;
@@ -32,6 +33,7 @@ paypal.configure({
 });
 
 const createTipIntoDB = async (userId: string, payload: ITip) => {
+  console.log('tip by ', payload.tipBy);
   let result;
   if (payload.tipBy === ENUM_TIP_BY.PROFILE_BALANCE) {
     result = await tipByProfileBalance(userId, payload);
@@ -49,6 +51,17 @@ const createTipIntoDB = async (userId: string, payload: ITip) => {
 // tip by account balance---------------------------------
 
 const tipByProfileBalance = async (userId: string, payload: ITip) => {
+  if (payload.entityType === 'Team') {
+    const team = await Team.findById(payload.entityId);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+  } else if (payload.entityType === 'Player') {
+    const player = await Player.findById(payload.entityId);
+    if (!player) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+    }
+  }
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -95,6 +108,26 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
 };
 
 const tipByCreditCard = async (userId: string, payload: ITip) => {
+  if (payload.entityType === 'Team') {
+    const team = await Team.findById(payload.entityId);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+  } else if (payload.entityType === 'Player') {
+    const player = await Player.findById(payload.entityId);
+    if (!player) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+    }
+  }
+
+  const user = await NormalUser.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (user?.totalAmount > payload.amount) {
+    throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
+  }
+
   const totalPoint = Math.ceil(payload.amount * 10);
   payload.point = totalPoint;
   payload.paymentStatus = ENUM_PAYMENT_STATUS.PENDING;
@@ -117,6 +150,28 @@ const tipByCreditCard = async (userId: string, payload: ITip) => {
 // tip by paypal
 
 const tipByPaypal = async (userId: string, payload: ITip) => {
+  if (payload.entityType === 'Team') {
+    const team = await Team.findById(payload.entityId);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+  } else if (payload.entityType === 'Player') {
+    const player = await Player.findById(payload.entityId);
+    if (!player) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+    }
+  }
+
+  const user = await NormalUser.findById(userId);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (user?.totalAmount > payload.amount) {
+    throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
+  }
+
+  const totalPoint = Math.ceil(payload.amount * 10);
+  payload.point = totalPoint;
   const create_payment_json = {
     intent: 'authorize', // Authorization rather than a sale
     payer: { payment_method: 'paypal' },
@@ -227,10 +282,84 @@ const makePaymentSuccessForTip = async (transactionId: string) => {
 };
 
 // Get all tips
-const getAllTipsFromDB = async () => {
-  const result = await Tip.find();
-  return result;
+
+const getAllTipsFromDB = async (query: Record<string, any>) => {
+  const tipQuery = new QueryBuilder(Tip.find(), query)
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const pipeline = [
+    {
+      $match: tipQuery.modelQuery.getFilter(),
+    },
+    {
+      $lookup: {
+        from: 'normalusers',
+        let: { userId: '$user' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+          { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
+        ],
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user',
+    },
+    {
+      $lookup: {
+        from: 'teams',
+        localField: 'entityId',
+        foreignField: '_id',
+        as: 'teamEntity',
+      },
+    },
+    {
+      $lookup: {
+        from: 'players',
+        localField: 'entityId',
+        foreignField: '_id',
+        as: 'playerEntity',
+      },
+    },
+    {
+      $addFields: {
+        entity: {
+          $cond: {
+            if: { $eq: ['$entityType', 'Team'] },
+            then: {
+              name: { $arrayElemAt: ['$teamEntity.name', 0] },
+            },
+            else: {
+              name: { $arrayElemAt: ['$playerEntity.name', 0] },
+              position: { $arrayElemAt: ['$playerEntity.position', 0] },
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        teamEntity: 0,
+        playerEntity: 0,
+      },
+    },
+  ];
+
+  // Execute the aggregation pipeline
+  const result = await Tip.aggregate(pipeline);
+
+  const meta = await tipQuery.countTotal(); // Count total documents for pagination
+  return {
+    meta,
+    result,
+  };
 };
+
+
 
 // Get all tips for a specific user
 const getUserTipsFromDB = async (userId: string) => {

@@ -6,7 +6,7 @@ const tipSchema = new Schema<ITip>({
     user: { type: Schema.Types.ObjectId, ref: "NormalUser", required: true },
     entityId: { type: Schema.Types.ObjectId, required: true },
     entityType: { type: String, enum: ["Team", "Player"], required: true },
-    point:{Type:Number,required:true},
+    point:{type:Number,required:true},
     amount: { type: Number, required: true },
     paymentStatus: { type: String, enum: Object.values(ENUM_PAYMENT_STATUS), required: true },
     tipBy: { type: String, enum: Object.values(ENUM_TIP_BY), required: true },
