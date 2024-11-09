@@ -19,6 +19,6 @@ const teamBookmarkSchema = new Schema<ITeamBookmark>(
   },
 );
 
-const TeamBookmark = model('ShopBookmark', teamBookmarkSchema);
+const TeamBookmark = model('TeamBookmark', teamBookmarkSchema);
 
 export default TeamBookmark;

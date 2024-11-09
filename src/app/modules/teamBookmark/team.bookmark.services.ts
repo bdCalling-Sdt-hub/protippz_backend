@@ -1,8 +1,13 @@
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import TeamBookmark from './team.bookmark.model';
+import Team from '../team/team.model';
 
 const createBookmarkIntoDB = async (teamId: string, normalUserId: string) => {
+  const team = await Team.findById(teamId);
+  if (!team) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Team not found');
+  }
   const isExists = await TeamBookmark.findOne({
     team: teamId,
     user: normalUserId,
@@ -22,7 +27,9 @@ const createBookmarkIntoDB = async (teamId: string, normalUserId: string) => {
 
 // get bookmark from db
 const getMyBookmarkFromDB = async (normalUserId: string) => {
-  const result = await TeamBookmark.find({ user: normalUserId });
+  const result = await TeamBookmark.find({ user: normalUserId }).populate({path:"team",select:"name team_logo team_bg_image",populate: [
+    { path: "league",select:"name" },
+  ]});
   return result;
 };
 

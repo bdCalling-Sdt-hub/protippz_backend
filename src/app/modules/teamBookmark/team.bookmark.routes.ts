@@ -5,18 +5,14 @@ import TeamBookmarkController from './team.bookmark.controller';
 
 const router = express.Router();
 
-router.post(
-  '/create-shop-bookmark',
-auth(USER_ROLE.user)
-
-);
+router.post('/create', auth(USER_ROLE.user),TeamBookmarkController.createBookmark);
 router.get(
-  '/my-bookmark-teams',
+  '/my-bookmark',
   auth(USER_ROLE.user),
   TeamBookmarkController.getMyBookmark,
 );
 router.delete(
-  '/delete-bookmark-team/:id',
+  '/delete/:id',
   auth(USER_ROLE.user),
   TeamBookmarkController.deleteBookmark,
 );
