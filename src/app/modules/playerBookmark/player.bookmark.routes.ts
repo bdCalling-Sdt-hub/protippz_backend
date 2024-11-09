@@ -6,19 +6,19 @@ import PlayerBookmarkController from './player.bookmark.controller';
 const router = express.Router();
 
 router.post(
-  '/create-player-bookmark',
+  '/create',
   auth(USER_ROLE.user),
   PlayerBookmarkController.createPlayerBookmark,
 );
 
 router.get(
-  '/my-bookmark-players',
+  '/my-bookmark',
   auth(USER_ROLE.user),
   PlayerBookmarkController.getMyPlayerBookmark,
 );
 
 router.delete(
-  '/delete-player-bookmark/:id',
+  '/delete/:id',
   auth(USER_ROLE.user),
   PlayerBookmarkController.deletePlayerBookmark,
 );
