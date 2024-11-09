@@ -15,6 +15,7 @@ import { playerRoutes } from '../modules/player/player.routes';
 import { rewardCategoryRoutes } from '../modules/rewardCategory/rewardCategory.routes';
 import { rewardRoutes } from '../modules/reward/reward.routes';
 import { tipRoutes } from '../modules/tip/tip.routes';
+import { redeemRequestRoutes } from '../modules/redeemRequest/redeemRequest.routes';
 
 const router = Router();
 
@@ -82,7 +83,7 @@ const moduleRoutes = [
   },
   {
     path: '/redeem-request',
-    router: tipRoutes,
+    router: redeemRequestRoutes,
   },
 ];
 

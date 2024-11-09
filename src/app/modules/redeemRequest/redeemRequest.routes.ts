@@ -8,13 +8,13 @@ import RedeemRequestController from './redeemRequest.controller';
 const router = express.Router();
 
 router.post(
-  '/create-redeem-request',
+  '/create',
   auth(USER_ROLE.user),
   validateRequest(redeemValidations.redeemRequestSchema),
   RedeemRequestController.createRedeemRequest,
 );
 router.post(
-  '/verify-redeem-email',
+  '/verify-redeem-email/:id',
   auth(USER_ROLE.user),
   RedeemRequestController.verifyCodeForRedeem,
 );

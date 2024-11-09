@@ -16,7 +16,7 @@ const createRedeemRequestIntoDB = async (
 ) => {
   const category = await RewardCategory.findById(payload.category);
   if (category?.deliveryOption === ENUM_DELIVERY_OPTION.EMAIL) {
-    if (payload.email) {
+    if (!payload.email) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'Email is required for redeem this reward',
@@ -26,12 +26,12 @@ const createRedeemRequestIntoDB = async (
 
   if (category?.deliveryOption === ENUM_DELIVERY_OPTION.SHIPPING_ADDRESS) {
     if (
-      payload.city ||
-      payload.phone ||
-      payload.state ||
-      payload.streetAddress ||
-      payload.userName ||
-      payload.zipCode
+      !payload.city ||
+      !payload.phone ||
+      !payload.state ||
+      !payload.streetAddress ||
+      !payload.userName ||
+      !payload.zipCode
     ) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -63,7 +63,7 @@ const createRedeemRequestIntoDB = async (
   const result = await RedeemRequest.create({ ...payload, user: userId });
 
   await NormalUser.findByIdAndUpdate(userId, {
-    $inc: { totalPoint: reward.pointRequired },
+    $inc: { totalPoint: -reward.pointRequired },
   });
 
   const html = `
@@ -87,7 +87,11 @@ const createRedeemRequestIntoDB = async (
   return result;
 };
 
-const verifyEmailForRedeem = async (userId: string, id: string, verifyCode: number) => {
+const verifyEmailForRedeem = async (
+  userId: string,
+  id: string,
+  verifyCode: number,
+) => {
   const redeemRequest = await RedeemRequest.findOne({ user: userId, _id: id });
 
   if (!redeemRequest) {
@@ -111,7 +115,7 @@ const verifyEmailForRedeem = async (userId: string, id: string, verifyCode: numb
 
 const RedeemRequestService = {
   createRedeemRequestIntoDB,
-  verifyEmailForRedeem
+  verifyEmailForRedeem,
 };
 
 export default RedeemRequestService;
