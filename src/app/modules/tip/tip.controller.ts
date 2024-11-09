@@ -3,12 +3,9 @@ import sendResponse from '../../utilities/sendResponse';
 import TipServices from './tip.services';
 
 const createTip = catchAsync(async (req, res) => {
-  const { entityId, entityType, amount } = req.body;
   const result = await TipServices.createTipIntoDB(
     req?.user?.profileId,
-    entityId,
-    entityType,
-    amount,
+    req.body
   );
 
   sendResponse(res, {
@@ -18,6 +15,19 @@ const createTip = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+// make payment success for tip
+const makePaymentSuccessForTip = catchAsync(async (req, res) => {
+  const result = await TipServices.makePaymentSuccessForTip(req.body.transactionId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Tip updated successfully',
+    data: result,
+  });
+});
+
 
 // Get all tips
 const getAllTips = catchAsync(async (req, res) => {
@@ -55,11 +65,13 @@ const getSingleTip = catchAsync(async (req, res) => {
   });
 });
 
+
 const TipController = {
   createTip,
   getAllTips,
   getUserTips,
   getSingleTip,
+  makePaymentSuccessForTip,
 };
 
 export default TipController;

@@ -48,7 +48,6 @@ const getAllTeamsFromDB = async (query: Record<string, any>) => {
 
   const sortField = query.sort as string;
   const isLeagueSort = sortField === 'league.sport' || sortField === '-league.sport';
-  console.log(isLeagueSort);
 
   const teamQuery = new QueryBuilder(
     isLeagueSort
