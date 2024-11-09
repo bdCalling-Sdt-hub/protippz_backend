@@ -80,6 +80,10 @@ const moduleRoutes = [
     path: '/tip',
     router: tipRoutes,
   },
+  {
+    path: '/redeem-request',
+    router: tipRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.router));
