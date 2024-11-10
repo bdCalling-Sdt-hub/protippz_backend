@@ -30,4 +30,11 @@ router.get(
   RedeemRequestController.getMyRedeem,
 );
 
+router.patch(
+  '/change-status/:id',
+  auth(USER_ROLE.superAdmin),
+  validateRequest(redeemValidations.changeRedeemStatusValidationSchema),
+  RedeemRequestController.changeRedeemStatus,
+);
+
 export const redeemRequestRoutes = router;

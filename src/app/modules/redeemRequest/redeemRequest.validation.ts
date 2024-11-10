@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENUM_REDEEM_STATUS } from '../../utilities/enum';
 
 const redeemRequestSchema = z.object({
   body: z.object({
@@ -14,8 +15,15 @@ const redeemRequestSchema = z.object({
   }),
 });
 
+const changeRedeemStatusValidationSchema = z.object({
+  body:z.object({
+    status:z.enum(Object.values(ENUM_REDEEM_STATUS) as [string, ...string[]])
+  })
+})
+
 const redeemValidations = {
   redeemRequestSchema,
+  changeRedeemStatusValidationSchema
 };
 
 export default redeemValidations;

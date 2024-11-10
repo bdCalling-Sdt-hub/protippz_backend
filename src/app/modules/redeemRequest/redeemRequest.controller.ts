@@ -47,9 +47,22 @@ const getMyRedeem = catchAsync(async (req, res) => {
     req.query,
   );
   sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     success: true,
     message: 'Redeem request retrieved successfully',
+    data: result,
+  });
+});
+// change redeem request status
+const changeRedeemStatus = catchAsync(async (req, res) => {
+  const result = await RedeemRequestService.changeRedeemRequestStatus(
+    req.params.id,
+    req.body.status,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Redeem request status updated successfully',
     data: result,
   });
 });
@@ -58,7 +71,8 @@ const RedeemRequestController = {
   createRedeemRequest,
   verifyCodeForRedeem,
   getAllRedeemRequest,
-  getMyRedeem
+  getMyRedeem,
+  changeRedeemStatus,
 };
 
 export default RedeemRequestController;

@@ -119,7 +119,10 @@ const verifyEmailForRedeem = async (
 // get all redeem request
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllRedeemRequestFromDB = async (query: Record<string, any>) => {
-  const redeemRequestQuery = new QueryBuilder(RedeemRequest.find({isVerified:true}), query)
+  const redeemRequestQuery = new QueryBuilder(
+    RedeemRequest.find({ isVerified: true }),
+    query,
+  )
     .search(['name'])
     .filter()
     .sort()
@@ -135,8 +138,14 @@ const getAllRedeemRequestFromDB = async (query: Record<string, any>) => {
   };
 };
 // get my redeem
-const getMyRedeemFromDB = async (userId:string,query: Record<string, any>) => {
-  const redeemRequestQuery = new QueryBuilder(RedeemRequest.find({user:userId}), query)
+const getMyRedeemFromDB = async (
+  userId: string,
+  query: Record<string, any>,
+) => {
+  const redeemRequestQuery = new QueryBuilder(
+    RedeemRequest.find({ user: userId }),
+    query,
+  )
     .search(['name'])
     .filter()
     .sort()
@@ -150,6 +159,23 @@ const getMyRedeemFromDB = async (userId:string,query: Record<string, any>) => {
     meta,
     result,
   };
+};
+
+// change redeem request status
+
+const changeRedeemRequestStatus = async (id: string, status: string) => {
+  const redeemRequest = await RedeemRequest.findById(id);
+  if (!redeemRequest) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Redeem Request not found');
+  }
+
+  const result = await RedeemRequest.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true, runValidators: true },
+  );
+
+  return result;
 };
 
 // crone jobs
@@ -189,7 +215,8 @@ const RedeemRequestService = {
   createRedeemRequestIntoDB,
   verifyEmailForRedeem,
   getAllRedeemRequestFromDB,
-  getMyRedeemFromDB
+  getMyRedeemFromDB,
+  changeRedeemRequestStatus
 };
 
 export default RedeemRequestService;
