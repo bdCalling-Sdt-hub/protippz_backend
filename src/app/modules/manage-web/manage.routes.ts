@@ -18,6 +18,11 @@ router.post(
   ManageController.addTermsConditions,
 );
 router.post(
+  '/add-partner',
+  auth(USER_ROLE.superAdmin),
+  ManageController.addPartner,
+);
+router.post(
   '/add-contact-us',
   auth(USER_ROLE.superAdmin),
   ManageController.addContactUs,
@@ -37,6 +42,11 @@ router.get(
   '/get-privacy-policy',
   auth(USER_ROLE.superAdmin),
   ManageController.getPrivacyPolicy,
+);
+router.get(
+  '/get-partner',
+  auth(USER_ROLE.superAdmin),
+  ManageController.getPartner,
 );
 router.get(
   '/get-slider',
@@ -63,6 +73,11 @@ router.patch(
   '/edit-privacy-policy/:id',
   auth(USER_ROLE.superAdmin),
   ManageController.editPrivacyPolicy,
+);
+router.patch(
+  '/edit-partner/:id',
+  auth(USER_ROLE.superAdmin),
+  ManageController.editPartner,
 );
 router.patch(
   '/edit-slider/:id',
@@ -114,6 +129,11 @@ router.delete(
   '/delete-privacy-policy/:id',
   auth(USER_ROLE.superAdmin),
   ManageController.deletePrivacyPolicy,
+);
+router.delete(
+  '/delete-partner/:id',
+  auth(USER_ROLE.superAdmin),
+  ManageController.deletePartner,
 );
 router.delete(
   '/delete-terms-conditions/:id',

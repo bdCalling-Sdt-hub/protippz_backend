@@ -45,6 +45,20 @@ const termsAndConditionsSchema = new mongoose.Schema(
     },
   },
 );
+const partnerSchema = new mongoose.Schema(
+  {
+    description: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+  },
+);
 //!Contact US
 const contactUsSchema = new mongoose.Schema(
   {
@@ -102,6 +116,7 @@ const sliderSchema = new mongoose.Schema(
     },
   },
 );
+
 export const PrivacyPolicy = model('PrivacyPolicy', privacySchema);
 export const AboutUs = model('AboutUs', aboutUsSchema);
 export const TermsConditions = model(
@@ -111,3 +126,4 @@ export const TermsConditions = model(
 export const ContactUs = model('ContactUs', contactUsSchema);
 export const FAQ = model('FAQ', faqSchema);
 export const Slider = model('Slider', sliderSchema);
+export const Partner = model('Partner', partnerSchema);

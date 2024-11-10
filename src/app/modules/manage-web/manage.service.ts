@@ -6,6 +6,7 @@ import {
   AboutUs,
   ContactUs,
   FAQ,
+  Partner,
   PrivacyPolicy,
   Slider,
   TermsConditions,
@@ -48,6 +49,43 @@ const deletePrivacyPolicy = async (id: string) => {
     throw new AppError(404, 'Privacy Policy not found');
   }
   return await PrivacyPolicy.findByIdAndDelete(id);
+};
+//! Partner
+const addPartner = async (payload: any) => {
+  const checkIsExist = await Partner.findOne();
+  if (checkIsExist) {
+    await Partner.findOneAndUpdate({}, payload, {
+      new: true,
+
+      runValidators: true,
+    });
+  } else {
+    return await Partner.create(payload);
+  }
+};
+const getPartner = async () => {
+  return await Partner.findOne();
+};
+const editPartner = async (
+  id: string,
+  payload: { description: string },
+) => {
+  const isExist = await Partner.findById(id);
+  if (!isExist) {
+    throw new AppError(404, 'Partner not found');
+  }
+  const result = await Partner.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+const deletePartner = async (id: string) => {
+  const isExist = await Partner.findById(id);
+  if (!isExist) {
+    throw new AppError(404, 'Partner not found');
+  }
+  return await Partner.findByIdAndDelete(id);
 };
 //! About us
 const addAboutUs = async (payload: any) => {
@@ -257,4 +295,8 @@ export const ManageService = {
   getSlider,
   deleteSlider,
   editSlider,
+  addPartner,
+  editPartner,
+  getPartner,
+  deletePartner
 };

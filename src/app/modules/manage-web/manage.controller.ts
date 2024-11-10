@@ -22,6 +22,15 @@ const addPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const addPartner = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.addPartner(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Partner added successfully ',
+    data: result,
+  });
+});
 const addTermsConditions = catchAsync(async (req: Request, res: Response) => {
   const result = await ManageService.addTermsConditions(req.body);
   sendResponse(res, {
@@ -55,6 +64,15 @@ const getPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Privacy Policy retrieved successfully',
+    data: result,
+  });
+});
+const getPartner = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.getPartner();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Partner retrieved successfully',
     data: result,
   });
 });
@@ -100,6 +118,15 @@ const editPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Privacy policy updated successfully',
+    data: result,
+  });
+});
+const editPartner = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.editPartner(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Partner updated successfully',
     data: result,
   });
 });
@@ -166,6 +193,15 @@ const deletePrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Privacy Policy deleted successfully',
+    data: result,
+  });
+});
+const deletePartner = catchAsync(async (req: Request, res: Response) => {
+  const result = await ManageService.deletePartner(req.params.id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Partner deleted successfully',
     data: result,
   });
 });
@@ -252,4 +288,8 @@ export const ManageController = {
   getFAQ,
   deleteFAQ,
   editFAQ,
+  addPartner,
+  getPartner,
+  editPartner,
+  deletePartner
 };
