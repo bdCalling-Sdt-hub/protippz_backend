@@ -22,7 +22,7 @@ router.post(
   validateRequest(teamValidations.createTeamSchema),
   TeamController.createTeam,
 );
-router.get('/get-all',simpleAuth, TeamController.getAllTeams);
+router.get('/get-all', simpleAuth, TeamController.getAllTeams);
 router.get('/get-single/:id', TeamController.getSingleTeam);
 router.patch(
   '/update/:id',
@@ -38,5 +38,10 @@ router.patch(
   TeamController.updateTeam,
 );
 router.delete('/delete/:id', TeamController.deleteTeam);
-
+router.patch(
+  '/send-money/:id',
+  auth(USER_ROLE.superAdmin),
+  validateRequest(teamValidations.sendMoneyValidationSchema),
+  TeamController.sendMoneyToTeam,
+);
 export const teamRoutes = router;

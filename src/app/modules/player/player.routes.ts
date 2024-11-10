@@ -6,6 +6,7 @@ import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 import { uploadFile } from '../../helper/fileUploader';
 import simpleAuth from '../../middlewares/simpleAuth';
+import teamValidations from '../team/team.validation';
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.post(
   validateRequest(playerValidations.createPlayerValidationSchema),
   PlayerController.createPlayer,
 );
-router.get('/get-all',simpleAuth, PlayerController.getAllPlayers);
+router.get('/get-all', simpleAuth, PlayerController.getAllPlayers);
 router.get('/get-single/:id', PlayerController.getSinglePlayer);
 router.patch(
   '/update/:id',
@@ -39,6 +40,15 @@ router.patch(
   validateRequest(playerValidations.updatePlayerValidationSchema),
   PlayerController.updatePlayer,
 );
-router.delete('/delete/:id',auth(USER_ROLE.superAdmin), PlayerController.deletePlayer);
-
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLE.superAdmin),
+  PlayerController.deletePlayer,
+);
+router.patch(
+  '/send-money/:id',
+  auth(USER_ROLE.superAdmin),
+  validateRequest(teamValidations.sendMoneyValidationSchema),
+  PlayerController.sendMoneyToPlayer,
+);
 export const playerRoutes = router;

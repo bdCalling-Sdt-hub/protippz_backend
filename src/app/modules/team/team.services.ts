@@ -25,7 +25,10 @@ const createTeamIntoDB = async (payload: ITeam) => {
   return result;
 };
 
-const getAllTeamsFromDB = async (userId:string,query: Record<string, any>) => {
+const getAllTeamsFromDB = async (
+  userId: string,
+  query: Record<string, any>,
+) => {
   const teamQuery = new QueryBuilder(
     Team.find().populate({ path: 'league', select: 'name sport' }).lean(),
     query,
@@ -38,12 +41,8 @@ const getAllTeamsFromDB = async (userId:string,query: Record<string, any>) => {
 
   const meta = await teamQuery.countTotal();
   const result = await teamQuery.modelQuery;
-  const bookmarks = await TeamBookmark.find({ user: userId }).select(
-    'team',
-  );
-  const bookmarkTeamIds = new Set(
-    bookmarks.map((b) => b?.team?.toString()),
-  );
+  const bookmarks = await TeamBookmark.find({ user: userId }).select('team');
+  const bookmarkTeamIds = new Set(bookmarks.map((b) => b?.team?.toString()));
 
   const enrichedResult = result.map((team) => ({
     ...team,
@@ -108,12 +107,32 @@ const deleteTeamFromDB = async (id: string) => {
   }
 };
 
+const sendMoneyToTeam = async (id: string, amount: number) => {
+  const team = await Team.findById(id);
+  if (!team) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+  }
+  if (team.dueAmount < amount) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You can not send money more then due amount',
+    );
+  }
+
+  const result = await Team.findByIdAndUpdate(id, {
+    $inc: { dueAmount: -amount, paidAmount: amount },
+  },{new:true,runValidators:true});
+
+  return result;
+};
+
 const TeamServices = {
   createTeamIntoDB,
   getAllTeamsFromDB,
   getSingleTeamFromDB,
   updateTeamIntoDB,
   deleteTeamFromDB,
+  sendMoneyToTeam
 };
 
 export default TeamServices;

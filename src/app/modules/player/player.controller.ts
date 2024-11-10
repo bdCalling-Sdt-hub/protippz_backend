@@ -70,12 +70,24 @@ const deletePlayer = catchAsync(async (req, res) => {
   });
 });
 
+
+const sendMoneyToPlayer = catchAsync(async (req, res) => {
+  const result = await PlayerServices.sendMoneyToPlayer(req.params.id,req.body.amount);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Send money successful',
+    data: result,
+  });
+});
+
 const PlayerController = {
   createPlayer,
   getAllPlayers,
   getSinglePlayer,
   updatePlayer,
-  deletePlayer
+  deletePlayer,
+  sendMoneyToPlayer
 };
 
 export default PlayerController;

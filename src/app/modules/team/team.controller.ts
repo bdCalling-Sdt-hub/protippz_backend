@@ -66,13 +66,25 @@ const deleteTeam = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const sendMoneyToTeam = catchAsync(async (req, res) => {
+  const result = await TeamServices.sendMoneyToTeam(req.params.id,req.body.amount);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Send money successful',
+    data: result,
+  });
+});
+
+
 
 const TeamController = {
   createTeam,
   getAllTeams,
   getSingleTeam,
   updateTeam,
-  deleteTeam
+  deleteTeam,
+  sendMoneyToTeam
 };
 
 export default TeamController;

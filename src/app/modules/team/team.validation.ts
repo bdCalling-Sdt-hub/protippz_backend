@@ -24,9 +24,16 @@ const updateTeamSchema = z.object({
  })
 });
 
+const sendMoneyValidationSchema = z.object({
+   body:z.object({
+      amount:z.number({required_error:"Amount is required"})
+   })
+})
+
 const teamValidations ={
     createTeamSchema,
-    updateTeamSchema
+    updateTeamSchema,
+    sendMoneyValidationSchema
 }
 
 export default teamValidations;
