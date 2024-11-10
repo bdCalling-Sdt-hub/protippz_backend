@@ -11,61 +11,31 @@ const getAminDashboardMetaData = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getVendorDashboardMetaData = catchAsync(async (req, res) => {
-  const result = await metaServices.getVendorDashboardMetaData(
-    req?.user?.profileId,
-  );
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Dashboard meta data successfully retrieved',
-    data: result,
-  });
-});
-const getShopChartData = catchAsync(async (req, res) => {
-  const result = await metaServices.getShopChartDataFromDB(
-    Number(req?.query?.year),
-  );
 
+const getTipChartData = catchAsync(async(req,res)=>{
+  const result = await metaServices.getChartDataForTips(Number(req.query.year));
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Shop chart data retrieved successfully',
+    message: 'Tip chart data retrieved successfully',
     data: result,
   });
-});
-const getAreaChartDataForIncome = catchAsync(async (req, res) => {
-  const result = await metaServices.getAreaChartDataForIncomeFromDB(
-    Number(req?.query?.year),
-  );
+})
+const getUserChartData = catchAsync(async(req,res)=>{
+  const result = await metaServices.getUserChartData(Number(req.query.year));
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User chart data retrieved successfully',
+    data: result,
+  });
+})
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Income chart data retrieved successfully',
-    data: result,
-  });
-});
-const getAreaChartDataForSales = catchAsync(async (req, res) => {
-  const result = await metaServices.getAreaChartDataForSalesFromDB(
-    req?.user?.profileId,
-    Number(req?.query?.year),
-  );
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Sales chart data retrieved successfully',
-    data: result,
-  });
-});
 
 const metaController = {
   getAminDashboardMetaData,
-  getVendorDashboardMetaData,
-  getShopChartData,
-  getAreaChartDataForIncome,
-  getAreaChartDataForSales,
+  getTipChartData,
+  getUserChartData
 };
 
 export default metaController;

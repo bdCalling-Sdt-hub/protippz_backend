@@ -16,6 +16,7 @@ import { rewardCategoryRoutes } from '../modules/rewardCategory/rewardCategory.r
 import { rewardRoutes } from '../modules/reward/reward.routes';
 import { tipRoutes } from '../modules/tip/tip.routes';
 import { redeemRequestRoutes } from '../modules/redeemRequest/redeemRequest.routes';
+import { metaRoutes } from '../modules/meta/meta.routes';
 
 const router = Router();
 
@@ -84,6 +85,10 @@ const moduleRoutes = [
   {
     path: '/redeem-request',
     router: redeemRequestRoutes,
+  },
+  {
+    path: '/meta',
+    router: metaRoutes,
   },
 ];
 

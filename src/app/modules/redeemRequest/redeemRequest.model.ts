@@ -5,8 +5,12 @@ import { ENUM_REDEEM_STATUS } from '../../utilities/enum';
 const redeemRequestSchema = new Schema<IRedeemRequest>(
   {
     reward: { type: Schema.Types.ObjectId, ref: 'Reward', required: true },
-    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'RewardCategory',
+      required: true,
+    },
+    user: { type: Schema.Types.ObjectId, ref: 'NormalUser', required: true },
     redeemedPoint: { type: Number, required: true },
     email: { type: String },
     userName: { type: String },

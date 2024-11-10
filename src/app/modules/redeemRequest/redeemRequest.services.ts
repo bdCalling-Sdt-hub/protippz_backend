@@ -120,10 +120,13 @@ const verifyEmailForRedeem = async (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getAllRedeemRequestFromDB = async (query: Record<string, any>) => {
   const redeemRequestQuery = new QueryBuilder(
-    RedeemRequest.find({ isVerified: true }),
+    RedeemRequest.find({ isVerified: true })
+      .populate({ path: 'user', select: 'name profile_image phone' })
+      .populate({ path: 'reward', select: 'name' })
+      .populate({ path: 'category', select: 'name' }),
     query,
   )
-    .search(['name'])
+    .search(['reward.name'])
     .filter()
     .sort()
     .paginate()
@@ -137,13 +140,17 @@ const getAllRedeemRequestFromDB = async (query: Record<string, any>) => {
     result,
   };
 };
+
 // get my redeem
 const getMyRedeemFromDB = async (
   userId: string,
   query: Record<string, any>,
 ) => {
   const redeemRequestQuery = new QueryBuilder(
-    RedeemRequest.find({ user: userId }),
+    RedeemRequest.find({ user: userId })
+      .populate({ path: 'user', select: 'name profile_image phone' })
+      .populate({ path: 'reward', select: 'name' })
+      .populate({ path: 'category', select: 'name' }),
     query,
   )
     .search(['name'])
@@ -216,7 +223,7 @@ const RedeemRequestService = {
   verifyEmailForRedeem,
   getAllRedeemRequestFromDB,
   getMyRedeemFromDB,
-  changeRedeemRequestStatus
+  changeRedeemRequestStatus,
 };
 
 export default RedeemRequestService;
