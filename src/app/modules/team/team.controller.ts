@@ -76,6 +76,17 @@ const sendMoneyToTeam = catchAsync(async (req, res) => {
   });
 });
 
+// invite team 
+const inviteTeam = catchAsync(async (req, res) => {
+  const result = await TeamServices.inviteTeam(req.params.id,req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Team invite credential retrieved successfully',
+    data: result,
+  });
+});
+
 
 
 const TeamController = {
@@ -84,7 +95,8 @@ const TeamController = {
   getSingleTeam,
   updateTeam,
   deleteTeam,
-  sendMoneyToTeam
+  sendMoneyToTeam,
+  inviteTeam
 };
 
 export default TeamController;

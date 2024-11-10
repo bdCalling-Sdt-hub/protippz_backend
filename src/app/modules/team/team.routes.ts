@@ -44,4 +44,5 @@ router.patch(
   validateRequest(teamValidations.sendMoneyValidationSchema),
   TeamController.sendMoneyToTeam,
 );
+router.post("/invite-team/:id",auth(USER_ROLE.superAdmin),validateRequest(teamValidations.inviteValidationSchema),TeamController.inviteTeam);
 export const teamRoutes = router;

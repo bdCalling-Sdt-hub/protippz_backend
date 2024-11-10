@@ -11,7 +11,7 @@ export const registerUserValidationSchema = z.object({
       .email('Invalid email format')
       .optional(),
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    phoneNumber: z.string().min(1, 'Phone number is required').max(15),
+    phone: z.string().min(1, 'Phone number is required').max(15),
     passwordChangedAt: z.date().optional(),
     bankAccountName: z.string().optional().nullable(),
     bankAccountNumber: z.string().optional().nullable(),

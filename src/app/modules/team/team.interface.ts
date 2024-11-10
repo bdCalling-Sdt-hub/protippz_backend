@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface ITeam {
+    user:Types.ObjectId;
     name:string;
     team_logo:string;
     league:Types.ObjectId;
@@ -8,4 +9,9 @@ export interface ITeam {
     totalTips:number;
     paidAmount:number;
     dueAmount:number;
+}
+
+export interface IInviteTeamPayload {
+    username:string;
+    password:string;
 }

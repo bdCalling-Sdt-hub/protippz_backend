@@ -30,10 +30,19 @@ const sendMoneyValidationSchema = z.object({
    })
 })
 
+
+const inviteValidationSchema = z.object({
+   body:z.object({
+      username:z.string({required_error:"Username is required"}),
+      password:z.string({required_error:"Password is required"}).min(6,{message:"Password must be 5 character long"})
+   })
+})
+
 const teamValidations ={
     createTeamSchema,
     updateTeamSchema,
-    sendMoneyValidationSchema
+    sendMoneyValidationSchema,
+    inviteValidationSchema
 }
 
 export default teamValidations;

@@ -2,12 +2,14 @@
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/appError';
-import { ITeam } from './team.interface';
+import { IInviteTeamPayload, ITeam } from './team.interface';
 import Team from './team.model';
 import League from '../league/league.model';
 import Player from '../player/player.model';
 import mongoose from 'mongoose';
 import TeamBookmark from '../teamBookmark/team.bookmark.model';
+import { User } from '../user/user.model';
+import { USER_ROLE } from '../user/user.constant';
 
 const createTeamIntoDB = async (payload: ITeam) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
@@ -119,11 +121,80 @@ const sendMoneyToTeam = async (id: string, amount: number) => {
     );
   }
 
-  const result = await Team.findByIdAndUpdate(id, {
-    $inc: { dueAmount: -amount, paidAmount: amount },
-  },{new:true,runValidators:true});
+  const result = await Team.findByIdAndUpdate(
+    id,
+    {
+      $inc: { dueAmount: -amount, paidAmount: amount },
+    },
+    { new: true, runValidators: true },
+  );
 
   return result;
+};
+
+// const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
+//   const team = await Team.findById(id);
+//   if (!team) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+//   }
+
+//   const isExistUser = await User.findOne({ username: payload.username });
+//   if (!isExistUser) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'This username already exits');
+//   }
+
+//   const userData = {
+//     username: payload.username,
+//     password: payload.password,
+//     role: USER_ROLE.team,
+//     isVerified: true,
+//   };
+
+//   const user = await User.create(userData);
+
+//   await Team.findByIdAndUpdate(id, { user: user._id });
+
+//   return user;
+// };
+
+
+const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const team = await Team.findById(id).session(session);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+
+    const isExistUser = await User.findOne({ username: payload.username }).session(session);
+    if (isExistUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'This username already exists');
+    }
+
+    const userData = {
+      username: payload.username,
+      password: payload.password,
+      role: USER_ROLE.team,
+      isVerified: true,
+    };
+
+    const user = await User.create([userData], { session });
+
+    await Team.findByIdAndUpdate(id, { user: user[0]._id }, { session });
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return user[0];
+  } catch (error) {
+    // Rollback the transaction in case of an error
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };
 
 const TeamServices = {
@@ -132,7 +203,8 @@ const TeamServices = {
   getSingleTeamFromDB,
   updateTeamIntoDB,
   deleteTeamFromDB,
-  sendMoneyToTeam
+  sendMoneyToTeam,
+  inviteTeam,
 };
 
 export default TeamServices;
