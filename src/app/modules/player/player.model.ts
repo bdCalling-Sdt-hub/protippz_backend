@@ -1,6 +1,7 @@
 import { Schema, model, Types } from 'mongoose';
 
 const PlayerSchema = new Schema({
+  user:{type:Schema.Types.ObjectId,ref:"User"},
   name: { type: String, required: true },
   league: { type: Types.ObjectId, ref: 'League', required: true },
   team: { type: Types.ObjectId, ref: 'Team', required: true },

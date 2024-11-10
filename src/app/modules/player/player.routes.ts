@@ -51,4 +51,10 @@ router.patch(
   validateRequest(teamValidations.sendMoneyValidationSchema),
   PlayerController.sendMoneyToPlayer,
 );
+router.post(
+  '/invite-player/:id',
+  auth(USER_ROLE.superAdmin),
+  validateRequest(teamValidations.inviteValidationSchema),
+  PlayerController.invitePlayer,
+);
 export const playerRoutes = router;

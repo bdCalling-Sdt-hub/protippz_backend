@@ -17,6 +17,7 @@ import { rewardRoutes } from '../modules/reward/reward.routes';
 import { tipRoutes } from '../modules/tip/tip.routes';
 import { redeemRequestRoutes } from '../modules/redeemRequest/redeemRequest.routes';
 import { metaRoutes } from '../modules/meta/meta.routes';
+import { inviteRoutes } from '../modules/invite/invite.routes';
 
 const router = Router();
 
@@ -89,6 +90,10 @@ const moduleRoutes = [
   {
     path: '/meta',
     router: metaRoutes,
+  },
+  {
+    path: '/invite',
+    router: inviteRoutes,
   },
 ];
 

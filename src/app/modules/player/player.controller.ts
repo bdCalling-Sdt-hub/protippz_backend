@@ -81,13 +81,24 @@ const sendMoneyToPlayer = catchAsync(async (req, res) => {
   });
 });
 
+const invitePlayer = catchAsync(async (req, res) => {
+  const result = await PlayerServices.invitePlayer(req.params.id,req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Player invite credential save successfully',
+    data: result,
+  });
+});
+
 const PlayerController = {
   createPlayer,
   getAllPlayers,
   getSinglePlayer,
   updatePlayer,
   deletePlayer,
-  sendMoneyToPlayer
+  sendMoneyToPlayer,
+  invitePlayer
 };
 
 export default PlayerController;

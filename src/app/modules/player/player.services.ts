@@ -7,6 +7,10 @@ import Player from './player.model';
 import Team from '../team/team.model';
 import League from '../league/league.model';
 import PlayerBookmark from '../playerBookmark/player.bookmark.model';
+import { IInviteTeamPayload } from '../team/team.interface';
+import mongoose from 'mongoose';
+import { User } from '../user/user.model';
+import { USER_ROLE } from '../user/user.constant';
 
 const createPlayerIntoDB = async (payload: IPlayer) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
@@ -138,13 +142,56 @@ const sendMoneyToPlayer = async (id: string, amount: number) => {
 
   return result;
 };
+
+// invite player 
+const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const player = await Player.findById(id).session(session);
+    if (!player) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+    }
+
+    const isExistUser = await User.findOne({ username: payload.username }).session(session);
+    if (isExistUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'This username already exists');
+    }
+
+    const userData = {
+      username: payload.username,
+      password: payload.password,
+      role: USER_ROLE.player,
+      isVerified: true,
+    };
+
+    const user = await User.create([userData], { session });
+
+    await Player.findByIdAndUpdate(id, { user: user[0]._id }, { session });
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return user[0];
+  } catch (error) {
+    // Rollback the transaction in case of an error
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+
 const PlayerServices = {
   createPlayerIntoDB,
   getAllPlayersFromDB,
   getSinglePlayerFromDB,
   updatePlayerIntoDB,
   deletePlayerFromDB,
-  sendMoneyToPlayer
+  sendMoneyToPlayer,
+  invitePlayer
 };
 
 export default PlayerServices;

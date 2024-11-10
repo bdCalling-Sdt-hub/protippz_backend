@@ -40,3 +40,8 @@ export const ENUM_PAYMENT_BY = {
   ACH: 'ACH',
   CHECK: 'Check',
 };
+
+export const ENUM_INVITE_STATUS = {
+  PENDING: 'Pending',
+  ACCEPTED: 'Accepted',
+};

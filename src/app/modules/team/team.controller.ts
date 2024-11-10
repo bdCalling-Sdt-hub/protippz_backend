@@ -82,7 +82,7 @@ const inviteTeam = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Team invite credential retrieved successfully',
+    message: 'Team invite credential save successfully',
     data: result,
   });
 });
