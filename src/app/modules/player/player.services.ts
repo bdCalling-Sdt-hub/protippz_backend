@@ -143,7 +143,7 @@ const sendMoneyToPlayer = async (id: string, amount: number) => {
   return result;
 };
 
-// invite player 
+// invite player
 const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -154,9 +154,14 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
     }
 
-    const isExistUser = await User.findOne({ username: payload.username }).session(session);
+    const isExistUser = await User.findOne({
+      username: payload.username,
+    }).session(session);
     if (isExistUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'This username already exists');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'This username already exists',
+      );
     }
 
     const userData = {
@@ -183,7 +188,6 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
   }
 };
 
-
 const PlayerServices = {
   createPlayerIntoDB,
   getAllPlayersFromDB,
@@ -191,7 +195,7 @@ const PlayerServices = {
   updatePlayerIntoDB,
   deletePlayerFromDB,
   sendMoneyToPlayer,
-  invitePlayer
+  invitePlayer,
 };
 
 export default PlayerServices;
