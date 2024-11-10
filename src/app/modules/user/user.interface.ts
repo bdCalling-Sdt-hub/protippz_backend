@@ -18,6 +18,7 @@ export interface TUser {
   codeExpireIn: Date;
   isActive: boolean;
   isDeleted: boolean;
+  inviteToken:string;
 }
 export interface TLoginUser {
   email: string;

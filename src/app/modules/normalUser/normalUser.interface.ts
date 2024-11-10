@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Types } from "mongoose";
 
 export interface INormalUser {
+    inviteToken: any;
     user:Types.ObjectId;
     name:string;
     username:string;

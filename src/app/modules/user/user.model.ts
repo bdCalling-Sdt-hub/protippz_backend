@@ -67,6 +67,7 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
+    inviteToken:{type:String,default:''},
   },
   {
     timestamps: true,

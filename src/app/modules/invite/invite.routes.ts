@@ -5,7 +5,7 @@ import InviteController from './invite.controller';
 
 const router = express.Router();;
 
-router.post("/generate-invite-link",auth(USER_ROLE.user),InviteController.generateInviteLink);
+router.post("/invite-friend",auth(USER_ROLE.user),InviteController.generateInviteLink);
 
 
 export const inviteRoutes = router;

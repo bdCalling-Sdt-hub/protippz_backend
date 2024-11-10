@@ -7,6 +7,7 @@ const generateInviteLink = async (inviterId: string) => {
 
   return {
     link: `https://yourapp.com/register?invite=${inviteToken}`,
+    token:inviteToken
   };
 };
 

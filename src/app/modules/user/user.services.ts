@@ -14,6 +14,8 @@ import sendEmail from '../../utilities/sendEmail';
 import { JwtPayload } from 'jsonwebtoken';
 import Player from '../player/player.model';
 import Team from '../team/team.model';
+import Invite from '../invite/invite.model';
+import { inviteRewardPoint } from '../../constant';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -57,6 +59,7 @@ const registerUser = async (
       role: USER_ROLE.user,
       verifyCode,
       codeExpireIn: new Date(Date.now() + 5 * 60000),
+      inviteToken: userData.inviteToken ? userData.inviteToken : '',
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -101,6 +104,13 @@ const verifyCode = async (email: string, verifyCode: number) => {
     { isVerified: true },
     { new: true, runValidators: true },
   );
+
+  if (result?.inviteToken) {
+    const invite = await Invite.findOne({ inviteToken: result.inviteToken });
+    await NormalUser.findByIdAndUpdate(invite?.inviter, {
+      $inc: { totalPoint: inviteRewardPoint },
+    });
+  }
 
   return result;
 };
@@ -184,7 +194,7 @@ const userServices = {
   verifyCode,
   resendVerifyCode,
   getMyProfile,
-  changeUserStatus
+  changeUserStatus,
 };
 
 export default userServices;
