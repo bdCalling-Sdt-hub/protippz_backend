@@ -19,4 +19,15 @@ router.post(
   RedeemRequestController.verifyCodeForRedeem,
 );
 
+router.get(
+  '/get-all',
+  auth(USER_ROLE.superAdmin),
+  RedeemRequestController.getAllRedeemRequest,
+);
+router.get(
+  '/my-redeem',
+  auth(USER_ROLE.user),
+  RedeemRequestController.getMyRedeem,
+);
+
 export const redeemRequestRoutes = router;

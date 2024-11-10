@@ -28,10 +28,37 @@ const verifyCodeForRedeem = catchAsync(async (req, res) => {
     data: result,
   });
 });
+// get all redeem request
+const getAllRedeemRequest = catchAsync(async (req, res) => {
+  const result = await RedeemRequestService.getAllRedeemRequestFromDB(
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Redeem request retrieved successfully',
+    data: result,
+  });
+});
+// get may redeem request
+const getMyRedeem = catchAsync(async (req, res) => {
+  const result = await RedeemRequestService.getMyRedeemFromDB(
+    req.user.profileId,
+    req.query,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Redeem request retrieved successfully',
+    data: result,
+  });
+});
 
 const RedeemRequestController = {
   createRedeemRequest,
   verifyCodeForRedeem,
+  getAllRedeemRequest,
+  getMyRedeem
 };
 
 export default RedeemRequestController;

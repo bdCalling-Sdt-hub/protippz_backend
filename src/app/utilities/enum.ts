@@ -14,13 +14,17 @@ export const ENUM_TIP_BY = {
   PAYPAL: 'Paypal',
 };
 
-
 export const ENUM_USER_STATUS = {
-  IN_PROGRESS:"in-progress",
-  BLOCKED:"blocked"
-}
+  IN_PROGRESS: 'in-progress',
+  BLOCKED: 'blocked',
+};
 
-export const ENUM_DELIVERY_OPTION={
-  EMAIL:"Email",
-  SHIPPING_ADDRESS:"Shipping Address"
-}
+export const ENUM_DELIVERY_OPTION = {
+  EMAIL: 'Email',
+  SHIPPING_ADDRESS: 'Shipping Address',
+};
+
+export const ENUM_REDEEM_STATUS = {
+  PENDING: 'Pending',
+  COMPLETED: 'Completed',
+};

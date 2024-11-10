@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IRedeemRequest } from './redeemRequest.interface';
+import { ENUM_REDEEM_STATUS } from '../../utilities/enum';
 
 const redeemRequestSchema = new Schema<IRedeemRequest>(
   {
@@ -16,6 +17,11 @@ const redeemRequestSchema = new Schema<IRedeemRequest>(
     zipCode: { type: String },
     isVerified: { type: Boolean, default: false },
     verifyCode: { type: Number },
+    status: {
+      type: String,
+      enum: Object.values(ENUM_REDEEM_STATUS),
+      default: ENUM_REDEEM_STATUS.PENDING,
+    },
   },
   {
     timestamps: true,

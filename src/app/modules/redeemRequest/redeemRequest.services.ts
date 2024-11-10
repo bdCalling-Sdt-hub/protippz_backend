@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { ENUM_DELIVERY_OPTION } from '../../utilities/enum';
@@ -7,6 +8,8 @@ import Reward from '../reward/reward.model';
 import NormalUser from '../normalUser/normalUser.model';
 import RedeemRequest from './redeemRequest.model';
 import sendEmail from '../../utilities/sendEmail';
+import cron from 'node-cron';
+import QueryBuilder from '../../builder/QueryBuilder';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -113,9 +116,80 @@ const verifyEmailForRedeem = async (
   return result;
 };
 
+// get all redeem request
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getAllRedeemRequestFromDB = async (query: Record<string, any>) => {
+  const redeemRequestQuery = new QueryBuilder(RedeemRequest.find({isVerified:true}), query)
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await redeemRequestQuery.countTotal();
+  const result = await redeemRequestQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+};
+// get my redeem
+const getMyRedeemFromDB = async (userId:string,query: Record<string, any>) => {
+  const redeemRequestQuery = new QueryBuilder(RedeemRequest.find({user:userId}), query)
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await redeemRequestQuery.countTotal();
+  const result = await redeemRequestQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
+};
+
+// crone jobs
+cron.schedule('*/5 * * * *', async () => {
+  try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
+    const oldRequests = await RedeemRequest.find({
+      isVerified: false,
+      createdAt: { $lt: fiveMinutesAgo },
+    });
+
+    for (const request of oldRequests) {
+      const user = await NormalUser.findById(request.user);
+
+      if (user) {
+        user.totalPoint = (user.totalPoint || 0) + request.redeemedPoint;
+        await user.save();
+        console.log(
+          `Added ${request.redeemedPoint} points to user ${user._id}`,
+        );
+      }
+
+      await RedeemRequest.deleteOne({ _id: request._id });
+      console.log(`Deleted redeem request ${request._id}`);
+    }
+
+    console.log(
+      `Processed and deleted ${oldRequests.length} pending redeem requests older than 5 minutes`,
+    );
+  } catch (error) {
+    console.error('Error processing old redeem requests:', error);
+  }
+});
+
 const RedeemRequestService = {
   createRedeemRequestIntoDB,
   verifyEmailForRedeem,
+  getAllRedeemRequestFromDB,
+  getMyRedeemFromDB
 };
 
 export default RedeemRequestService;
