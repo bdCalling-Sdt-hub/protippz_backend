@@ -16,6 +16,7 @@ import Team from '../team/team.model';
 import Player from '../player/player.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import cron from 'node-cron';
+import Notification from '../notification/notification.model';
 
 interface PayPalLink {
   href: string;
@@ -247,11 +248,19 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
       { new: true, runValidators: true, session },
     );
 
-    await NormalUser.findByIdAndUpdate(
+    const updatedUser = await NormalUser.findByIdAndUpdate(
       tip.user,
       { $inc: { totalPoint: tip.point } },
       { new: true, runValidators: true, session },
     );
+
+    const notificationData = {
+      title: `Successfully tip sent`,
+      message: `Successfully tip send to ${tip.entityType} and you got ${tip.point} points`,
+      receiver: updatedUser?._id,
+    };
+
+    await Notification.create(notificationData);
 
     // Determine whether to update a Team or Player
     if (updatedTip?.entityType === 'Team') {
@@ -321,11 +330,18 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
       { new: true, runValidators: true, session },
     );
 
-    await NormalUser.findByIdAndUpdate(
+    const updatedUser = await NormalUser.findByIdAndUpdate(
       tip.user,
       { $inc: { totalPoint: tip.point } },
       { new: true, runValidators: true, session },
     );
+    const notificationData = {
+      title: `Successfully tip sent`,
+      message: `Successfully tip send to ${tip.entityType} and you got ${tip.point} points`,
+      receiver: updatedUser?._id,
+    };
+
+    await Notification.create(notificationData);
 
     // Determine whether to update a Team or Player
     if (updatedTip?.entityType === 'Team') {

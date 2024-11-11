@@ -15,6 +15,7 @@ import { USER_ROLE } from '../user/user.constant';
 import NormalUser from '../normalUser/normalUser.model';
 import Invite from '../invite/invite.model';
 import { inviteRewardPoint } from '../../constant';
+import Notification from '../notification/notification.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -35,7 +36,10 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
   }
   if (!user.isVerified) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You are not verified user . Please verify your email');
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You are not verified user . Please verify your email',
+    );
   }
   // checking if the password is correct ----
   if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
@@ -127,9 +131,17 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
         inviteToken: payload.inviteToken,
       }).session(session);
       if (invite && invite.inviter) {
-        await NormalUser.findByIdAndUpdate(invite.inviter, {
-          $inc: { totalPoint: inviteRewardPoint},
+        const updatedUser = await NormalUser.findByIdAndUpdate(invite.inviter, {
+          $inc: { totalPoint: inviteRewardPoint },
         }).session(session);
+
+        const notificationData = {
+          title: 'Congratulations you got points',
+          message: `Congratulations your friend register with your invitation and you got ${inviteRewardPoint} points`,
+          receiver: updatedUser?._id,
+        };
+
+        await Notification.create(notificationData);
       }
     }
 
@@ -180,7 +192,6 @@ const changePasswordIntoDB = async (
   if (user.status === 'blocked') {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
   }
-
 
   if (!(await User.isPasswordMatched(payload?.oldPassword, user?.password))) {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
@@ -271,13 +282,11 @@ const forgetPassword = async (email: string) => {
   //   'Reset password code',
   //   resetPasswordEmailBody(user.username, resetCode),
   // );
-  sendEmail(
-    {
+  sendEmail({
     email: user.email,
-     subject:'Reset password code',
-     html: resetPasswordEmailBody(user.username, resetCode),
-    }
-   );
+    subject: 'Reset password code',
+    html: resetPasswordEmailBody(user.username, resetCode),
+  });
 
   return null;
 
@@ -424,13 +433,11 @@ const resendResetCode = async (email: string) => {
       codeExpireIn: new Date(Date.now() + 5 * 60000),
     },
   );
-  sendEmail(
-    {
+  sendEmail({
     email: user.email,
-     subject:'Reset password code',
-     html: resetPasswordEmailBody(user.username, resetCode),
-    }
-   );
+    subject: 'Reset password code',
+    html: resetPasswordEmailBody(user.username, resetCode),
+  });
 
   return null;
 };
@@ -443,7 +450,7 @@ const authServices = {
   resetPassword,
   verifyResetOtp,
   resendResetCode,
-  loginWithGoogle
+  loginWithGoogle,
 };
 
 export default authServices;

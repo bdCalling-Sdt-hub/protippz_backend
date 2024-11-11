@@ -83,7 +83,6 @@
 
 // export default uploadCsvFile;
 
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import fs, { PathLike } from 'fs';
@@ -181,21 +180,23 @@ const uploadCsvFile = async (req: Request, res: Response) => {
 
         // Complete progress
         sendProgress(100);
-        res.write(`data: ${JSON.stringify({ message: 'Upload complete' })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ message: 'Upload complete' })}\n\n`,
+        );
         res.end();
       } catch (error) {
-        res.status(500).send(`Error processing data ${error?.message }`);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'An unexpected error occurred';
+        res.status(400).json({ error: errorMessage });
       }
     });
 };
 
 export default uploadCsvFile;
 
-
-
-
-
-// for frontend 
+// for frontend
 
 // import React, { useEffect, useState } from 'react';
 

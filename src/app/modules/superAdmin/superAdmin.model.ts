@@ -32,6 +32,8 @@ const superAdminSchema = new Schema<ISuperAdmin>({
     type: String,
     default: '',
   },
+},{
+  timestamps:true
 });
 const SuperAdmin = model<ISuperAdmin>('SuperAdmin', superAdminSchema);
 

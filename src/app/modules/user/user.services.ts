@@ -16,6 +16,7 @@ import Player from '../player/player.model';
 import Team from '../team/team.model';
 import Invite from '../invite/invite.model';
 import { inviteRewardPoint } from '../../constant';
+import Notification from '../notification/notification.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -109,9 +110,17 @@ const verifyCode = async (email: string, verifyCode: number) => {
 
   if (result?.inviteToken) {
     const invite = await Invite.findOne({ inviteToken: result.inviteToken });
-    await NormalUser.findByIdAndUpdate(invite?.inviter, {
+   const updatedUser = await NormalUser.findByIdAndUpdate(invite?.inviter, {
       $inc: { totalPoint: inviteRewardPoint },
     });
+
+    const notificationData = {
+      title: "Congratulations you got points",
+      message: `Congratulations your friend register with your invitation and you got ${inviteRewardPoint} points`,
+      receiver: updatedUser?._id,
+    };
+
+    await Notification.create(notificationData);
   }
 
   return result;

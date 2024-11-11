@@ -14,6 +14,7 @@ import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import NormalUser from '../normalUser/normalUser.model';
 import mongoose from 'mongoose';
+import Notification from '../notification/notification.model';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 
 paypal.configure({
@@ -102,8 +103,6 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
     },
   );
 
-  console.log("dkfjd",payment.paymentId)
-
   await Transaction.create({
     ...payload,
     entityId: user.profileId,
@@ -153,6 +152,15 @@ const executeStripeDeposit = async (transactionId: string) => {
       { new: true, runValidators: true, session },
     );
 
+    const notificationData = {
+      title: 'Successfully deposit amount',
+      message:
+        'Your deposit is successful with credit card . Check your account balance',
+      receiver: updatedUser?._id,
+    };
+
+    await Notification.create(notificationData);
+
     if (!updatedUser) {
       throw new AppError(
         httpStatus.INTERNAL_SERVER_ERROR,
@@ -198,7 +206,7 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
   try {
     const transaction = await Transaction.findOne({
       transactionId: payment.id,
-      status:ENUM_TRANSACTION_STATUS.PENDING
+      status: ENUM_TRANSACTION_STATUS.PENDING,
     }).session(session);
     if (!transaction) {
       throw new AppError(httpStatus.NOT_FOUND, "You don't have deposit intent");
@@ -210,11 +218,26 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
       { new: true, runValidators: true, session },
     );
 
-    await NormalUser.findByIdAndUpdate(
+    const updatedUser = await NormalUser.findByIdAndUpdate(
       transaction.entityId,
       { $inc: { totalAmount: transaction.amount } },
       { new: true, runValidators: true, session },
     );
+    if (!updatedUser) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'User not found during deposit update.',
+      );
+    }
+
+    const notificationData = {
+      title: 'Successfully deposit amount',
+      message:
+        'Your deposit is successful with credit card . Check your account balance',
+      receiver: updatedUser?._id,
+    };
+
+    await Notification.create(notificationData);
 
     await session.commitTransaction();
     session.endSession();

@@ -10,6 +10,8 @@ import RedeemRequest from './redeemRequest.model';
 import sendEmail from '../../utilities/sendEmail';
 import cron from 'node-cron';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { USER_ROLE } from '../user/user.constant';
+import Notification from '../notification/notification.model';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -65,9 +67,24 @@ const createRedeemRequestIntoDB = async (
 
   const result = await RedeemRequest.create({ ...payload, user: userId });
 
-  await NormalUser.findByIdAndUpdate(userId, {
+  const updatedUser = await NormalUser.findByIdAndUpdate(userId, {
     $inc: { totalPoint: -reward.pointRequired },
   });
+
+  const notificationData = [
+    {
+      title: 'User sent redeem request please check',
+      message: `A user sent reward redeem request . Please check it and make ready for send`,
+      receiver: USER_ROLE.superAdmin,
+    },
+    {
+      title: 'Redeem request sent successfully',
+      message: `Your reward redeem request sent successfully . We will shortly send you the reward`,
+      receiver: updatedUser?._id,
+    },
+  ];
+
+  await Notification.create(notificationData);
 
   const html = `
   <h1>Protipzz Reward Redemption Verification</h1>
