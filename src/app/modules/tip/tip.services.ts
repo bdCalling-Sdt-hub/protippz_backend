@@ -35,7 +35,6 @@ paypal.configure({
 });
 
 const createTipIntoDB = async (userId: string, payload: ITip) => {
-  console.log('tip by ', payload.tipBy);
   let result;
   if (payload.tipBy === ENUM_TIP_BY.PROFILE_BALANCE) {
     result = await tipByProfileBalance(userId, payload);

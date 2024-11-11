@@ -6,5 +6,6 @@ export interface ITransaction {
   type: (typeof ENUM_TRANSACTION_TYPE)[keyof typeof ENUM_TRANSACTION_TYPE];
   paymentBy: (typeof ENUM_PAYMENT_BY)[keyof typeof ENUM_PAYMENT_BY];
   description: string;
-  user: Types.ObjectId;
+  entityId: Types.ObjectId;
+  entityType: 'User' | 'Team' | 'Player';
 }

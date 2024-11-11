@@ -16,7 +16,8 @@ const transactionSchema = new Schema<ITransaction>(
       required: true,
     },
     description: { type: String, default:""  },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    entityId: { type: Schema.Types.ObjectId, required: true },
+    entityType: { type: String, enum: ["User", "Player","Team"], required: true },
   },
   { timestamps: true },
 );

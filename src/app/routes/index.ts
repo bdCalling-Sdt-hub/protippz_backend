@@ -18,6 +18,7 @@ import { tipRoutes } from '../modules/tip/tip.routes';
 import { redeemRequestRoutes } from '../modules/redeemRequest/redeemRequest.routes';
 import { metaRoutes } from '../modules/meta/meta.routes';
 import { inviteRoutes } from '../modules/invite/invite.routes';
+import { depositRoutes } from '../modules/deposit/deposit.routes';
 
 const router = Router();
 
@@ -94,6 +95,10 @@ const moduleRoutes = [
   {
     path: '/invite',
     router: inviteRoutes,
+  },
+  {
+    path: '/deposit',
+    router: depositRoutes,
   },
 ];
 
