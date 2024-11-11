@@ -88,6 +88,8 @@ const registerUser = async (
   }
 };
 
+
+
 const verifyCode = async (email: string, verifyCode: number) => {
   const user = await User.findOne({ email: email });
   if (!user) {

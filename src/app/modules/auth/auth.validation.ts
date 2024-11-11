@@ -8,6 +8,14 @@ const loginValidationSchema = z.object({
   }),
 });
 
+const googleSignUpValidationSchema = z.object({
+  body:z.object({
+    name:z.string({required_error:"Name is required"}),
+    email:z.string({required_error:"Email is required"}),
+    profile_image:z.string().optional()
+  })
+})
+
 const changePasswordValidationSchema = z.object({
   body: z.object({
     oldPassword: z.string({ required_error: 'Old password is required' }),
@@ -63,6 +71,7 @@ const authValidations = {
   resetPasswordValidationSchema,
   verifyResetOtpValidationSchema,
   resendResetCodeValidationSchema,
+  googleSignUpValidationSchema
 };
 
 export default authValidations;

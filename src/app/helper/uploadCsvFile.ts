@@ -184,7 +184,7 @@ const uploadCsvFile = async (req: Request, res: Response) => {
         res.write(`data: ${JSON.stringify({ message: 'Upload complete' })}\n\n`);
         res.end();
       } catch (error) {
-        res.status(500).send(`Error processing data ${error.message}`);
+        res.status(500).send(`Error processing data ${error?.message }`);
       }
     });
 };

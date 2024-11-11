@@ -77,6 +77,8 @@ const changeUserStatus = z.object({
   }),
 });
 
+
+
 const userValidations = {
   registerUserValidationSchema,
   loginValidationSchema,
@@ -86,7 +88,7 @@ const userValidations = {
   resetPasswordValidationSchema,
   verifyCodeValidationSchema,
   resendVerifyCodeSchema,
-  changeUserStatus
+  changeUserStatus,
 };
 
 export default userValidations;

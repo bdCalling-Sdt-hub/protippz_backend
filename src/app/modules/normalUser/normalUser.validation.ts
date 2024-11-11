@@ -16,7 +16,7 @@ export const createNormalUserSchema = z.object({
         .nonempty('Phone number is required')
         .regex(/^\+?[1-9]\d{1,14}$/, 'Phone number must be a valid format'),
       email: z.string().email('Invalid email format'),
-      address: z.string().nonempty('Address is required'),
+      address: z.string().nonempty('Address is required').optional(),
     }),
   }),
 });

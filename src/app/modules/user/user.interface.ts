@@ -4,7 +4,7 @@ import { USER_ROLE } from './user.constant';
 
 export interface TUser {
   _id: string;
-  username:string;
+  username: string;
   email: string;
   phone: string;
   password: string;
@@ -18,11 +18,20 @@ export interface TUser {
   codeExpireIn: Date;
   isActive: boolean;
   isDeleted: boolean;
-  inviteToken:string;
+  inviteToken: string;
 }
 export interface TLoginUser {
   email: string;
   password: string;
+}
+
+export interface ILoginWithGoogle {
+  name: string;
+  email: string;
+  profile_image?: string;
+  inviteToken?:string;
+  username?:string;
+  phone?:string
 }
 
 export interface UserModel extends Model<TUser> {

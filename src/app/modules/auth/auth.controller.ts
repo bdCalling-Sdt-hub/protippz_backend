@@ -12,6 +12,15 @@ const loginUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const googleLogin = catchAsync(async (req, res) => {
+  const result = await authServices.loginWithGoogle(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User login successfully',
+    data: result,
+  });
+});
 const changePassword = catchAsync(async (req, res) => {
   const { ...passwordData } = req.body;
   const result = await authServices.changePasswordIntoDB(
@@ -93,6 +102,7 @@ const authControllers = {
   resetPassword,
   verifyResetOtp,
   resendResetCode,
+  googleLogin
 };
 
 export default authControllers;

@@ -19,6 +19,7 @@ import multer from 'multer';
 import uploadCsvFile from './app/helper/uploadCsvFile';
 import auth from './app/middlewares/auth';
 import { USER_ROLE } from './app/modules/user/user.constant';
+import sendContactUsEmail from './app/helper/sendContactUsEmail';
 const upload = multer({ dest: 'uploads/' });
 // parser
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
 app.use(express.static('uploads'));
 // application routers ----------------
 app.use('/', router);
+app.post('/contact-us',sendContactUsEmail);
 
 app.post("/upload-csv",auth(USER_ROLE.superAdmin), upload.single('file'),uploadCsvFile)
 

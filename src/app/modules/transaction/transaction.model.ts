@@ -31,6 +31,7 @@ const transactionSchema = new Schema<ITransaction>(
       enum: ['User', 'Player', 'Team'],
       required: true,
     },
+    transactionId:{type:String,required:true}
   },
   { timestamps: true },
 );

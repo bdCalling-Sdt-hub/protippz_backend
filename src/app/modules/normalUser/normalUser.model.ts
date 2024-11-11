@@ -18,7 +18,7 @@ const NormalUserSchema = new Schema<INormalUser>({
     },
     phone: {
         type: String,
-        required: true,
+        // required: true,
         // unique: true,
     },
     email: {
@@ -28,7 +28,7 @@ const NormalUserSchema = new Schema<INormalUser>({
     },
     address: {
         type: String,
-        required: true,
+        // required: true,
     },
     profile_image:{
         type:String,

@@ -14,6 +14,11 @@ router.post(
   authControllers.loginUser,
 );
 router.post(
+  '/google-login',
+  validateRequest(authValidations.googleSignUpValidationSchema),
+  authControllers.googleLogin,
+);
+router.post(
   '/change-password',
   auth(
     USER_ROLE.user,

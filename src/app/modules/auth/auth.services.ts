@@ -3,13 +3,18 @@ import httpStatus from 'http-status';
 import AppError from '../../error/appError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import { TUserRole } from '../user/user.interface';
+import { ILoginWithGoogle, TUser, TUserRole } from '../user/user.interface';
 import { createToken, verifyToken } from '../user/user.utils';
 import config from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import resetPasswordEmailBody from '../../mailTemplate/resetPasswordEmailBody';
 import sendEmail from '../../utilities/sendEmail';
+import mongoose from 'mongoose';
+import { USER_ROLE } from '../user/user.constant';
+import NormalUser from '../normalUser/normalUser.model';
+import Invite from '../invite/invite.model';
+import { inviteRewardPoint } from '../../constant';
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -56,6 +61,106 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
     accessToken,
     refreshToken,
   };
+};
+
+const loginWithGoogle = async (payload: ILoginWithGoogle) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Check if the user already exists
+    const isExistUser = await User.findOne(
+      { email: payload.email },
+      { isVerified: true },
+    ).session(session);
+
+    // If user exists, create JWT and return tokens
+    if (isExistUser) {
+      const jwtPayload = {
+        id: isExistUser._id,
+        username: isExistUser.username,
+        email: isExistUser.email,
+        role: isExistUser.role as TUserRole,
+      };
+
+      const accessToken = createToken(
+        jwtPayload,
+        config.jwt_access_secret as string,
+        config.jwt_access_expires_in as string,
+      );
+      const refreshToken = createToken(
+        jwtPayload,
+        config.jwt_refresh_secret as string,
+        config.jwt_refresh_expires_in as string,
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+      return { accessToken, refreshToken };
+    }
+
+    // If user doesn't exist, create a new user
+    const userDataPayload: Partial<TUser> = {
+      username: payload.username,
+      email: payload.email,
+      phone: payload.phone,
+      role: USER_ROLE.user,
+      inviteToken: payload.inviteToken || '',
+    };
+
+    const createUser = await User.create([userDataPayload], { session });
+
+    const normalUserData = {
+      name: payload.name,
+      email: payload.email,
+      profile_image: payload.profile_image,
+      user: createUser[0]._id,
+    };
+
+    await NormalUser.create([normalUserData], {
+      session,
+    });
+
+    // Handle invite reward if applicable
+    if (payload.inviteToken) {
+      const invite = await Invite.findOne({
+        inviteToken: payload.inviteToken,
+      }).session(session);
+      if (invite && invite.inviter) {
+        await NormalUser.findByIdAndUpdate(invite.inviter, {
+          $inc: { totalPoint: inviteRewardPoint},
+        }).session(session);
+      }
+    }
+
+    // Create JWT tokens
+    const jwtPayload = {
+      id: createUser[0]._id,
+      username: createUser[0].username,
+      email: createUser[0].email,
+      role: createUser[0].role as TUserRole,
+    };
+
+    const accessToken = createToken(
+      jwtPayload,
+      config.jwt_access_secret as string,
+      config.jwt_access_expires_in as string,
+    );
+    const refreshToken = createToken(
+      jwtPayload,
+      config.jwt_refresh_secret as string,
+      config.jwt_refresh_expires_in as string,
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };
 
 // change password
@@ -338,6 +443,7 @@ const authServices = {
   resetPassword,
   verifyResetOtp,
   resendResetCode,
+  loginWithGoogle
 };
 
 export default authServices;

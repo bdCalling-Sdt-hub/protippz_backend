@@ -40,6 +40,12 @@ export const ENUM_PAYMENT_BY = {
   ACH: 'ACH',
   CHECK: 'Check',
 };
+export const ENUM_WITHDRAW_OPTION = {
+  CREDIT_CARD: 'Credit Card',
+  PAYPAL: 'Paypal',
+  ACH: 'ACH',
+  CHECK: 'Check',
+};
 
 export const ENUM_INVITE_STATUS = {
   PENDING: 'Pending',

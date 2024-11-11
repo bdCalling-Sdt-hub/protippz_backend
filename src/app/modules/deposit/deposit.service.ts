@@ -102,6 +102,8 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
     },
   );
 
+  console.log("dkfjd",payment.paymentId)
+
   await Transaction.create({
     ...payload,
     entityId: user.profileId,
@@ -196,12 +198,13 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
   try {
     const transaction = await Transaction.findOne({
       transactionId: payment.id,
+      status:ENUM_TRANSACTION_STATUS.PENDING
     }).session(session);
     if (!transaction) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Transaction not found');
+      throw new AppError(httpStatus.NOT_FOUND, "You don't have deposit intent");
     }
 
-    const updatedTip = await Transaction.findOneAndUpdate(
+    const updatedTransaction = await Transaction.findOneAndUpdate(
       { transactionId: payment.id },
       { status: ENUM_TRANSACTION_STATUS.SUCCESS },
       { new: true, runValidators: true, session },
@@ -209,14 +212,14 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
 
     await NormalUser.findByIdAndUpdate(
       transaction.entityId,
-      { $inc: { totalPoint: transaction.amount } },
+      { $inc: { totalAmount: transaction.amount } },
       { new: true, runValidators: true, session },
     );
 
     await session.commitTransaction();
     session.endSession();
 
-    return updatedTip;
+    return updatedTransaction;
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
