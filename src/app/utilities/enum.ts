@@ -45,3 +45,8 @@ export const ENUM_INVITE_STATUS = {
   PENDING: 'Pending',
   ACCEPTED: 'Accepted',
 };
+
+export const ENUM_TRANSACTION_STATUS = {
+  PENDING: 'Pending',
+  SUCCESS: 'Success',
+};

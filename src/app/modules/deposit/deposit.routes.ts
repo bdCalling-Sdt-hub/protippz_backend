@@ -14,4 +14,18 @@ router.post(
   DepositController.depositAmount,
 );
 
+router.post(
+  '/execute-stripe-deposit',
+  auth(USER_ROLE.user),
+  validateRequest(depositValidations.executeStipeDeposit),
+  DepositController.executeDepositWithStripe,
+);
+
+router.post(
+  '/execute-paypal-deposit',
+  auth(USER_ROLE.user),
+  validateRequest(depositValidations.executePaypalDeposit),
+  DepositController.executePaypalDeposit,
+);
+
 export const depositRoutes = router;

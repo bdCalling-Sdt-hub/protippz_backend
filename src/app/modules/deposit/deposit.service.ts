@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { JwtPayload } from 'jsonwebtoken';
 import { ITransaction } from '../transaction/transaction.interface';
-import { ENUM_PAYMENT_BY } from '../../utilities/enum';
+import {
+  ENUM_PAYMENT_BY,
+  ENUM_TRANSACTION_STATUS,
+  ENUM_TRANSACTION_TYPE,
+} from '../../utilities/enum';
 import Stripe from 'stripe';
 import config from '../../config';
 import paypal from 'paypal-rest-sdk';
 import Transaction from '../transaction/transaction.model';
+import AppError from '../../error/appError';
+import httpStatus from 'http-status';
+import NormalUser from '../normalUser/normalUser.model';
+import mongoose from 'mongoose';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 
 paypal.configure({
@@ -41,6 +49,7 @@ const depositWithCreditCard = async (
     entityId: user.profileId,
     entityType: 'User',
     transactionId: paymentIntent.id,
+    transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
   });
 
   return {
@@ -98,14 +107,127 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
     entityId: user.profileId,
     entityType: 'User',
     transactionId: payment?.paymentId,
+    transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
   });
   return {
     approvalUrl: payment.approvalUrl,
   };
 };
 
+const executeStripeDeposit = async (transactionId: string) => {
+  const session = await Transaction.startSession();
+  session.startTransaction();
+
+  try {
+    const transaction = await Transaction.findOne(
+      { transactionId: transactionId, status: ENUM_TRANSACTION_STATUS.PENDING },
+      null,
+      { session },
+    );
+
+    if (!transaction) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'No pending deposit intent found.',
+      );
+    }
+
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { transactionId: transactionId, status: ENUM_TRANSACTION_STATUS.PENDING },
+      { status: ENUM_TRANSACTION_STATUS.SUCCESS },
+      { new: true, runValidators: true, session },
+    );
+
+    if (!updatedTransaction) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Failed to update transaction status.',
+      );
+    }
+
+    const updatedUser = await NormalUser.findByIdAndUpdate(
+      updatedTransaction.entityId,
+      { $inc: { totalAmount: updatedTransaction.amount } },
+      { new: true, runValidators: true, session },
+    );
+
+    if (!updatedUser) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Failed to update user balance.',
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return updatedTransaction;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+// execute paypal deposit
+
+const executePaypalDeposit = async (paymentId: string, payerId: string) => {
+  const execute_payment_json = { payer_id: payerId };
+  const executePaypalPayment = (paymentId: string, execute_payment_json: any) =>
+    new Promise((resolve, reject) => {
+      paypal.payment.execute(
+        paymentId,
+        execute_payment_json,
+        (error, payment) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(payment);
+          }
+        },
+      );
+    });
+
+  // Await the PayPal payment execution
+  const payment = await executePaypalPayment(paymentId, execute_payment_json);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const transaction = await Transaction.findOne({
+      transactionId: payment.id,
+    }).session(session);
+    if (!transaction) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Transaction not found');
+    }
+
+    const updatedTip = await Transaction.findOneAndUpdate(
+      { transactionId: payment.id },
+      { status: ENUM_TRANSACTION_STATUS.SUCCESS },
+      { new: true, runValidators: true, session },
+    );
+
+    await NormalUser.findByIdAndUpdate(
+      transaction.entityId,
+      { $inc: { totalPoint: transaction.amount } },
+      { new: true, runValidators: true, session },
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return updatedTip;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 const depositServices = {
   depositAmount,
+  executeStripeDeposit,
+  executePaypalDeposit,
 };
 
 export default depositServices;
