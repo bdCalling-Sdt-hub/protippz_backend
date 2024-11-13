@@ -14,7 +14,16 @@ router.post(
   WithdrawRequestController.createWithdrawRequest,
 );
 
-router.get('/get-all',auth(USER_ROLE.superAdmin),WithdrawRequestController.getAllWithdrawRequest);
-
+router.get(
+  '/get-all',
+  auth(USER_ROLE.superAdmin),
+  WithdrawRequestController.getAllWithdrawRequest,
+);
+router.patch(
+  '/update-status/:id',
+  auth(USER_ROLE.superAdmin),
+  validateRequest(withdrawRequestValidations.withdrawRequestValidationSchema),
+  WithdrawRequestController.updateWithdrawRequestStatus,
+);
 
 export const withdrawRoutes = router;

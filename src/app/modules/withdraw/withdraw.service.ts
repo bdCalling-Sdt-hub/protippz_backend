@@ -9,6 +9,11 @@ import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import { WithdrawalRequest } from './withdraw.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import Transaction from '../transaction/transaction.model';
+import {
+  ENUM_PAYMENT_STATUS,
+  ENUM_TRANSACTION_TYPE,
+} from '../../utilities/enum';
 
 const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
   if (user.role === USER_ROLE.user) {
@@ -109,9 +114,37 @@ const getAllWithdrawRequest = async (query: Record<string, any>) => {
   };
 };
 
+// update withdraw status
+const updateWithdrawRequestStatus = async (id: string, status: string) => {
+  const withdraw = await WithdrawalRequest.findById(id);
+  if (!withdraw) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Withdraw not found');
+  }
+
+  const updateWithdraw = await WithdrawalRequest.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true, runValidators: true },
+  );
+
+  const transactionData = {
+    amount: updateWithdraw?.amount,
+    transactionType: ENUM_TRANSACTION_TYPE.WITHDRAW,
+    paymentBy: updateWithdraw?.withdrawOption,
+    status: ENUM_PAYMENT_STATUS.SUCCESS,
+    entityId: updateWithdraw?.entityId,
+    entityType: updateWithdraw?.entityType,
+  };
+
+  await Transaction.create(transactionData);
+
+  return updateWithdraw;
+};
+
 const WithdrawRequestServices = {
   crateWithdrawRequest,
   getAllWithdrawRequest,
+  updateWithdrawRequestStatus
 };
 
 export default WithdrawRequestServices;

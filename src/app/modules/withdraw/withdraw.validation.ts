@@ -57,11 +57,18 @@ export const withdrawalRequestSchema = z.object({
     ),
 });
 
+const withdrawRequestValidationSchema = z.object({
+  body: z.object({
+    status: z.enum(['Pending', 'Completed']),
+  }),
+});
+
 // Type inference for TypeScript
 export type IWithdraw = z.infer<typeof withdrawalRequestSchema>;
 
 const withdrawRequestValidations = {
   withdrawalRequestSchema,
+  withdrawRequestValidationSchema
 };
 
 export default withdrawRequestValidations;

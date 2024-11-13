@@ -21,11 +21,21 @@ const getAllWithdrawRequest = catchAsync(async (req, res) => {
       data: result,
     });
   });
+const updateWithdrawRequestStatus = catchAsync(async (req, res) => {
+    const result = await WithdrawRequestServices.updateWithdrawRequestStatus(req.params.id,req.body.status)
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Withdraw request updated successfully',
+      data: result,
+    });
+  });
 
 
 const WithdrawRequestController = {
     createWithdrawRequest,
-    getAllWithdrawRequest
+    getAllWithdrawRequest,
+    updateWithdrawRequestStatus
 }
 
 export default WithdrawRequestController;
