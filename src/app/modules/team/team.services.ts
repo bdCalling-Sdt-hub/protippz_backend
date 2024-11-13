@@ -35,7 +35,7 @@ const getAllTeamsFromDB = async (
     Team.find().populate({ path: 'league', select: 'name sport' }).lean(),
     query,
   )
-    .search(['name'])
+    .search(['name',"sport"])
     .filter()
     .sort()
     .paginate()

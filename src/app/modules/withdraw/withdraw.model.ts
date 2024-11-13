@@ -3,8 +3,7 @@ import { ENUM_WITHDRAW_OPTION } from '../../utilities/enum';
 
 const WithdrawalRequestSchema = new Schema(
   {
-    requestId: { type: String, required: true, unique: true },
-    requestAmount: { type: Number, required: true },
+    amount: { type: Number, required: true },
     withdrawOption: {
       type: String,
       enum: Object.values(ENUM_WITHDRAW_OPTION),
@@ -17,7 +16,7 @@ const WithdrawalRequestSchema = new Schema(
     },
     entityType: {
       type: String,
-      enum: ['User', 'Player', 'Team'],
+      enum: ['NormalUser', 'Player', 'Team'],
       required: true,
     },
     entityId: {
@@ -25,14 +24,25 @@ const WithdrawalRequestSchema = new Schema(
       required: true,
       refPath: 'entityType',
     },
-    requestDate: { type: Date, default: Date.now },
+
+    // ACH fields
+    bankAccountNumber: { type: Number },
+    routingNumber: { type: Number },
+    accountType: { type: String },
+    bankName: { type: String },
+    accountHolderName: { type: String },
+
+    // Check fields
+    fullName: { type: String },
+    streetAddress: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: Number },
+    email: { type: String },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-export const WithdrawalRequest = model(
-  'WithdrawalRequest',
-  WithdrawalRequestSchema,
-);
+export const WithdrawalRequest = model('WithdrawalRequest', WithdrawalRequestSchema);

@@ -22,8 +22,6 @@ const createPlayer = catchAsync(async (req, res) => {
 
 const getAllPlayers = catchAsync(async (req, res) => {
 
-  console.log(req.user)
-
   const result = await PlayerServices.getAllPlayersFromDB(req?.user?.profileId,req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,

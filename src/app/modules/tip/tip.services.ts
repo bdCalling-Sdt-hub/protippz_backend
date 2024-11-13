@@ -375,12 +375,93 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
 
 // Get all tips
 
+// const getAllTipsFromDB = async (query: Record<string, any>) => {
+//   const tipQuery = new QueryBuilder(
+//     Tip.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
+//     query,
+//   )
+//     .search(['name'])
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   const pipeline = [
+//     {
+//       $match: tipQuery.modelQuery.getFilter(),
+//     },
+//     {
+//       $lookup: {
+//         from: 'normalusers',
+//         let: { userId: '$user' },
+//         pipeline: [
+//           { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+//           { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
+//         ],
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $unwind: '$user',
+//     },
+//     {
+//       $lookup: {
+//         from: 'teams',
+//         localField: 'entityId',
+//         foreignField: '_id',
+//         as: 'teamEntity',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'players',
+//         localField: 'entityId',
+//         foreignField: '_id',
+//         as: 'playerEntity',
+//       },
+//     },
+//     {
+//       $addFields: {
+//         entity: {
+//           $cond: {
+//             if: { $eq: ['$entityType', 'Team'] },
+//             then: {
+//               name: { $arrayElemAt: ['$teamEntity.name', 0] },
+//               team_logo: { $arrayElemAt: ['$teamEntity.team_logo', 0] },
+//             },
+//             else: {
+//               name: { $arrayElemAt: ['$playerEntity.name', 0] },
+//               position: { $arrayElemAt: ['$playerEntity.position', 0] },
+//               player_image: { $arrayElemAt: ['$playerEntity.player_image', 0] },
+//             },
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $project: {
+//         teamEntity: 0,
+//         playerEntity: 0,
+//       },
+//     },
+//   ];
+
+//   // Execute the aggregation pipeline
+//   const result = await Tip.aggregate(pipeline);
+
+//   const meta = await tipQuery.countTotal(); // Count total documents for pagination
+//   return {
+//     meta,
+//     result,
+//   };
+// };
 const getAllTipsFromDB = async (query: Record<string, any>) => {
+  const { searchTerm, ...otherQueryParams } = query;
+
   const tipQuery = new QueryBuilder(
     Tip.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
-    query,
+    otherQueryParams,
   )
-    .search(['name'])
     .filter()
     .sort()
     .paginate()
@@ -396,7 +477,7 @@ const getAllTipsFromDB = async (query: Record<string, any>) => {
         let: { userId: '$user' },
         pipeline: [
           { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-          { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
+          { $project: { name: 1, email: 1, profile_image: 1 } },
         ],
         as: 'user',
       },
@@ -438,6 +519,19 @@ const getAllTipsFromDB = async (query: Record<string, any>) => {
         },
       },
     },
+    // Add this match stage if `searchTerm` exists in the query
+    ...(searchTerm
+      ? [
+          {
+            $match: {
+              $or: [
+                { 'entity.name': { $regex: searchTerm, $options: 'i' } },
+                { 'user.name': { $regex: searchTerm, $options: 'i' } },
+              ],
+            },
+          },
+        ]
+      : []),
     {
       $project: {
         teamEntity: 0,
@@ -455,6 +549,7 @@ const getAllTipsFromDB = async (query: Record<string, any>) => {
     result,
   };
 };
+
 const getUserTipsFromDB = async (
   userId: string,
   query: Record<string, any>,

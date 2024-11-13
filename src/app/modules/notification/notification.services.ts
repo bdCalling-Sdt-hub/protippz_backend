@@ -68,6 +68,9 @@ const seeNotification = async (user: JwtPayload) => {
   return result;
 };
 
+
+
+
 const notificationService = {
   getAllNotificationFromDB,
   seeNotification,

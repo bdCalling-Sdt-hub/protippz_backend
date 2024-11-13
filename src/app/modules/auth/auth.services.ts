@@ -178,8 +178,18 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
 // change password
 const changePasswordIntoDB = async (
   userData: JwtPayload,
-  payload: { oldPassword: string; newPassword: string },
+  payload: {
+    oldPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+  },
 ) => {
+  if (payload.newPassword !== payload.confirmNewPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Password and confirm password doesn't match",
+    );
+  }
   const user = await User.findOne({
     $or: [{ email: userData?.email }, { username: userData.username }],
   });

@@ -59,7 +59,7 @@ const registerUser = async (
       password: password,
       role: USER_ROLE.user,
       verifyCode,
-      codeExpireIn: new Date(Date.now() + 5 * 60000),
+      codeExpireIn: new Date(Date.now() + 2 * 60000),
       inviteToken: userData.inviteToken ? userData.inviteToken : '',
     };
 
@@ -172,20 +172,53 @@ const getMyProfile = async (userData: JwtPayload) => {
 
 // all cron jobs for users
 
-cron.schedule('* * * * *', async () => {
+// cron.schedule('*/1 * * * *', async () => {
+//   console.log("nice")
+//   try {
+//     const now = new Date();
+//     const result = await User.deleteMany({
+//       isVerified: false,
+//       codeExpireIn: { $lte: now },
+//     });
+
+//     if (result.deletedCount > 0) {
+//       console.log(`Deleted ${result.deletedCount} expired inactive users`);
+//     }
+//   } catch (error) {
+//     console.log('Error deleting expired users:', error);
+//   }
+// });
+cron.schedule('*/2 * * * *', async () => {
   try {
     const now = new Date();
-    const result = await User.deleteMany({
+    
+    // Find unverified users whose expiration time has passed
+    const expiredUsers = await User.find({
       isVerified: false,
-      expirationTime: { $lte: now },
+      codeExpireIn: { $lte: now },
     });
-    if (result.deletedCount > 0) {
-      console.log(`Deleted ${result.deletedCount} expired inactive users`);
+
+    if (expiredUsers.length > 0) {
+      const expiredUserIds = expiredUsers.map(user => user._id);
+
+      // Delete corresponding NormalUser documents
+      const normalUserDeleteResult = await NormalUser.deleteMany({
+        user: { $in: expiredUserIds },
+      });
+
+      // Delete the expired User documents
+      const userDeleteResult = await User.deleteMany({
+        _id: { $in: expiredUserIds },
+      });
+
+      console.log(`Deleted ${userDeleteResult.deletedCount} expired inactive users`);
+      console.log(`Deleted ${normalUserDeleteResult.deletedCount} associated NormalUser documents`);
     }
   } catch (error) {
-    console.log('Error deleting expired users:', error);
+    console.log('Error deleting expired users and associated data:', error);
   }
 });
+
 
 const changeUserStatus = async (id: string, status: string) => {
   const user = await User.findById(id);

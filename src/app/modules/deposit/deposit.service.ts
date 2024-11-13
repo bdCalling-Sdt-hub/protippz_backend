@@ -48,7 +48,7 @@ const depositWithCreditCard = async (
   await Transaction.create({
     ...payload,
     entityId: user.profileId,
-    entityType: 'User',
+    entityType: 'NormalUser',
     transactionId: paymentIntent.id,
     transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
   });
@@ -106,7 +106,7 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
   await Transaction.create({
     ...payload,
     entityId: user.profileId,
-    entityType: 'User',
+    entityType: 'NormalUser',
     transactionId: payment?.paymentId,
     transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
   });

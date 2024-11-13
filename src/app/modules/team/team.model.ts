@@ -6,6 +6,7 @@ const TeamSchema = new Schema({
   team_logo: { type: String, default:"" },
   league: { type: Types.ObjectId, ref: 'League', required: true },
   team_bg_image: { type: String, default:"" },
+  sport:{type:String,required:true},
   totalTips: { type: Number, default: 0 },
   paidAmount: { type: Number,  default: 0 },
   dueAmount: { type: Number,  default: 0 },

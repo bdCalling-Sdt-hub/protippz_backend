@@ -25,13 +25,17 @@ const transactionSchema = new Schema<ITransaction>(
       default: ENUM_TRANSACTION_STATUS.PENDING,
     },
     description: { type: String, default: '' },
-    entityId: { type: Schema.Types.ObjectId, required: true },
+    entityId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      refPath: 'entityType',
+    },
     entityType: {
       type: String,
-      enum: ['User', 'Player', 'Team'],
+      enum: ['NormalUser', 'Player', 'Team'],
       required: true,
     },
-    transactionId:{type:String,required:true}
+    transactionId: { type: String, required: true },
   },
   { timestamps: true },
 );

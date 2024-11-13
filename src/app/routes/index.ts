@@ -19,6 +19,8 @@ import { redeemRequestRoutes } from '../modules/redeemRequest/redeemRequest.rout
 import { metaRoutes } from '../modules/meta/meta.routes';
 import { inviteRoutes } from '../modules/invite/invite.routes';
 import { depositRoutes } from '../modules/deposit/deposit.routes';
+import { transactionRoutes } from '../modules/transaction/transaction.routes';
+import { withdrawRoutes } from '../modules/withdraw/withdraw.routes';
 
 const router = Router();
 
@@ -99,6 +101,14 @@ const moduleRoutes = [
   {
     path: '/deposit',
     router: depositRoutes,
+  },
+  {
+    path: '/withdraw',
+    router: withdrawRoutes,
+  },
+  {
+    path: '/transaction',
+    router: transactionRoutes,
   },
 ];
 

@@ -6,6 +6,7 @@ export interface ITeam {
     team_logo:string;
     league:Types.ObjectId;
     team_bg_image:string;
+    sport:string;
     totalTips:number;
     paidAmount:number;
     dueAmount:number;
