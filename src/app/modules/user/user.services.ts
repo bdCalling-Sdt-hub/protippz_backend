@@ -89,8 +89,6 @@ const registerUser = async (
   }
 };
 
-
-
 const verifyCode = async (email: string, verifyCode: number) => {
   const user = await User.findOne({ email: email });
   if (!user) {
@@ -110,12 +108,12 @@ const verifyCode = async (email: string, verifyCode: number) => {
 
   if (result?.inviteToken) {
     const invite = await Invite.findOne({ inviteToken: result.inviteToken });
-   const updatedUser = await NormalUser.findByIdAndUpdate(invite?.inviter, {
+    const updatedUser = await NormalUser.findByIdAndUpdate(invite?.inviter, {
       $inc: { totalPoint: inviteRewardPoint },
     });
 
     const notificationData = {
-      title: "Congratulations you got points",
+      title: 'Congratulations you got points',
       message: `Congratulations your friend register with your invitation and you got ${inviteRewardPoint} points`,
       receiver: updatedUser?._id,
     };
@@ -170,28 +168,25 @@ const getMyProfile = async (userData: JwtPayload) => {
   return result;
 };
 
+const deleteUserAccount = async (user: JwtPayload) => {
+  const userData = await User.findById(user.id);
+
+  if (!userData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  await NormalUser.findByIdAndDelete(user.profileId);
+  await User.findByIdAndDelete(user.id);
+
+  return null;
+};
+
 // all cron jobs for users
 
-// cron.schedule('*/1 * * * *', async () => {
-//   console.log("nice")
-//   try {
-//     const now = new Date();
-//     const result = await User.deleteMany({
-//       isVerified: false,
-//       codeExpireIn: { $lte: now },
-//     });
-
-//     if (result.deletedCount > 0) {
-//       console.log(`Deleted ${result.deletedCount} expired inactive users`);
-//     }
-//   } catch (error) {
-//     console.log('Error deleting expired users:', error);
-//   }
-// });
 cron.schedule('*/2 * * * *', async () => {
   try {
     const now = new Date();
-    
+
     // Find unverified users whose expiration time has passed
     const expiredUsers = await User.find({
       isVerified: false,
@@ -199,7 +194,7 @@ cron.schedule('*/2 * * * *', async () => {
     });
 
     if (expiredUsers.length > 0) {
-      const expiredUserIds = expiredUsers.map(user => user._id);
+      const expiredUserIds = expiredUsers.map((user) => user._id);
 
       // Delete corresponding NormalUser documents
       const normalUserDeleteResult = await NormalUser.deleteMany({
@@ -211,14 +206,17 @@ cron.schedule('*/2 * * * *', async () => {
         _id: { $in: expiredUserIds },
       });
 
-      console.log(`Deleted ${userDeleteResult.deletedCount} expired inactive users`);
-      console.log(`Deleted ${normalUserDeleteResult.deletedCount} associated NormalUser documents`);
+      console.log(
+        `Deleted ${userDeleteResult.deletedCount} expired inactive users`,
+      );
+      console.log(
+        `Deleted ${normalUserDeleteResult.deletedCount} associated NormalUser documents`,
+      );
     }
   } catch (error) {
     console.log('Error deleting expired users and associated data:', error);
   }
 });
-
 
 const changeUserStatus = async (id: string, status: string) => {
   const user = await User.findById(id);
@@ -239,6 +237,7 @@ const userServices = {
   resendVerifyCode,
   getMyProfile,
   changeUserStatus,
+  deleteUserAccount
 };
 
 export default userServices;

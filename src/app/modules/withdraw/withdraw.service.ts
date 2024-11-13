@@ -91,28 +91,64 @@ const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
   return result;
 };
 
+// const getAllWithdrawRequest = async (query: Record<string, any>) => {
+//   const withdrawQuery = new QueryBuilder(
+//     WithdrawalRequest.find().populate({
+//       path: 'entityId',
+//       select: 'name profile_image player_image team_logo',
+//     }),
+//     query,
+//   )
+//     .search(['entityId.name'])
+//     .filter()
+//     .sort()
+//     .paginate()
+//     .fields();
+
+//   const meta = await withdrawQuery.countTotal();
+//   const result = await withdrawQuery.modelQuery;
+
+//   return {
+//     meta,
+//     result,
+//   };
+// };
+
 const getAllWithdrawRequest = async (query: Record<string, any>) => {
-  const withdrawQuery = new QueryBuilder(
-    WithdrawalRequest.find().populate({
+    const { searchTerm, ...restQuery } = query;
+  
+    // Step 1: Query the database with the populate option
+    const withdrawQuery = WithdrawalRequest.find().populate({
       path: 'entityId',
       select: 'name profile_image player_image team_logo',
-    }),
-    query,
-  )
-    .search(['entityType'])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
-
-  const meta = await withdrawQuery.countTotal();
-  const result = await withdrawQuery.modelQuery;
-
-  return {
-    meta,
-    result,
+    });
+  
+    // Pass the query to QueryBuilder for filtering, sorting, pagination, and fields
+    const queryBuilder = new QueryBuilder(withdrawQuery, restQuery)
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+  
+    // Execute the query to get initial results with populate
+    const rawResults = await queryBuilder.modelQuery;
+  
+    // Step 2: Manually filter results by search term in `entityId.name`
+    let filteredResults = rawResults;
+    if (searchTerm) {
+      const regex = new RegExp(searchTerm, 'i'); // Case-insensitive regex
+      filteredResults = rawResults.filter((item: any) => regex.test(item.entityId?.name));
+    }
+  
+    // Get the count of filtered results for pagination metadata
+    const meta = { total: filteredResults.length };
+  
+    return {
+      meta,
+      result: filteredResults,
+    };
   };
-};
+  
 
 // update withdraw status
 const updateWithdrawRequestStatus = async (id: string, status: string) => {

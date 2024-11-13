@@ -38,5 +38,10 @@ router.patch(
   validateRequest(userValidations.changeUserStatus),
   userControllers.changeUserStatus,
 );
+router.delete(
+  '/delete-account',
+  auth(USER_ROLE.user),
+  userControllers.deleteUserAccount,
+);
 
 export const userRoutes = router;
