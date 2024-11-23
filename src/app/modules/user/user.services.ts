@@ -168,11 +168,14 @@ const getMyProfile = async (userData: JwtPayload) => {
   return result;
 };
 
-const deleteUserAccount = async (user: JwtPayload) => {
+const deleteUserAccount = async (user: JwtPayload, password: string) => {
   const userData = await User.findById(user.id);
 
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (!(await User.isPasswordMatched(password, userData?.password))) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
   }
 
   await NormalUser.findByIdAndDelete(user.profileId);
@@ -237,7 +240,7 @@ const userServices = {
   resendVerifyCode,
   getMyProfile,
   changeUserStatus,
-  deleteUserAccount
+  deleteUserAccount,
 };
 
 export default userServices;

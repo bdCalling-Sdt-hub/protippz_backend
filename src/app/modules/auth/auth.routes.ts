@@ -63,4 +63,10 @@ router.post(
   authControllers.resendResetCode,
 );
 
+router.post(
+  '/resend-verify-code',
+  validateRequest(authValidations.resendResetCodeValidationSchema),
+  authControllers.resendResetCode,
+);
+
 export const authRoutes = router;

@@ -41,6 +41,7 @@ router.patch(
 router.delete(
   '/delete-account',
   auth(USER_ROLE.user),
+  validateRequest(userValidations.deleteUserAccountValidationSchema),
   userControllers.deleteUserAccount,
 );
 

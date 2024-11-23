@@ -93,6 +93,15 @@ const resendResetCode = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const resendVerifyCode = catchAsync(async (req, res) => {
+  const result = await authServices.resendVerifyCode(req?.body.email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Verify code resend successfully',
+    data: result,
+  });
+});
 
 const authControllers = {
   loginUser,
@@ -102,7 +111,8 @@ const authControllers = {
   resetPassword,
   verifyResetOtp,
   resendResetCode,
-  googleLogin
+  googleLogin,
+  resendVerifyCode
 };
 
 export default authControllers;

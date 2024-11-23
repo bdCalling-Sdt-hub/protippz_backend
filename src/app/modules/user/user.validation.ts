@@ -77,7 +77,11 @@ const changeUserStatus = z.object({
   }),
 });
 
-
+const deleteUserAccountValidationSchema = z.object({
+  body:z.object({
+    password:z.string({required_error:"Password is required"})
+  })
+})
 
 const userValidations = {
   registerUserValidationSchema,
@@ -89,6 +93,7 @@ const userValidations = {
   verifyCodeValidationSchema,
   resendVerifyCodeSchema,
   changeUserStatus,
+  deleteUserAccountValidationSchema
 };
 
 export default userValidations;

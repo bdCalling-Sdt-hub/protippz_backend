@@ -107,7 +107,7 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
     const userDataPayload: Partial<TUser> = {
       username: payload.username,
       email: payload.email,
-      phone: payload.phone,
+      phone: payload?.phone,
       role: USER_ROLE.user,
       inviteToken: payload.inviteToken || '',
     };
@@ -213,7 +213,7 @@ const changePasswordIntoDB = async (
   );
   await User.findOneAndUpdate(
     {
-      id: userData.userId,
+      _id: userData.id,
       role: userData.role,
     },
     {
@@ -451,6 +451,35 @@ const resendResetCode = async (email: string) => {
 
   return null;
 };
+const resendVerifyCode = async (email: string) => {
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
+  }
+  if (user.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted');
+  }
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
+  }
+
+  const verifyCode = generateVerifyCode();
+  await User.findOneAndUpdate(
+    { email: email },
+    {
+      verifyCode: verifyCode,
+      isVerified: false,
+      codeExpireIn: new Date(Date.now() + 5 * 60000),
+    },
+  );
+  sendEmail({
+    email: user.email,
+    subject: 'Reset password code',
+    html: resetPasswordEmailBody(user.username, verifyCode),
+  });
+
+  return null;
+};
 
 const authServices = {
   loginUserIntoDB,
@@ -461,6 +490,7 @@ const authServices = {
   verifyResetOtp,
   resendResetCode,
   loginWithGoogle,
+  resendVerifyCode
 };
 
 export default authServices;
