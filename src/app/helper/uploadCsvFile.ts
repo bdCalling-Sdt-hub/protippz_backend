@@ -104,6 +104,12 @@ const uploadCsvFile = async (req: Request, res: Response) => {
     res.write(`data: ${JSON.stringify({ progress })}\n\n`);
   };
 
+    // Helper function to clean invalid values
+    const cleanValue = (value: any) => {
+      return value === "#VALUE!" || value === undefined || value === null ? "" : value;
+    };
+  
+
   // Stream the CSV file and read data
   fs.createReadStream(filePath as PathLike)
     .pipe(csv())
@@ -114,6 +120,9 @@ const uploadCsvFile = async (req: Request, res: Response) => {
         let processedRows = 0;
 
         for (const row of results) {
+          const cleanedRow = Object.fromEntries(
+            Object.entries(row).map(([key, value]) => [key, cleanValue(value)])
+          );
           const {
             leagueName,
             leagueImage,
@@ -125,7 +134,7 @@ const uploadCsvFile = async (req: Request, res: Response) => {
             playerPosition,
             playerBgImage,
             playerImage,
-          } = row;
+          } = cleanedRow;
 
           // Find or create League
           let league = await League.findOne({ name: leagueName });

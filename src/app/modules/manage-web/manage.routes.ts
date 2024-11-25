@@ -40,33 +40,33 @@ router.post(
 );
 router.get(
   '/get-privacy-policy',
-  auth(USER_ROLE.superAdmin),
+  // auth(USER_ROLE.superAdmin),
   ManageController.getPrivacyPolicy,
 );
 router.get(
   '/get-partner',
-  auth(USER_ROLE.superAdmin),
+  // auth(USER_ROLE.superAdmin),
   ManageController.getPartner,
 );
 router.get(
   '/get-slider',
-  auth(USER_ROLE.superAdmin),
+  // auth(USER_ROLE.superAdmin),
   ManageController.getSlider,
 );
-router.get('/get-faq', auth(USER_ROLE.superAdmin), ManageController.getFAQ);
+router.get('/get-faq', ManageController.getFAQ);
 router.get(
   '/get-about-us',
-  auth(USER_ROLE.superAdmin),
+  // auth(USER_ROLE.superAdmin),
   ManageController.getAboutUs,
 );
 router.get(
   '/get-terms-conditions',
-  auth(USER_ROLE.superAdmin),
+  // auth(USER_ROLE.superAdmin),
   ManageController.getTermsConditions,
 );
 router.get(
   '/get-contact-us',
-  auth(USER_ROLE.superAdmin),
+  // auth(USER_ROLE.superAdmin),
   ManageController.getContactUs,
 );
 router.patch(
