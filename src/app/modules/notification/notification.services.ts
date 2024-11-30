@@ -60,16 +60,13 @@ const seeNotification = async (user: JwtPayload) => {
       { runValidators: true, new: true },
     );
   }
-//   const updatedNotificationCount = await getUnseenNotificationCount(
-//     user?.userId,
-//   );
+  //   const updatedNotificationCount = await getUnseenNotificationCount(
+  //     user?.userId,
+  //   );
   //@ts-ignore
-//   global.io.to(user?.userId).emit('notifications', updatedNotificationCount);
+  //   global.io.to(user?.userId).emit('notifications', updatedNotificationCount);
   return result;
 };
-
-
-
 
 const notificationService = {
   getAllNotificationFromDB,

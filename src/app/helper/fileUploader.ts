@@ -20,14 +20,11 @@ export const uploadFile = () => {
         uploadPath = 'uploads/images/team_bg_image';
       } else if (file.fieldname === 'player_image') {
         uploadPath = 'uploads/images/player_image';
-      }
-       else if (file.fieldname === 'player_bg_image') {
+      } else if (file.fieldname === 'player_bg_image') {
         uploadPath = 'uploads/images/player_bg_image';
-      } 
-       else if (file.fieldname === 'reward_image') {
+      } else if (file.fieldname === 'reward_image') {
         uploadPath = 'uploads/images/reward_image';
-      } 
-      else {
+      } else {
         uploadPath = 'uploads';
       }
 
@@ -39,6 +36,7 @@ export const uploadFile = () => {
         file.mimetype === 'image/jpeg' ||
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/webp' ||
         file.mimetype === 'video/mp4'
       ) {
         cb(null, uploadPath);
@@ -61,9 +59,9 @@ export const uploadFile = () => {
       'category_image',
       'team_logo',
       'team_bg_image',
-      "player_image",
-      "player_bg_image",
-      "reward_image",
+      'player_image',
+      'player_bg_image',
+      'reward_image',
       'video',
     ];
 
@@ -75,6 +73,7 @@ export const uploadFile = () => {
         file.mimetype === 'image/jpeg' ||
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/webp' ||
         file.mimetype === 'video/mp4'
       ) {
         cb(null, true);

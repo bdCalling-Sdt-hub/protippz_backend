@@ -17,6 +17,9 @@ import Team from '../team/team.model';
 import Invite from '../invite/invite.model';
 import { inviteRewardPoint } from '../../constant';
 import Notification from '../notification/notification.model';
+import Stripe from 'stripe';
+import config from '../../config';
+const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -39,6 +42,7 @@ const registerUser = async (
       'If you want to add total amount or total point manually we will block you',
     );
   }
+
   const usernameExist = await User.findOne({ username: userData.username });
   if (usernameExist) {
     throw new AppError(httpStatus.BAD_REQUEST, 'This username already exist');
@@ -105,6 +109,19 @@ const verifyCode = async (email: string, verifyCode: number) => {
     { isVerified: true },
     { new: true, runValidators: true },
   );
+
+  // for create stripe customer ================
+  const customer = await stripe.customers.create({
+    email: result?.email,
+  });
+  await User.findByIdAndUpdate(
+    result?.id,
+    {
+      stripeCustomerId: customer.id,
+    },
+    { new: true, runValidators: true },
+  );
+  //=====================================
 
   if (result?.inviteToken) {
     const invite = await Invite.findOne({ inviteToken: result.inviteToken });

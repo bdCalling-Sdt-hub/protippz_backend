@@ -5,15 +5,15 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new Schema<TUser>(
   {
-    username:{
-      type:String,
-      required:true,
-      unique:true
+    username: {
+      type: String,
+      required: true,
+      unique: true,
     },
     email: {
       type: String,
       required: function () {
-        return this.role === 'user';  // Only required if the role is 'user'
+        return this.role === 'user'; // Only required if the role is 'user'
       },
       // unique: true,
       match: [
@@ -67,7 +67,9 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
-    inviteToken:{type:String,default:''},
+    inviteToken: { type: String, default: '' },
+    stripeCustomerId: { type: String },
+    bankAccountId: { type: String },
   },
   {
     timestamps: true,

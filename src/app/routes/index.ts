@@ -21,6 +21,8 @@ import { inviteRoutes } from '../modules/invite/invite.routes';
 import { depositRoutes } from '../modules/deposit/deposit.routes';
 import { transactionRoutes } from '../modules/transaction/transaction.routes';
 import { withdrawRoutes } from '../modules/withdraw/withdraw.routes';
+import { stripeRoutes } from '../modules/stripe/stripe.routes';
+import { notificationRoutes } from '../modules/notification/notification.routes';
 
 const router = Router();
 
@@ -109,6 +111,14 @@ const moduleRoutes = [
   {
     path: '/transaction',
     router: transactionRoutes,
+  },
+  {
+    path: '/stripe',
+    router: stripeRoutes,
+  },
+  {
+    path: '/notification',
+    router: notificationRoutes,
   },
 ];
 

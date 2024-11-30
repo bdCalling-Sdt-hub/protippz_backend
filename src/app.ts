@@ -3,12 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import express, {
-  Application,
-  Request,
-  Response,
-  application,
-} from 'express';
+import express, { Application, Request, Response, application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
@@ -25,12 +20,21 @@ const upload = multer({ dest: 'uploads/' });
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
-app.use("/uploads", express.static("uploads"));
+app.use('/uploads', express.static('uploads'));
 // application routers ----------------
 app.use('/', router);
-app.post('/contact-us',sendContactUsEmail);
+app.post('/contact-us', sendContactUsEmail);
 
-app.post("/upload-csv",auth(USER_ROLE.superAdmin), upload.single('file'),uploadCsvFile)
+app.get('/nice', async (req, res) => {
+  res.send({ message: 'nice to meet you' });
+});
+
+app.post(
+  '/upload-csv',
+  auth(USER_ROLE.superAdmin),
+  upload.single('file'),
+  uploadCsvFile,
+);
 
 // global error handler
 app.use(globalErrorHandler);

@@ -62,7 +62,10 @@ const changeUserStatus = catchAsync(async (req, res) => {
   });
 });
 const deleteUserAccount = catchAsync(async (req, res) => {
-  const result = await userServices.deleteUserAccount(req.user,req.body.password);
+  const result = await userServices.deleteUserAccount(
+    req.user,
+    req.body.password,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -78,6 +81,6 @@ const userController = {
   resendVerifyCode,
   getMyProfile,
   changeUserStatus,
-  deleteUserAccount
+  deleteUserAccount,
 };
 export default userController;

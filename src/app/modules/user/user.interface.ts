@@ -19,6 +19,8 @@ export interface TUser {
   isActive: boolean;
   isDeleted: boolean;
   inviteToken: string;
+  stripeCustomerId: string;
+  bankAccountId: string;
 }
 export interface TLoginUser {
   email: string;
@@ -29,9 +31,9 @@ export interface ILoginWithGoogle {
   name: string;
   email: string;
   profile_image?: string;
-  inviteToken?:string;
-  username?:string;
-  phone?:string
+  inviteToken?: string;
+  username?: string;
+  phone?: string;
 }
 
 export interface UserModel extends Model<TUser> {

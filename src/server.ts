@@ -16,8 +16,12 @@ async function main() {
 
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port);
-    myServer = server.listen(port, config.base_url as string, () => {
-      logger.info(`Example app listening on port ${config.port}`);
+    // myServer = server.listen(port, config.base_url as string, () => {
+    //   logger.info(`Example app listening on port ${config.port}`);
+    //   seedSuperAdmin();
+    // });
+    myServer = server.listen(port, '0.0.0.0', () => {
+      logger.info(`Server running on http://0.0.0.0:${port}`);
       seedSuperAdmin();
     });
 

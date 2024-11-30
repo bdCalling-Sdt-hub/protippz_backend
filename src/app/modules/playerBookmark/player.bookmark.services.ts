@@ -31,16 +31,19 @@ const createPlayerBookmarkIntoDB = async (
 
 // Get bookmarks from the database
 const getMyPlayerBookmarkFromDB = async (normalUserId: string) => {
-  const result = await PlayerBookmark.find({ user: normalUserId }).populate({path:"player",select:"name position league team player_image player_bg_image", populate: [
-    { path: "team",select:"name" },
-    { path: "league",select:"name" },
-  ],});
+  const result = await PlayerBookmark.find({ user: normalUserId }).populate({
+    path: 'player',
+    select: 'name position league team player_image player_bg_image',
+    populate: [
+      { path: 'team', select: 'name sport' },
+      { path: 'league', select: 'name sport' },
+    ],
+  });
   return result;
 };
 
 // Delete a bookmark
 const deletePlayerBookmarkFromDB = async (id: string, normalUserId: string) => {
-
   const bookmark = await PlayerBookmark.findOne({
     _id: id,
     user: normalUserId,
