@@ -490,7 +490,7 @@ const authServices = {
   verifyResetOtp,
   resendResetCode,
   loginWithGoogle,
-  resendVerifyCode
+  resendVerifyCode,
 };
 
 export default authServices;

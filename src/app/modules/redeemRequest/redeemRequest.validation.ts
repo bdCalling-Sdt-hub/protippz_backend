@@ -16,14 +16,14 @@ const redeemRequestSchema = z.object({
 });
 
 const changeRedeemStatusValidationSchema = z.object({
-  body:z.object({
-    status:z.enum(Object.values(ENUM_REDEEM_STATUS) as [string, ...string[]])
-  })
-})
+  body: z.object({
+    status: z.enum(Object.values(ENUM_REDEEM_STATUS) as [string, ...string[]]),
+  }),
+});
 
 const redeemValidations = {
   redeemRequestSchema,
-  changeRedeemStatusValidationSchema
+  changeRedeemStatusValidationSchema,
 };
 
 export default redeemValidations;

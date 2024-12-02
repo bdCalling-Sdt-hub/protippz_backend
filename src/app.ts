@@ -19,7 +19,23 @@ const upload = multer({ dest: 'uploads/' });
 // parser
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
+      'http://localhost:3003',
+      'http://localhost:3004',
+      'http://localhost:3005',
+      'http://localhost:3006',
+      'http://localhost:3007',
+      'http://localhost:3008',
+    ],
+    credentials: true,
+  }),
+);
 app.use('/uploads', express.static('uploads'));
 // application routers ----------------
 app.use('/', router);

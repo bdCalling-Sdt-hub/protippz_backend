@@ -53,6 +53,16 @@ const createTipIntoDB = async (userId: string, payload: ITip) => {
 // tip by account balance---------------------------------
 
 const tipByProfileBalance = async (userId: string, payload: ITip) => {
+  const normalUser = await NormalUser.findById(userId);
+  if (!normalUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  if (normalUser.totalAmount < payload.amount) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You don't have enough amount in you account",
+    );
+  }
   if (payload.entityType === 'Team') {
     const team = await Team.findById(payload.entityId);
     if (!team) {
@@ -126,9 +136,9 @@ const tipByCreditCard = async (userId: string, payload: ITip) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  if (user?.totalAmount < payload.amount) {
-    throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
-  }
+  // if (user?.totalAmount < payload.amount) {
+  //   throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
+  // }
 
   const totalPoint = Math.ceil(payload.amount * 10);
   payload.point = totalPoint;
@@ -168,9 +178,9 @@ const tipByPaypal = async (userId: string, payload: ITip) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  if (user?.totalAmount < payload.amount) {
-    throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
-  }
+  // if (user?.totalAmount < payload.amount) {
+  //   throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
+  // }
 
   const totalPoint = Math.ceil(payload.amount * 10);
   payload.point = totalPoint;

@@ -35,7 +35,7 @@ const getAllTeamsFromDB = async (
     Team.find().populate({ path: 'league', select: 'name sport' }).lean(),
     query,
   )
-    .search(['name',"sport"])
+    .search(['name', 'sport'])
     .filter()
     .sort()
     .paginate()
@@ -157,7 +157,6 @@ const sendMoneyToTeam = async (id: string, amount: number) => {
 //   return user;
 // };
 
-
 const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -168,9 +167,14 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
     }
 
-    const isExistUser = await User.findOne({ username: payload.username }).session(session);
+    const isExistUser = await User.findOne({
+      username: payload.username,
+    }).session(session);
     if (isExistUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'This username already exists');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'This username already exists',
+      );
     }
 
     const userData = {
