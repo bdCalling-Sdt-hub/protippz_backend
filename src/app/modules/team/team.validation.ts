@@ -9,7 +9,7 @@ const createTeamSchema = z.object({
       .string()
       .url('Background image must be a valid URL')
       .optional(),
-    sport: z.string().min(1, 'Sport is required'),
+    //  sport: z.string().min(1, 'Sport is required'),
     totalTips: z.number().min(0, 'Total tips must be zero or more').optional(),
     paidAmount: z
       .number()

@@ -23,7 +23,7 @@ const createTeamIntoDB = async (payload: ITeam) => {
   if (!league) {
     throw new AppError(httpStatus.NOT_FOUND, "League doesn't exits");
   }
-  const result = await Team.create(payload);
+  const result = await Team.create({ ...payload, sport: league.sport });
   return result;
 };
 

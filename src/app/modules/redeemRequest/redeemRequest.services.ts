@@ -54,7 +54,7 @@ const createRedeemRequestIntoDB = async (
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Unauthorized access');
   }
-  if (user?.totalAmount < reward.pointRequired) {
+  if (user?.totalPoint < reward.pointRequired) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "You don't have enough point for redeem this reward",
@@ -87,7 +87,7 @@ const createRedeemRequestIntoDB = async (
   await Notification.create(notificationData);
 
   const html = `
-  <h1>Protipzz Reward Redemption Verification</h1>
+  <h1>Protipzz Reward Redeem Verification</h1>
   <p>Hello,</p>
   <p>Thank you for redeeming your reward at Protipzz!</p>
   <p>Please use the verification code below to verify your request:</p>
@@ -98,7 +98,7 @@ const createRedeemRequestIntoDB = async (
 
   if (payload.email) {
     sendEmail({
-      email: user.email,
+      email: payload.email,
       subject: 'Please verify your email for redeem reward',
       html: html,
     });

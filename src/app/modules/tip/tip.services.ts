@@ -654,7 +654,6 @@ const getSingleTipFromDB = async (tipId: string) => {
 
   return tip;
 };
-
 // crone jobs
 cron.schedule('*/30 * * * *', async () => {
   try {
