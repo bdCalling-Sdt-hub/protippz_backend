@@ -7,6 +7,7 @@ const getAllTransactionFromDB = async (query: Record<string, any>) => {
   const transactionQuery = new QueryBuilder(
     Transaction.find({ status: ENUM_TRANSACTION_STATUS.SUCCESS }).populate({
       path: 'entityId',
+      select: '-totalAmount -totalPoint -createdAt -updatedAt -address',
     }),
     query,
   )
@@ -56,7 +57,7 @@ cron.schedule('*/2 * * * *', async () => {
   const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000);
   try {
     const deletePendingTransactions = await Transaction.deleteMany({
-      status: 'pending',
+      status: 'Pending',
       createdAt: { $lt: twoMinsAgo },
     });
     console.log(
