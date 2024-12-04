@@ -4,6 +4,7 @@ import { INormalUser } from './normalUser.interface';
 import NormalUser from './normalUser.model';
 
 const updateUserProfile = async (id: string, payload: Partial<INormalUser>) => {
+  console.log(payload);
   if (payload.email || payload.username) {
     throw new AppError(
       httpStatus.BAD_REQUEST,

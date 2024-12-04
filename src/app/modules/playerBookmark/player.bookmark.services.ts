@@ -45,7 +45,7 @@ const getMyPlayerBookmarkFromDB = async (normalUserId: string) => {
 // Delete a bookmark
 const deletePlayerBookmarkFromDB = async (id: string, normalUserId: string) => {
   const bookmark = await PlayerBookmark.findOne({
-    _id: id,
+    player: id,
     user: normalUserId,
   });
 
@@ -53,7 +53,7 @@ const deletePlayerBookmarkFromDB = async (id: string, normalUserId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'This bookmark does not exist');
   }
   const result = await PlayerBookmark.findOneAndDelete({
-    _id: id,
+    player: id,
     user: normalUserId,
   });
   return result;

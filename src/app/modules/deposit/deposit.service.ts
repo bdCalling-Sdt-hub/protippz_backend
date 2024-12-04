@@ -64,8 +64,8 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
     intent: 'authorize', // Authorization rather than a sale
     payer: { payment_method: 'paypal' },
     redirect_urls: {
-      return_url: process.env.PAYPAL_SUCCESS_URL,
-      cancel_url: process.env.PAYPAL_CANCEL_URL,
+      return_url: process.env.PAYPAL_DEPOSIT_SUCCESS_URL,
+      cancel_url: process.env.PAYPAL_DEPOSIT_CANCEL_URL,
     },
     transactions: [
       {
