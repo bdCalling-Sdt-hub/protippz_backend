@@ -6,8 +6,8 @@ const generateInviteLink = async (inviterId: string) => {
   await Invite.create({ inviter: inviterId, inviteToken });
 
   return {
-    link: `https://yourapp.com/register?invite=${inviteToken}`,
-    token:inviteToken
+    link: `http://localhost:3000/sign-up?invite=${inviteToken}`,
+    token: inviteToken,
   };
 };
 

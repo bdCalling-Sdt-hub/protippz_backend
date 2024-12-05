@@ -254,6 +254,16 @@
             "date": 1733371535391,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-12-05-10-error.log",
             "hash": "70b2244e258c7fd2b1be655421cf057358a1ff07bbcbf8e12215800aa8cadf06"
+        },
+        {
+            "date": 1733374992126,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-12-05-11-error.log",
+            "hash": "b4aefc038953ea65a6cedf3b94eb49d4d1e84e0f697692d59fb896dbef507ce8"
+        },
+        {
+            "date": 1733386019192,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-12-05-14-error.log",
+            "hash": "f6e4d8336b0fe769bd3a0afed2bc1aee4d4f45454736441ad40839da0f2a7d74"
         }
     ],
     "hashType": "sha256"

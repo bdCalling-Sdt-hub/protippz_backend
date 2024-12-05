@@ -104,10 +104,12 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
     }
 
     // If user doesn't exist, create a new user
+    console.log('username', payload.username);
     const userDataPayload: Partial<TUser> = {
       username: payload.username,
       email: payload.email,
       phone: payload?.phone,
+      password: 'password',
       role: USER_ROLE.user,
       inviteToken: payload.inviteToken || '',
     };
@@ -117,6 +119,7 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
     const normalUserData = {
       name: payload.name,
       email: payload.email,
+      username: payload.username,
       profile_image: payload.profile_image,
       user: createUser[0]._id,
     };

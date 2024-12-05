@@ -19,6 +19,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // check if the token is sent from client -----
     const token = req?.headers?.authorization;
+    console.log('token', token);
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Your are not authorized 1');
     }
@@ -36,17 +37,14 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Token is expired');
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, role, email,username, iat } = decoded;
+    const { id, role, email, username, iat } = decoded;
 
     if (!decoded) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Token is expired');
     }
     // get the user if that here ---------
     const user = await User.findOne({
-      $or: [
-        { email:email },
-        { username: username },
-      ],
+      $or: [{ email: email }, { username: username }],
     });
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
@@ -58,10 +56,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
     }
     if (!user?.isVerified) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'You are not verified user',
-      );
+      throw new AppError(httpStatus.BAD_REQUEST, 'You are not verified user');
     }
 
     let profileData;
@@ -71,9 +66,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
       profileData = await Player.findOne({ user: id }).select('_id');
     } else if (role === USER_ROLE.team) {
       profileData = await Team.findOne({ user: id }).select('_id');
-    }
-    else if(role === USER_ROLE.superAdmin){
-      profileData = await SuperAdmin.findOne({user:id}).select("_id");
+    } else if (role === USER_ROLE.superAdmin) {
+      profileData = await SuperAdmin.findOne({ user: id }).select('_id');
     }
 
     decoded.profileId = profileData?._id;
