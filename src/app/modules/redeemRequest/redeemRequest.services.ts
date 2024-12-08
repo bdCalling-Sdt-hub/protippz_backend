@@ -139,7 +139,7 @@ const getAllRedeemRequestFromDB = async (query: Record<string, any>) => {
   const redeemRequestQuery = new QueryBuilder(
     RedeemRequest.find({ isVerified: true })
       .populate({ path: 'user', select: 'name profile_image phone' })
-      .populate({ path: 'reward', select: 'name' })
+      .populate({ path: 'reward', select: 'name reward_image' })
       .populate({ path: 'category', select: 'name' }),
     query,
   )
@@ -166,7 +166,7 @@ const getMyRedeemFromDB = async (
   const redeemRequestQuery = new QueryBuilder(
     RedeemRequest.find({ user: userId })
       .populate({ path: 'user', select: 'name profile_image phone' })
-      .populate({ path: 'reward', select: 'name' })
+      .populate({ path: 'reward', select: 'name reward_image' })
       .populate({ path: 'category', select: 'name' }),
     query,
   )

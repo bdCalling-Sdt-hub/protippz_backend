@@ -19,9 +19,19 @@ const updateUserProfile = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getAllNormalUser = catchAsync(async (req, res) => {
+  const result = await NormalUserServices.getAllNormalUser(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All users retrieved successfully',
+    data: result,
+  });
+});
 
 const NormalUserController = {
   updateUserProfile,
+  getAllNormalUser,
 };
 
 export default NormalUserController;

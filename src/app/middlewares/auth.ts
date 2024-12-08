@@ -19,7 +19,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // check if the token is sent from client -----
     const token = req?.headers?.authorization;
-    console.log('token', token);
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Your are not authorized 1');
     }

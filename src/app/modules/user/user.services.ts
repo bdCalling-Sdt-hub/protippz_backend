@@ -5,7 +5,7 @@ import AppError from '../../error/appError';
 import httpStatus from 'http-status';
 import { INormalUser } from '../normalUser/normalUser.interface';
 import mongoose from 'mongoose';
-import { TUser } from './user.interface';
+import { TUser, TUserRole } from './user.interface';
 import { USER_ROLE } from './user.constant';
 import NormalUser from '../normalUser/normalUser.model';
 import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
@@ -19,6 +19,7 @@ import { inviteRewardPoint } from '../../constant';
 import Notification from '../notification/notification.model';
 import Stripe from 'stripe';
 import config from '../../config';
+import { createToken } from './user.utils';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
@@ -125,10 +126,15 @@ const verifyCode = async (email: string, verifyCode: number) => {
 
   if (result?.inviteToken) {
     const invite = await Invite.findOne({ inviteToken: result.inviteToken });
-    const updatedUser = await NormalUser.findByIdAndUpdate(invite?.inviter, {
-      $inc: { totalPoint: inviteRewardPoint },
-    });
-
+    console.log('Invite token', invite);
+    const updatedUser = await NormalUser.findByIdAndUpdate(
+      invite?.inviter,
+      {
+        $inc: { totalPoint: inviteRewardPoint },
+      },
+      { new: true, runValidators: true },
+    );
+    console.log('updated user', updatedUser);
     const notificationData = {
       title: 'Congratulations you got points',
       message: `Congratulations your friend register with your invitation and you got ${inviteRewardPoint} points`,
@@ -137,8 +143,26 @@ const verifyCode = async (email: string, verifyCode: number) => {
 
     await Notification.create(notificationData);
   }
-
-  return result;
+  const jwtPayload = {
+    id: user?._id,
+    username: user.username,
+    email: user?.email,
+    role: user?.role as TUserRole,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 const resendVerifyCode = async (email: string) => {

@@ -136,9 +136,6 @@ const tipByCreditCard = async (userId: string, payload: ITip) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  // if (user?.totalAmount < payload.amount) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
-  // }
 
   const totalPoint = Math.ceil(payload.amount * 10);
   payload.point = totalPoint;
@@ -156,6 +153,7 @@ const tipByCreditCard = async (userId: string, payload: ITip) => {
   });
   return {
     clientSecret: paymentIntent.client_secret,
+    transactionId: paymentIntent.id,
   };
 };
 
@@ -178,15 +176,12 @@ const tipByPaypal = async (userId: string, payload: ITip) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  // if (user?.totalAmount < payload.amount) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, "You don't have enough amount");
-  // }
 
   const totalPoint = Math.ceil(payload.amount * 10);
   payload.point = totalPoint;
   payload.paymentStatus = ENUM_PAYMENT_STATUS.PENDING;
   const create_payment_json = {
-    intent: 'authorize', // Authorization rather than a sale
+    intent: 'authorize',
     payer: { payment_method: 'paypal' },
     redirect_urls: {
       return_url: process.env.PAYPAL_SUCCESS_URL,

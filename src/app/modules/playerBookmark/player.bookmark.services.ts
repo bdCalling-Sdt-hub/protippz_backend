@@ -35,8 +35,10 @@ const getMyPlayerBookmarkFromDB = async (normalUserId: string) => {
     path: 'player',
     select: 'name position league team player_image player_bg_image',
     populate: [
-      { path: 'team', select: 'name sport' },
-      { path: 'league', select: 'name sport' },
+      // { path: 'team', select: 'name sport' },
+      // { path: 'league', select: 'name sport' },
+      { path: 'team' },
+      { path: 'league' },
     ],
   });
   return result;

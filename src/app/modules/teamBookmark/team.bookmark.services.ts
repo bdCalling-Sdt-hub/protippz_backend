@@ -29,8 +29,9 @@ const createBookmarkIntoDB = async (teamId: string, normalUserId: string) => {
 const getMyBookmarkFromDB = async (normalUserId: string) => {
   const result = await TeamBookmark.find({ user: normalUserId }).populate({
     path: 'team',
-    select: 'name team_logo team_bg_image sport',
-    populate: [{ path: 'league', select: 'name sport' }],
+    // select: 'name team_logo team_bg_image sport',
+    // populate: [{ path: 'league', select: 'name sport' }],
+    populate: [{ path: 'league' }],
   });
   return result;
 };

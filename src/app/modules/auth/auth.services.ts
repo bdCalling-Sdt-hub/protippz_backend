@@ -104,7 +104,6 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
     }
 
     // If user doesn't exist, create a new user
-    console.log('username', payload.username);
     const userDataPayload: Partial<TUser> = {
       username: payload.username,
       email: payload.email,
@@ -112,10 +111,10 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
       password: 'password',
       role: USER_ROLE.user,
       inviteToken: payload.inviteToken || '',
+      isVerified: true,
     };
 
     const createUser = await User.create([userDataPayload], { session });
-
     const normalUserData = {
       name: payload.name,
       email: payload.email,

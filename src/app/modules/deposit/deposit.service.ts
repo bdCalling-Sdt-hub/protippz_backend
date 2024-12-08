@@ -55,6 +55,7 @@ const depositWithCreditCard = async (
 
   return {
     clientSecret: paymentIntent.client_secret,
+    transactionId: paymentIntent.id,
   };
 };
 
