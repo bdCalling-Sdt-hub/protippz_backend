@@ -7,6 +7,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import RewardCategory from '../rewardCategory/rewardCategory.model';
 
 const createRewardIntoDB = async (payload: IReward) => {
+  payload.pointRequired = Number(payload.pointRequired);
   const rewardCategory = await RewardCategory.findById(payload.category);
   if (!rewardCategory) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category does not exits');
@@ -17,7 +18,10 @@ const createRewardIntoDB = async (payload: IReward) => {
 };
 
 const getAllRewardsFromDB = async (query: Record<string, any>) => {
-  const rewardQuery = new QueryBuilder(Reward.find().populate({path:"category",select:"name deliveryOption"}), query)
+  const rewardQuery = new QueryBuilder(
+    Reward.find().populate({ path: 'category', select: 'name deliveryOption' }),
+    query,
+  )
     .search(['name'])
     .filter()
     .sort()
@@ -42,6 +46,9 @@ const getSingleRewardFromDB = async (id: string) => {
 };
 
 const updateRewardIntoDB = async (id: string, payload: Partial<IReward>) => {
+  if (payload?.pointRequired) {
+    payload.pointRequired = Number(payload.pointRequired);
+  }
   const reward = await Reward.findById(id);
   if (!reward) {
     throw new AppError(httpStatus.NOT_FOUND, 'Reward not found');

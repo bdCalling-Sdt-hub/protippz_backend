@@ -39,6 +39,10 @@ router.patch(
   validateRequest(rewardValidations.updateRewardSchema),
   RewardController.updateReward,
 );
-router.delete('/delete/:id',auth(USER_ROLE.superAdmin), RewardController.deleteReward);
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLE.superAdmin),
+  RewardController.deleteReward,
+);
 
 export const rewardRoutes = router;

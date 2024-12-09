@@ -32,7 +32,10 @@ const updateUserProfile = async (id: string, payload: Partial<INormalUser>) => {
 };
 
 const getAllNormalUser = async (query: Record<string, any>) => {
-  const normalUserQury = new QueryBuilder(NormalUser.find(), query)
+  const normalUserQury = new QueryBuilder(
+    NormalUser.find().populate({ path: 'user', select: 'status' }),
+    query,
+  )
     .search(['name'])
     .filter()
     .sort()

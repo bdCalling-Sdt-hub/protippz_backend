@@ -14,6 +14,7 @@ import {
   ENUM_PAYMENT_STATUS,
   ENUM_TRANSACTION_TYPE,
 } from '../../utilities/enum';
+import Notification from '../notification/notification.model';
 
 const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
   if (user.role === USER_ROLE.user) {
@@ -115,40 +116,42 @@ const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
 // };
 
 const getAllWithdrawRequest = async (query: Record<string, any>) => {
-    const { searchTerm, ...restQuery } = query;
-  
-    // Step 1: Query the database with the populate option
-    const withdrawQuery = WithdrawalRequest.find().populate({
-      path: 'entityId',
-      select: 'name profile_image player_image team_logo',
-    });
-  
-    // Pass the query to QueryBuilder for filtering, sorting, pagination, and fields
-    const queryBuilder = new QueryBuilder(withdrawQuery, restQuery)
-      .filter()
-      .sort()
-      .paginate()
-      .fields();
-  
-    // Execute the query to get initial results with populate
-    const rawResults = await queryBuilder.modelQuery;
-  
-    // Step 2: Manually filter results by search term in `entityId.name`
-    let filteredResults = rawResults;
-    if (searchTerm) {
-      const regex = new RegExp(searchTerm, 'i'); // Case-insensitive regex
-      filteredResults = rawResults.filter((item: any) => regex.test(item.entityId?.name));
-    }
-  
-    // Get the count of filtered results for pagination metadata
-    const meta = { total: filteredResults.length };
-  
-    return {
-      meta,
-      result: filteredResults,
-    };
+  const { searchTerm, ...restQuery } = query;
+
+  // Step 1: Query the database with the populate option
+  const withdrawQuery = WithdrawalRequest.find().populate({
+    path: 'entityId',
+    select: 'name profile_image player_image team_logo',
+  });
+
+  // Pass the query to QueryBuilder for filtering, sorting, pagination, and fields
+  const queryBuilder = new QueryBuilder(withdrawQuery, restQuery)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  // Execute the query to get initial results with populate
+  const rawResults = await queryBuilder.modelQuery;
+
+  // Step 2: Manually filter results by search term in `entityId.name`
+  let filteredResults = rawResults;
+  if (searchTerm) {
+    const regex = new RegExp(searchTerm, 'i'); // Case-insensitive regex
+    filteredResults = rawResults.filter((item: any) =>
+      regex.test(item.entityId?.name),
+    );
+  }
+
+  // Get the count of filtered results for pagination metadata
+  // const meta = { total: filteredResults.length };
+  const meta = await queryBuilder.countTotal();
+
+  return {
+    meta,
+    result: filteredResults,
   };
-  
+};
 
 // update withdraw status
 const updateWithdrawRequestStatus = async (id: string, status: string) => {
@@ -173,14 +176,19 @@ const updateWithdrawRequestStatus = async (id: string, status: string) => {
   };
 
   await Transaction.create(transactionData);
-
+  const notificationData = {
+    title: 'Withdrawal request approved',
+    message: `Admin approve your withdrawal request and send you money`,
+    receiver: updateWithdraw?.entityId,
+  };
+  await Notification.create(notificationData);
   return updateWithdraw;
 };
 
 const WithdrawRequestServices = {
   crateWithdrawRequest,
   getAllWithdrawRequest,
-  updateWithdrawRequestStatus
+  updateWithdrawRequestStatus,
 };
 
 export default WithdrawRequestServices;
