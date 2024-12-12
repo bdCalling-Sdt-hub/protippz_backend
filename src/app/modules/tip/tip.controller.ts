@@ -12,7 +12,7 @@ const createTip = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Tip created successfully',
+    message: 'Tip send successfully',
     data: result,
   });
 });
