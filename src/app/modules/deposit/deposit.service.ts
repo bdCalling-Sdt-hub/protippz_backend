@@ -55,7 +55,7 @@ const depositWithCreditCard = async (
 
   return {
     clientSecret: paymentIntent.client_secret,
-    transactionId: paymentIntent.id,
+    // transactionId: paymentIntent.id,
   };
 };
 
@@ -103,6 +103,8 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
       });
     },
   );
+
+  console.log('payment', payment);
 
   await Transaction.create({
     ...payload,
@@ -251,10 +253,71 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
   }
 };
 
+const executeDepositPaymentWithApp = async (
+  profileId: string,
+  paymentId: string,
+  payerId: string,
+) => {
+  console.log('user,payerId,paymentId', profileId, paymentId, payerId);
+  try {
+    // Use the payment.get method to retrieve payment details
+    const payment = await new Promise<any>((resolve, reject) => {
+      paypal.payment.get(paymentId, (error, payment) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(payment);
+        }
+      });
+    });
+
+    // Verify if the payer_id matches and the payment status is 'approved'
+    if (
+      payment.payer.payer_info.payer_id === payerId &&
+      payment.state === 'approved'
+    ) {
+      const isExistTransaction = await Transaction.findOne({
+        transactionId: payment.id,
+      });
+      if (isExistTransaction) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'This payment already execute',
+        );
+      }
+      // Payment is successful
+      const transaction = await Transaction.create({
+        entityId: profileId,
+        entityType: 'NormalUser',
+        amount: payment.transactions[0].amount.total,
+        transactionId: payment?.id,
+        paymentBy: ENUM_PAYMENT_BY.PAYPAL,
+        status: ENUM_TRANSACTION_STATUS.SUCCESS,
+        transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
+      });
+      const notificationData = {
+        title: 'Successfully deposit amount',
+        message:
+          'Your deposit is successful with paypal. Check your account balance',
+        receiver: profileId,
+      };
+      await Notification.create(notificationData);
+      return transaction;
+    } else {
+      // Payment failed or was not approved
+      throw new Error('Payment verification failed');
+    }
+  } catch (err) {
+    console.error('Error verifying PayPal payment:', err);
+    return { status: 'error', message: err.message };
+  }
+};
+
 const depositServices = {
   depositAmount,
   executeStripeDeposit,
   executePaypalDeposit,
+  executeDepositPaymentWithApp,
 };
 
 export default depositServices;

@@ -11,6 +11,7 @@ import { IInviteTeamPayload } from '../team/team.interface';
 import mongoose from 'mongoose';
 import { User } from '../user/user.model';
 import { USER_ROLE } from '../user/user.constant';
+import TeamBookmark from '../teamBookmark/team.bookmark.model';
 
 const createPlayerIntoDB = async (payload: IPlayer) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
@@ -117,6 +118,7 @@ const deletePlayerFromDB = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
   }
   const result = await Player.findByIdAndDelete(id);
+  await TeamBookmark.deleteMany({ team: id });
   return result;
 };
 

@@ -1,3 +1,4 @@
+import { string } from 'joi';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import TipServices from './tip.services';
@@ -25,7 +26,7 @@ const paymentSuccessWithStripe = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Tip updated successfully',
+    message: 'Tip send successfully',
     data: result,
   });
 });
@@ -57,7 +58,10 @@ const getAllTips = catchAsync(async (req, res) => {
 
 // Get all tips for the current user
 const getUserTips = catchAsync(async (req, res) => {
-  const result = await TipServices.getUserTipsFromDB(req?.user?.profileId,req.query);
+  const result = await TipServices.getUserTipsFromDB(
+    req?.user?.profileId,
+    req.query,
+  );
 
   sendResponse(res, {
     statusCode: 200,
@@ -79,13 +83,31 @@ const getSingleTip = catchAsync(async (req, res) => {
   });
 });
 
+const executeDepositPaymentWithApp = catchAsync(async (req, res) => {
+  const result = await TipServices.executePaypalTipPaymentWithApp(
+    req.user.profileId,
+    req.body.paymentId,
+    req.body.payerId,
+    req.body.entityId,
+    req.body.entityType,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Tip send successfully',
+    data: result,
+  });
+});
+
 const TipController = {
   createTip,
   getAllTips,
   getUserTips,
   getSingleTip,
   paymentSuccessWithStripe,
-  executePaypalPayment
+  executePaypalPayment,
+  executeDepositPaymentWithApp,
 };
 
 export default TipController;

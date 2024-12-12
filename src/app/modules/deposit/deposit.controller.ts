@@ -39,11 +39,26 @@ const executePaypalDeposit = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const executeDepositPaymentWithApp = catchAsync(async (req, res) => {
+  const result = await depositServices.executeDepositPaymentWithApp(
+    req.user.profileId,
+    req.body.paymentId,
+    req.body.payerId,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Your deposit successful',
+    data: result,
+  });
+});
 
 const DepositController = {
   depositAmount,
   executeDepositWithStripe,
   executePaypalDeposit,
+  executeDepositPaymentWithApp,
 };
 
 export default DepositController;

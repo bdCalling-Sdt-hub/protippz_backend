@@ -40,5 +40,10 @@ router.get(
   auth(USER_ROLE.user, USER_ROLE.superAdmin),
   TipController.getSingleTip,
 );
+router.patch(
+  '/execute-paypal-payment-app',
+  auth(USER_ROLE.user),
+  TipController.executeDepositPaymentWithApp,
+);
 
 export const tipRoutes = router;

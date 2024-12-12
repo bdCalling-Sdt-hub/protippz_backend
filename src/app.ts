@@ -15,6 +15,7 @@ import uploadCsvFile from './app/helper/uploadCsvFile';
 import auth from './app/middlewares/auth';
 import { USER_ROLE } from './app/modules/user/user.constant';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
+import uploadCsvWithProgress from './app/helper/uploadCsvWithProgress';
 const upload = multer({ dest: 'uploads/' });
 // parser
 app.use(express.json());
@@ -32,6 +33,7 @@ app.use(
       'http://localhost:3006',
       'http://localhost:3007',
       'http://localhost:3008',
+      'http://localhost:5173',
       'http://192.168.10.25:3000',
     ],
     credentials: true,
@@ -52,6 +54,29 @@ app.post(
   upload.single('file'),
   uploadCsvFile,
 );
+app.post(
+  '/upload-csv-with-progress',
+  upload.single('file'),
+  uploadCsvWithProgress,
+);
+app.get('/upload-progress', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  // Here you send progress updates like this:
+  let progress = 0;
+  const interval = setInterval(() => {
+    if (progress >= 100) {
+      clearInterval(interval);
+      res.write(`data: {"message": "Upload complete"}\n\n`);
+    } else {
+      progress += 10;
+      res.write(`data: {"progress": ${progress}}\n\n`);
+    }
+  }, 1000);
+});
 
 // global error handler
 app.use(globalErrorHandler);

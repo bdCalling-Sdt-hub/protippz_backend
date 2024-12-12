@@ -7,7 +7,13 @@ import Tip from './tip.model';
 import { ITip } from './tip.interface';
 import NormalUser from '../normalUser/normalUser.model';
 import mongoose from 'mongoose';
-import { ENUM_PAYMENT_STATUS, ENUM_TIP_BY } from '../../utilities/enum';
+import {
+  ENUM_PAYMENT_BY,
+  ENUM_PAYMENT_STATUS,
+  ENUM_TIP_BY,
+  ENUM_TRANSACTION_STATUS,
+  ENUM_TRANSACTION_TYPE,
+} from '../../utilities/enum';
 import Stripe from 'stripe';
 import config from '../../config';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
@@ -17,6 +23,8 @@ import Player from '../player/player.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import cron from 'node-cron';
 import Notification from '../notification/notification.model';
+import Transaction from '../transaction/transaction.model';
+import { pointPerAmountTip } from '../../constant';
 
 interface PayPalLink {
   href: string;
@@ -266,7 +274,6 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
     };
 
     await Notification.create(notificationData);
-
     // Determine whether to update a Team or Player
     if (updatedTip?.entityType === 'Team') {
       await Team.findByIdAndUpdate(
@@ -375,6 +382,82 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
     await session.abortTransaction();
     session.endSession();
     throw error;
+  }
+};
+
+const executePaypalTipPaymentWithApp = async (
+  profileId: string,
+  paymentId: string,
+  payerId: string,
+  entityId: string,
+  entityType: 'Team' | 'Player',
+) => {
+  console.log('user,payerId,paymentId', profileId, paymentId, payerId);
+  if (entityType === 'Team') {
+    const team = await Team.findById(entityId);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+  } else if (entityType === 'Player') {
+    const player = await Player.findById(entityId);
+    if (!player) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+    }
+  }
+  try {
+    // Use the payment.get method to retrieve payment details
+    const payment = await new Promise<any>((resolve, reject) => {
+      paypal.payment.get(paymentId, (error, payment) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(payment);
+        }
+      });
+    });
+
+    console.log('payment in tip', payment);
+
+    // Verify if the payer_id matches and the payment status is 'approved'
+    if (
+      payment.payer.payer_info.payer_id === payerId &&
+      payment.state === 'approved'
+    ) {
+      const isExistTransaction = await Tip.findOne({
+        transactionId: payment.id,
+      });
+      if (isExistTransaction) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'This payment already execute',
+        );
+      }
+      const createTip = await Tip.create({
+        user: profileId,
+        entityId: entityId,
+        entityType: entityType,
+        amount: payment.transactions[0].amount.total,
+        transactionId: paymentId,
+        paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+        tipBy: ENUM_TIP_BY.PAYPAL,
+        point: payment.transactions[0].amount.total * pointPerAmountTip,
+      });
+      const notificationData = {
+        title: `Successfully tip sent`,
+        message: `Successfully tip send to ${createTip.entityType} and you got ${createTip.point} points`,
+        receiver: profileId,
+      };
+
+      await Notification.create(notificationData);
+      return createTip;
+    } else {
+      // Payment failed or was not approved
+      throw new AppError(httpStatus.BAD_REQUEST, 'Payment verification failed');
+    }
+  } catch (err) {
+    // console.error('Error verifying PayPal payment:', err);
+    // return { status: 'error', message: err.message };
+    throw new AppError(httpStatus.BAD_REQUEST, 'Tip payment not successful');
   }
 };
 
@@ -672,6 +755,7 @@ const TipServices = {
   getSingleTipFromDB,
   paymentSuccessWithStripe,
   executePaymentWithPaypal,
+  executePaypalTipPaymentWithApp,
 };
 
 export default TipServices;

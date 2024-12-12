@@ -73,10 +73,10 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
 
   try {
     // Check if the user already exists
-    const isExistUser = await User.findOne(
-      { email: payload.email },
-      { isVerified: true },
-    ).session(session);
+    const isExistUser = await User.findOne({
+      email: payload.email,
+      isVerified: true,
+    }).session(session);
 
     // If user exists, create JWT and return tokens
     if (isExistUser) {

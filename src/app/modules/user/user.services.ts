@@ -20,6 +20,7 @@ import Notification from '../notification/notification.model';
 import Stripe from 'stripe';
 import config from '../../config';
 import { createToken } from './user.utils';
+import SuperAdmin from '../superAdmin/superAdmin.model';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
@@ -203,6 +204,10 @@ const getMyProfile = async (userData: JwtPayload) => {
     });
   } else if (userData.role === USER_ROLE.team) {
     result = await Team.findOne({
+      $or: [{ email: userData?.email }, { username: userData?.username }],
+    });
+  } else if (userData.role === USER_ROLE.superAdmin) {
+    result = await SuperAdmin.findOne({
       $or: [{ email: userData?.email }, { username: userData?.username }],
     });
   }

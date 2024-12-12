@@ -98,7 +98,7 @@ const deleteTeamFromDB = async (id: string) => {
     }
     await Team.findByIdAndDelete(id).session(session);
     await Player.deleteMany({ team: id }).session(session);
-
+    await TeamBookmark.deleteMany({ team: id }).session(session);
     await session.commitTransaction();
     session.endSession();
     return team;

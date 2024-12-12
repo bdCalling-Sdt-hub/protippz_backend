@@ -27,5 +27,11 @@ router.post(
   validateRequest(depositValidations.executePaypalDeposit),
   DepositController.executePaypalDeposit,
 );
+router.post(
+  '/execute-paypal-deposit-app',
+  auth(USER_ROLE.user),
+  validateRequest(depositValidations.executePaypalDeposit),
+  DepositController.executeDepositPaymentWithApp,
+);
 
 export const depositRoutes = router;
