@@ -261,6 +261,9 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
       { new: true, runValidators: true, session },
     );
 
+    if (!updatedTip) {
+      throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Server unavailable');
+    }
     const updatedUser = await NormalUser.findByIdAndUpdate(
       tip.user,
       { $inc: { totalPoint: tip.point } },
@@ -341,7 +344,9 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
       { paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS },
       { new: true, runValidators: true, session },
     );
-
+    if (!updatedTip) {
+      throw new AppError(httpStatus.SERVICE_UNAVAILABLE, 'Server unavailable');
+    }
     const updatedUser = await NormalUser.findByIdAndUpdate(
       tip.user,
       { $inc: { totalPoint: tip.point } },
@@ -446,7 +451,10 @@ const executePaypalTipPaymentWithApp = async (
       await NormalUser.findByIdAndUpdate(
         profileId,
         {
-          $inc: { totalAmount: -payment.transactions[0].amount.total },
+          $inc: {
+            totalPoint:
+              payment.transactions[0].amount.total * pointPerAmountTip,
+          },
         },
         { new: true, runValidators: true },
       );

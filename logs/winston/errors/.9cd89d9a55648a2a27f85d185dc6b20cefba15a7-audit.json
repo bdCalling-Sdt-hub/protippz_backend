@@ -6,26 +6,6 @@
     "auditLog": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\.9cd89d9a55648a2a27f85d185dc6b20cefba15a7-audit.json",
     "files": [
         {
-            "date": 1732939143446,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-11-30-09-error.log",
-            "hash": "295380cf2d57df2c28407297c242f9e976b12c4b51f881d79da25a2d575ba9a7"
-        },
-        {
-            "date": 1732940814466,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-11-30-10-error.log",
-            "hash": "7f39c4cb80ef718155884fb21a45e64f466be6f55de21c56a21efc1ac5edfc6d"
-        },
-        {
-            "date": 1732942803514,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-11-30-11-error.log",
-            "hash": "25253c8c8593daaa89c15dc63fe53d2d525573b04d406c39be905e11734afd69"
-        },
-        {
-            "date": 1732948108092,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-11-30-12-error.log",
-            "hash": "eecc71e8784b34719bf827d9cd2a11ed719ee90a25fd94c50102d9a78dc1ec5d"
-        },
-        {
             "date": 1733022213530,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-12-01-09-error.log",
             "hash": "ed8e4bb34aca926df857d52563b33c2ce77e757c76eaac1300f451bb85a89e4d"
@@ -324,6 +304,11 @@
             "date": 1734146229950,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-12-14-09-error.log",
             "hash": "9c4afc52d1b8fd19830eead4446ee1492b69f01c76d715aec94b1e122dc34e74"
+        },
+        {
+            "date": 1734167851953,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\errors\\um-2024-12-14-15-error.log",
+            "hash": "e41f4e1a2a8b78f499fbd18590120df50f8acf9c04203942fd72fed3c666a16f"
         }
     ],
     "hashType": "sha256"
