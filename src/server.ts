@@ -20,10 +20,6 @@ async function main() {
       logger.info(`Example app listening on port ${config.port}`);
       seedSuperAdmin();
     });
-    // myServer = server.listen(port, '0.0.0.0', () => {
-    //   logger.info(`Server running on http://0.0.0.0:${port}`);
-    //   seedSuperAdmin();
-    // });
 
     // Global unhandled rejection handler
     process.on('unhandledRejection', (error) => {
