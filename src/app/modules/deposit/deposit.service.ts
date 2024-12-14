@@ -285,6 +285,14 @@ const executeDepositPaymentWithApp = async (
           'This payment already execute',
         );
       }
+
+      await NormalUser.findByIdAndUpdate(
+        profileId,
+        {
+          $inc: { totalAmount: payment.transactions[0].amount.total },
+        },
+        { new: true, runValidators: true },
+      );
       // Payment is successful
       const transaction = await Transaction.create({
         entityId: profileId,

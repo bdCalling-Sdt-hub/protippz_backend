@@ -442,6 +442,14 @@ const executePaypalTipPaymentWithApp = async (
         tipBy: ENUM_TIP_BY.PAYPAL,
         point: payment.transactions[0].amount.total * pointPerAmountTip,
       });
+
+      await NormalUser.findByIdAndUpdate(
+        profileId,
+        {
+          $inc: { totalAmount: -payment.transactions[0].amount.total },
+        },
+        { new: true, runValidators: true },
+      );
       const notificationData = {
         title: `Successfully tip sent`,
         message: `Successfully tip send to ${createTip.entityType} and you got ${createTip.point} points`,
