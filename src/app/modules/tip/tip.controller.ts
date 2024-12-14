@@ -1,4 +1,3 @@
-import { string } from 'joi';
 import catchAsync from '../../utilities/catchasync';
 import sendResponse from '../../utilities/sendResponse';
 import TipServices from './tip.services';
@@ -8,7 +7,6 @@ const createTip = catchAsync(async (req, res) => {
     req?.user?.profileId,
     req.body,
   );
-
   sendResponse(res, {
     statusCode: 201,
     success: true,
