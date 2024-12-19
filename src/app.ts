@@ -17,7 +17,7 @@ import { USER_ROLE } from './app/modules/user/user.constant';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import uploadCsvWithProgress from './app/helper/uploadCsvWithProgress';
 const upload = multer({ dest: 'uploads/' });
-// parser
+// parser-----------------------
 app.use(express.json());
 app.use(cookieParser());
 app.use(
