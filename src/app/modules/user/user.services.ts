@@ -214,6 +214,7 @@ const getMyProfile = async (userData: JwtPayload) => {
   return result;
 };
 
+// delete account
 const deleteUserAccount = async (user: JwtPayload, password: string) => {
   const userData = await User.findById(user.id);
 
