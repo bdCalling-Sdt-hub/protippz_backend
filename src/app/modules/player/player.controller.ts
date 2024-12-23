@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import sendResponse from "../../utilities/sendResponse";
-import PlayerServices from "./player.services";
-import catchAsync from "../../utilities/catchasync";
+import httpStatus from 'http-status';
+import sendResponse from '../../utilities/sendResponse';
+import PlayerServices from './player.services';
+import catchAsync from '../../utilities/catchasync';
 
 const createPlayer = catchAsync(async (req, res) => {
   const { files } = req;
@@ -21,8 +21,10 @@ const createPlayer = catchAsync(async (req, res) => {
 });
 
 const getAllPlayers = catchAsync(async (req, res) => {
-
-  const result = await PlayerServices.getAllPlayersFromDB(req?.user?.profileId,req.query);
+  const result = await PlayerServices.getAllPlayersFromDB(
+    req?.user?.profileId,
+    req.query,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -49,7 +51,10 @@ const updatePlayer = catchAsync(async (req, res) => {
   if (files && typeof files === 'object' && 'player_bg_image' in files) {
     req.body.player_bg_image = files['player_bg_image'][0].path;
   }
-  const result = await PlayerServices.updatePlayerIntoDB(req.params.id, req.body);
+  const result = await PlayerServices.updatePlayerIntoDB(
+    req.params.id,
+    req.body,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -68,9 +73,11 @@ const deletePlayer = catchAsync(async (req, res) => {
   });
 });
 
-
 const sendMoneyToPlayer = catchAsync(async (req, res) => {
-  const result = await PlayerServices.sendMoneyToPlayer(req.params.id,req.body.amount);
+  const result = await PlayerServices.sendMoneyToPlayer(
+    req.params.id,
+    req.body.amount,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -80,11 +87,25 @@ const sendMoneyToPlayer = catchAsync(async (req, res) => {
 });
 
 const invitePlayer = catchAsync(async (req, res) => {
-  const result = await PlayerServices.invitePlayer(req.params.id,req.body);
+  const result = await PlayerServices.invitePlayer(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Player invite credential save successfully',
+    data: result,
+  });
+});
+
+// edit address and text
+const editTeamAddressTax = catchAsync(async (req, res) => {
+  const result = await PlayerServices.editTeamAddressTax(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully updated profile',
     data: result,
   });
 });
@@ -96,7 +117,8 @@ const PlayerController = {
   updatePlayer,
   deletePlayer,
   sendMoneyToPlayer,
-  invitePlayer
+  invitePlayer,
+  editTeamAddressTax,
 };
 
 export default PlayerController;
