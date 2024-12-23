@@ -32,7 +32,7 @@ interface PayPalPayment {
   id: string;
   links: PayPalLink[];
 }
-// PayPal configuration
+// PayPal configuration-----------------------------------
 paypal.configure({
   mode: process.env.PAYPAL_MODE as string,
   client_id: process.env.PAYPAL_CLIENT_ID as string,
