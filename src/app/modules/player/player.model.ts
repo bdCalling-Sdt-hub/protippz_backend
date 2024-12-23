@@ -1,5 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
-import { IAddress } from './player.interface';
+import { IAddress, ITaxInfo } from './player.interface';
+import { ENUM_RESIDENTIAL_STATUS } from '../../utilities/enum';
 export const addressSchema = new Schema<IAddress>({
   state: {
     type: String,
@@ -18,6 +19,18 @@ export const addressSchema = new Schema<IAddress>({
     required: true,
   },
 });
+
+export const taxInfoSchema = new Schema<ITaxInfo>({
+  fullname: { type: String, required: true },
+  taxId: { type: String, required: true },
+  address: { type: String, required: true },
+  residentialStatus: {
+    type: String,
+    enum: Object.values(ENUM_RESIDENTIAL_STATUS),
+    required: true,
+  },
+});
+
 const PlayerSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -32,6 +45,9 @@ const PlayerSchema = new Schema(
     dueAmount: { type: Number, required: true, default: 0 },
     address: {
       type: addressSchema,
+    },
+    taxInfo: {
+      type: taxInfoSchema,
     },
   },
   {
