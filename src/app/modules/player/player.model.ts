@@ -1,4 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
+import { IAddress } from './player.interface';
 export const addressSchema = new Schema<IAddress>({
   state: {
     type: String,
@@ -29,6 +30,9 @@ const PlayerSchema = new Schema(
     totalTips: { type: Number, required: true, default: 0 },
     paidAmount: { type: Number, required: true, default: 0 },
     dueAmount: { type: Number, required: true, default: 0 },
+    address: {
+      type: addressSchema,
+    },
   },
   {
     timestamps: true,
