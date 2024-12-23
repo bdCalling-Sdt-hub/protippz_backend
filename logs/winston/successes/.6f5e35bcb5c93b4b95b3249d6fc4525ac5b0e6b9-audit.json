@@ -6,11 +6,6 @@
     "auditLog": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\.6f5e35bcb5c93b4b95b3249d6fc4525ac5b0e6b9-audit.json",
     "files": [
         {
-            "date": 1733732206483,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-09-14-success.log",
-            "hash": "aeacbc021e1e520c196464cc10d209edd46a254aba90fa57a381b2000bef8dca"
-        },
-        {
             "date": 1733735521308,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-09-15-success.log",
             "hash": "1b81bd7e101a5101e463f973ee206c2fc21f67e785aa6e99b057064cc2c48769"
@@ -149,6 +144,11 @@
             "date": 1734940933649,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-23-14-success.log",
             "hash": "f4550f262a4a71ecd1bb53a3ae3369328eade6c082a4423a32f55f9b86628a90"
+        },
+        {
+            "date": 1734944460841,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-23-15-success.log",
+            "hash": "7a31c866166d0ea254a0d96c32d130bce7e74dab80cca8fe9c2d3b097e5dd9f4"
         }
     ],
     "hashType": "sha256"

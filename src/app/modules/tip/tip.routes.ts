@@ -33,7 +33,11 @@ router.get(
   TipController.getAllTips,
 );
 
-router.get('/my-tips', auth(USER_ROLE.user), TipController.getUserTips);
+router.get(
+  '/my-tips',
+  auth(USER_ROLE.user, USER_ROLE.player, USER_ROLE.team),
+  TipController.getUserTips,
+);
 
 router.get(
   '/tip/:id',

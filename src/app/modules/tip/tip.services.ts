@@ -25,6 +25,8 @@ import cron from 'node-cron';
 import Notification from '../notification/notification.model';
 import Transaction from '../transaction/transaction.model';
 import { pointPerAmountTip } from '../../constant';
+import { JwtPayload } from 'jsonwebtoken';
+import { USER_ROLE } from '../user/user.constant';
 
 interface PayPalLink {
   href: string;
@@ -655,87 +657,114 @@ const getAllTipsFromDB = async (query: Record<string, any>) => {
 };
 
 const getUserTipsFromDB = async (
-  userId: string,
+  user: JwtPayload,
   query: Record<string, any>,
 ) => {
-  const tipQuery = new QueryBuilder(
-    Tip.find({ user: userId, paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
-    query,
-  )
-    .search(['name'])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  const userId = user.profileId;
 
-  const pipeline = [
-    {
-      $match: tipQuery.modelQuery.getFilter(),
-    },
-    {
-      $lookup: {
-        from: 'normalusers',
-        let: { userId: '$user' },
-        pipeline: [
-          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-          { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
-        ],
-        as: 'user',
+  if (user?.role == USER_ROLE.user) {
+    const tipQuery = new QueryBuilder(
+      Tip.find({ user: userId, paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
+      query,
+    )
+      .search(['name'])
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+
+    const pipeline = [
+      {
+        $match: tipQuery.modelQuery.getFilter(),
       },
-    },
-    {
-      $unwind: '$user',
-    },
-    {
-      $lookup: {
-        from: 'teams',
-        localField: 'entityId',
-        foreignField: '_id',
-        as: 'teamEntity',
+      {
+        $lookup: {
+          from: 'normalusers',
+          let: { userId: '$user' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+            { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
+          ],
+          as: 'user',
+        },
       },
-    },
-    {
-      $lookup: {
-        from: 'players',
-        localField: 'entityId',
-        foreignField: '_id',
-        as: 'playerEntity',
+      {
+        $unwind: '$user',
       },
-    },
-    {
-      $addFields: {
-        entity: {
-          $cond: {
-            if: { $eq: ['$entityType', 'Team'] },
-            then: {
-              name: { $arrayElemAt: ['$teamEntity.name', 0] },
-              team_logo: { $arrayElemAt: ['$teamEntity.team_logo', 0] },
-            },
-            else: {
-              name: { $arrayElemAt: ['$playerEntity.name', 0] },
-              position: { $arrayElemAt: ['$playerEntity.position', 0] },
-              player_image: { $arrayElemAt: ['$playerEntity.player_image', 0] },
+      {
+        $lookup: {
+          from: 'teams',
+          localField: 'entityId',
+          foreignField: '_id',
+          as: 'teamEntity',
+        },
+      },
+      {
+        $lookup: {
+          from: 'players',
+          localField: 'entityId',
+          foreignField: '_id',
+          as: 'playerEntity',
+        },
+      },
+      {
+        $addFields: {
+          entity: {
+            $cond: {
+              if: { $eq: ['$entityType', 'Team'] },
+              then: {
+                name: { $arrayElemAt: ['$teamEntity.name', 0] },
+                team_logo: { $arrayElemAt: ['$teamEntity.team_logo', 0] },
+              },
+              else: {
+                name: { $arrayElemAt: ['$playerEntity.name', 0] },
+                position: { $arrayElemAt: ['$playerEntity.position', 0] },
+                player_image: {
+                  $arrayElemAt: ['$playerEntity.player_image', 0],
+                },
+              },
             },
           },
         },
       },
-    },
-    {
-      $project: {
-        teamEntity: 0,
-        playerEntity: 0,
+      {
+        $project: {
+          teamEntity: 0,
+          playerEntity: 0,
+        },
       },
-    },
-  ];
+    ];
 
-  // Execute the aggregation pipeline
-  const result = await Tip.aggregate(pipeline);
+    // Execute the aggregation pipeline
+    const result = await Tip.aggregate(pipeline);
 
-  const meta = await tipQuery.countTotal(); // Count total documents for pagination
-  return {
-    meta,
-    result,
-  };
+    const meta = await tipQuery.countTotal(); // Count total documents for pagination
+    return {
+      meta,
+      result,
+    };
+  } else {
+    const tipQuery = new QueryBuilder(
+      Tip.find({ $or: [{ entityId: userId }, { entityId: userId }] }).populate({
+        path: 'user',
+        select: 'name profile_image',
+      }),
+      query,
+    )
+      .search(['name'])
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+
+    const meta = await tipQuery.countTotal();
+    const result = await tipQuery.modelQuery;
+
+    return {
+      meta,
+      result,
+    };
+  }
 };
 
 // Get a single tip by ID
