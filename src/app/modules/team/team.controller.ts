@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import sendResponse from "../../utilities/sendResponse";
-import TeamServices from "./team.services";
-import catchAsync from "../../utilities/catchasync";
+import httpStatus from 'http-status';
+import sendResponse from '../../utilities/sendResponse';
+import TeamServices from './team.services';
+import catchAsync from '../../utilities/catchasync';
 
 const createTeam = catchAsync(async (req, res) => {
   const { files } = req;
@@ -21,7 +21,10 @@ const createTeam = catchAsync(async (req, res) => {
 });
 
 const getAllTeams = catchAsync(async (req, res) => {
-  const result = await TeamServices.getAllTeamsFromDB(req?.user?.profileId,req.query);
+  const result = await TeamServices.getAllTeamsFromDB(
+    req?.user?.profileId,
+    req.query,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -67,7 +70,10 @@ const deleteTeam = catchAsync(async (req, res) => {
   });
 });
 const sendMoneyToTeam = catchAsync(async (req, res) => {
-  const result = await TeamServices.sendMoneyToTeam(req.params.id,req.body.amount);
+  const result = await TeamServices.sendMoneyToTeam(
+    req.params.id,
+    req.body.amount,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -76,9 +82,9 @@ const sendMoneyToTeam = catchAsync(async (req, res) => {
   });
 });
 
-// invite team 
+// invite team
 const inviteTeam = catchAsync(async (req, res) => {
-  const result = await TeamServices.inviteTeam(req.params.id,req.body);
+  const result = await TeamServices.inviteTeam(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -87,7 +93,19 @@ const inviteTeam = catchAsync(async (req, res) => {
   });
 });
 
-
+// edit address and text
+const editPlayerAddressTaxInfo = catchAsync(async (req, res) => {
+  const result = await TeamServices.editPlayerAddressTextInfo(
+    req.user.profileId,
+    req.body,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Successfully updated profile',
+    data: result,
+  });
+});
 
 const TeamController = {
   createTeam,
@@ -96,7 +114,8 @@ const TeamController = {
   updateTeam,
   deleteTeam,
   sendMoneyToTeam,
-  inviteTeam
+  inviteTeam,
+  editPlayerAddressTaxInfo,
 };
 
 export default TeamController;
