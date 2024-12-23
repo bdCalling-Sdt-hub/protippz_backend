@@ -1,18 +1,20 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
+import { IAddress } from '../player/player.interface';
 
 export interface ITeam {
-    user:Types.ObjectId;
-    name:string;
-    team_logo:string;
-    league:Types.ObjectId;
-    team_bg_image:string;
-    sport:string;
-    totalTips:number;
-    paidAmount:number;
-    dueAmount:number;
+  user: Types.ObjectId;
+  name: string;
+  team_logo: string;
+  league: Types.ObjectId;
+  team_bg_image: string;
+  sport: string;
+  totalTips: number;
+  paidAmount: number;
+  dueAmount: number;
+  address: IAddress;
 }
 
 export interface IInviteTeamPayload {
-    username:string;
-    password:string;
+  username: string;
+  password: string;
 }

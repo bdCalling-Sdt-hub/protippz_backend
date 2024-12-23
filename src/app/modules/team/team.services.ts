@@ -204,8 +204,26 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
 // edit player address
 const editTeamAddressTax = async (profileId: string, payload: any) => {
   const { address, ...remainingPlayerData } = payload;
-  console.log('address', address);
-  console.log('remaining', remainingPlayerData);
+  // console.log('address', address);
+  // console.log('remaining', remainingPlayerData);
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingPlayerData,
+  };
+
+  if (address && Object.keys(address).length) {
+    for (const [key, value] of Object.entries(address)) {
+      modifiedUpdatedData[`address.${key}`] = value;
+    }
+  }
+
+  console.log(modifiedUpdatedData);
+  console.log('profileId', profileId);
+  const result = await Team.findByIdAndUpdate(profileId, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  });
+  console.log('result', result);
+  return result;
 };
 const TeamServices = {
   createTeamIntoDB,
