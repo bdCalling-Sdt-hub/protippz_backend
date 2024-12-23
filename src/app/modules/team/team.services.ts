@@ -201,6 +201,12 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
   }
 };
 
+// edit player address
+const editPlayerAddressTextInfo = async (profileId: string, payload: any) => {
+  const { address, ...remainingPlayerData } = payload;
+  console.log('address', address);
+  console.log('remaining', remainingPlayerData);
+};
 const TeamServices = {
   createTeamIntoDB,
   getAllTeamsFromDB,
@@ -209,6 +215,7 @@ const TeamServices = {
   deleteTeamFromDB,
   sendMoneyToTeam,
   inviteTeam,
+  editPlayerAddressTextInfo,
 };
 
 export default TeamServices;
