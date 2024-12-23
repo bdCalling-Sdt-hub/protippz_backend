@@ -1,4 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
+import { addressSchema } from '../player/player.model';
 
 const TeamSchema = new Schema(
   {
@@ -11,6 +12,9 @@ const TeamSchema = new Schema(
     totalTips: { type: Number, default: 0 },
     paidAmount: { type: Number, default: 0 },
     dueAmount: { type: Number, default: 0 },
+    address: {
+      type: addressSchema,
+    },
   },
   {
     timestamps: true,
