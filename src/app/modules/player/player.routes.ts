@@ -57,4 +57,10 @@ router.post(
   validateRequest(teamValidations.inviteValidationSchema),
   PlayerController.invitePlayer,
 );
+
+router.patch(
+  '/edit-address-tax',
+  auth(USER_ROLE.player),
+  PlayerController.editTeamAddressTax,
+);
 export const playerRoutes = router;
