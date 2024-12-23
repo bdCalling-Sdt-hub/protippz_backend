@@ -56,3 +56,8 @@ export const ENUM_TRANSACTION_STATUS = {
   PENDING: 'Pending',
   SUCCESS: 'Success',
 };
+
+export const ENUM_RESIDENTIAL_STATUS = {
+  RESIDENT: 'Resident',
+  NON_RESIDENT: 'Non Resident',
+};
