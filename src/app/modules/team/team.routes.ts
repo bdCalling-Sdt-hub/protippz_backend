@@ -50,4 +50,10 @@ router.post(
   validateRequest(teamValidations.inviteValidationSchema),
   TeamController.inviteTeam,
 );
+
+router.patch(
+  '/edit-address-tax',
+  auth(USER_ROLE.team),
+  TeamController.editTeamAddressTax,
+);
 export const teamRoutes = router;

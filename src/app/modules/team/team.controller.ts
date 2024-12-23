@@ -94,8 +94,8 @@ const inviteTeam = catchAsync(async (req, res) => {
 });
 
 // edit address and text
-const editPlayerAddressTaxInfo = catchAsync(async (req, res) => {
-  const result = await TeamServices.editPlayerAddressTextInfo(
+const editTeamAddressTax = catchAsync(async (req, res) => {
+  const result = await TeamServices.editTeamAddressTax(
     req.user.profileId,
     req.body,
   );
@@ -115,7 +115,7 @@ const TeamController = {
   deleteTeam,
   sendMoneyToTeam,
   inviteTeam,
-  editPlayerAddressTaxInfo,
+  editTeamAddressTax,
 };
 
 export default TeamController;

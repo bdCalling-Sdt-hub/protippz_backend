@@ -202,7 +202,7 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
 };
 
 // edit player address
-const editPlayerAddressTextInfo = async (profileId: string, payload: any) => {
+const editTeamAddressTax = async (profileId: string, payload: any) => {
   const { address, ...remainingPlayerData } = payload;
   console.log('address', address);
   console.log('remaining', remainingPlayerData);
@@ -215,7 +215,7 @@ const TeamServices = {
   deleteTeamFromDB,
   sendMoneyToTeam,
   inviteTeam,
-  editPlayerAddressTextInfo,
+  editTeamAddressTax,
 };
 
 export default TeamServices;
