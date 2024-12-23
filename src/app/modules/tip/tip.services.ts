@@ -7,13 +7,7 @@ import Tip from './tip.model';
 import { ITip } from './tip.interface';
 import NormalUser from '../normalUser/normalUser.model';
 import mongoose from 'mongoose';
-import {
-  ENUM_PAYMENT_BY,
-  ENUM_PAYMENT_STATUS,
-  ENUM_TIP_BY,
-  ENUM_TRANSACTION_STATUS,
-  ENUM_TRANSACTION_TYPE,
-} from '../../utilities/enum';
+import { ENUM_PAYMENT_STATUS, ENUM_TIP_BY } from '../../utilities/enum';
 import Stripe from 'stripe';
 import config from '../../config';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
@@ -56,8 +50,6 @@ const createTipIntoDB = async (userId: string, payload: ITip) => {
   }
 
   return result;
-  // const result = await Tip.create({...payload,user:userId});
-  // return result;
 };
 
 // tip by account balance---------------------------------
@@ -399,7 +391,6 @@ const executePaypalTipPaymentWithApp = async (
   entityId: string,
   entityType: 'Team' | 'Player',
 ) => {
-  console.log('user,payerId,paymentId', profileId, paymentId, payerId);
   if (entityType === 'Team') {
     const team = await Team.findById(entityId);
     if (!team) {
@@ -423,7 +414,7 @@ const executePaypalTipPaymentWithApp = async (
       });
     });
 
-    console.log('payment in tip', payment);
+    // console.log('payment in tip', payment);
 
     // Verify if the payer_id matches and the payment status is 'approved'
     if (
@@ -473,8 +464,6 @@ const executePaypalTipPaymentWithApp = async (
       throw new AppError(httpStatus.BAD_REQUEST, 'Payment verification failed');
     }
   } catch (err) {
-    // console.error('Error verifying PayPal payment:', err);
-    // return { status: 'error', message: err.message };
     throw new AppError(httpStatus.BAD_REQUEST, 'Tip payment not successful');
   }
 };
