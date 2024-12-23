@@ -1,10 +1,19 @@
 import { Types } from 'mongoose';
+import { ENUM_RESIDENTIAL_STATUS } from '../../utilities/enum';
 export interface IAddress {
   streetAddress: string;
   city: string;
   state: string;
   zipCode: number;
 }
+
+export interface ITaxInfo {
+  fullname: string;
+  taxId: string;
+  address: string;
+  residentialStatus: (typeof ENUM_RESIDENTIAL_STATUS)[keyof typeof ENUM_RESIDENTIAL_STATUS];
+}
+
 export interface IPlayer {
   _id: Types.ObjectId;
   user: Types.ObjectId;
@@ -18,4 +27,5 @@ export interface IPlayer {
   paidAmount: number;
   dueAmount: number;
   address?: IAddress;
+  taxInfo?: ITaxInfo;
 }
