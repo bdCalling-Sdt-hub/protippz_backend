@@ -190,6 +190,35 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
   }
 };
 
+// edit player address
+const editTeamAddressTax = async (profileId: string, payload: any) => {
+  const { address, taxInfo, ...remainingPlayerData } = payload;
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingPlayerData,
+  };
+
+  if (address && Object.keys(address).length) {
+    for (const [key, value] of Object.entries(address)) {
+      modifiedUpdatedData[`address.${key}`] = value;
+    }
+  }
+  if (taxInfo && Object.keys(taxInfo).length) {
+    for (const [key, value] of Object.entries(taxInfo)) {
+      modifiedUpdatedData[`taxInfo.${key}`] = value;
+    }
+  }
+
+  const result = await Player.findByIdAndUpdate(
+    profileId,
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return result;
+};
+
 const PlayerServices = {
   createPlayerIntoDB,
   getAllPlayersFromDB,
@@ -198,6 +227,7 @@ const PlayerServices = {
   deletePlayerFromDB,
   sendMoneyToPlayer,
   invitePlayer,
+  editTeamAddressTax,
 };
 
 export default PlayerServices;
