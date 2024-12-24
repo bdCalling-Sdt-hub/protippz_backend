@@ -479,7 +479,7 @@ const executePaypalTipPaymentWithApp = async (
         { new: true, runValidators: true },
       );
 
-      // update player or team
+      // update player or team------------------
       const tipAmountAfterCharge =
         createTip.amount - (createTip.amount * 10) / 100;
       if (createTip?.entityType === 'Team') {
