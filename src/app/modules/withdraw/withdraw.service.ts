@@ -185,6 +185,17 @@ const updateWithdrawRequestStatus = async (id: string, status: string) => {
   return updateWithdraw;
 };
 
+const achWithdraw = async (user: JwtPayload, amount: number) => {
+  if (user.role == USER_ROLE.player) {
+    const player = await Player.findById(user.profileId);
+    if (!player) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+  } else if (user.role == USER_ROLE.team) {
+    console.log('nice');
+  }
+};
+
 const WithdrawRequestServices = {
   crateWithdrawRequest,
   getAllWithdrawRequest,
