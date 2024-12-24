@@ -28,4 +28,5 @@ export interface IPlayer {
   dueAmount: number;
   address?: IAddress;
   taxInfo?: ITaxInfo;
+  stripe_account_id: string;
 }
