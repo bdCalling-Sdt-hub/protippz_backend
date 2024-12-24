@@ -104,7 +104,7 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
     },
   );
 
-  console.log('payment', payment);
+  // console.log('payment', payment);
 
   await Transaction.create({
     ...payload,
