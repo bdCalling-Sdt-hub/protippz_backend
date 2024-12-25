@@ -94,29 +94,6 @@ const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
   return result;
 };
 
-// const getAllWithdrawRequest = async (query: Record<string, any>) => {
-//   const withdrawQuery = new QueryBuilder(
-//     WithdrawalRequest.find().populate({
-//       path: 'entityId',
-//       select: 'name profile_image player_image team_logo',
-//     }),
-//     query,
-//   )
-//     .search(['entityId.name'])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const meta = await withdrawQuery.countTotal();
-//   const result = await withdrawQuery.modelQuery;
-
-//   return {
-//     meta,
-//     result,
-//   };
-// };
-
 const getAllWithdrawRequest = async (query: Record<string, any>) => {
   const { searchTerm, ...restQuery } = query;
 
@@ -341,6 +318,7 @@ const WithdrawRequestServices = {
   crateWithdrawRequest,
   getAllWithdrawRequest,
   updateWithdrawRequestStatus,
+  achWithdraw,
 };
 
 export default WithdrawRequestServices;
