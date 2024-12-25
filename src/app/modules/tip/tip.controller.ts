@@ -54,10 +54,9 @@ const getAllTips = catchAsync(async (req, res) => {
   });
 });
 
-// Get all tips for the current user
+// Get all tips for the current user---------------
 const getUserTips = catchAsync(async (req, res) => {
   const result = await TipServices.getUserTipsFromDB(req?.user, req.query);
-
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -66,7 +65,7 @@ const getUserTips = catchAsync(async (req, res) => {
   });
 });
 
-// Get a single tip by ID
+// Get a single tip by ID--------------------------
 const getSingleTip = catchAsync(async (req, res) => {
   const result = await TipServices.getSingleTipFromDB(req?.params?.id);
 
