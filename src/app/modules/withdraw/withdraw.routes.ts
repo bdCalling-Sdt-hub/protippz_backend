@@ -25,5 +25,10 @@ router.patch(
   validateRequest(withdrawRequestValidations.withdrawRequestValidationSchema),
   WithdrawRequestController.updateWithdrawRequestStatus,
 );
+router.post(
+  '/ach-withdraw',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  WithdrawRequestController.achWithdraw,
+);
 
 export const withdrawRoutes = router;

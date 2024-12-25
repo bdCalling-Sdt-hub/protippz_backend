@@ -226,6 +226,12 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
     if (!player) {
       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
     }
+    if (player.dueAmount > amount) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You don't have enough balance",
+      );
+    }
 
     const stripe_account_id = player.stripe_account_id;
 
@@ -270,6 +276,12 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
     const team = await Team.findById(user.profileId);
     if (!team) {
       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+    if (team.dueAmount > amount) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You don't have enough balance",
+      );
     }
 
     const stripe_account_id = team.stripe_account_id;
