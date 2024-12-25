@@ -95,16 +95,27 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
     );
 
     // Determine whether to update a Team or Player
+    const tipAmountAfterCharge = payload.amount - (payload.amount * 10) / 100;
     if (payload.entityType === 'Team') {
       await Team.findByIdAndUpdate(
         payload.entityId,
-        { $inc: { totalTips: payload.amount, dueAmount: payload.amount } },
+        {
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
+        },
         { session },
       );
     } else if (payload.entityType === 'Player') {
       await Player.findByIdAndUpdate(
         payload.entityId,
-        { $inc: { totalTips: payload.amount, dueAmount: payload.amount } },
+        {
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
+        },
         { session },
       );
     }
@@ -272,11 +283,16 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
 
     await Notification.create(notificationData);
     // Determine whether to update a Team or Player
+    const tipAmountAfterCharge =
+      updatedTip.amount - (updatedTip.amount * 10) / 100;
     if (updatedTip?.entityType === 'Team') {
       await Team.findByIdAndUpdate(
         updatedTip?.entityId,
         {
-          $inc: { totalTips: updatedTip.amount, dueAmount: updatedTip.amount },
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
         },
         { session },
       );
@@ -284,7 +300,10 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
       await Player.findByIdAndUpdate(
         updatedTip.entityId,
         {
-          $inc: { totalTips: updatedTip.amount, dueAmount: updatedTip.amount },
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
         },
         { session },
       );
@@ -321,7 +340,10 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
     });
 
   // Await the PayPal payment execution
-  const payment = await executePaypalPayment(paymentId, execute_payment_json);
+  const payment: any = await executePaypalPayment(
+    paymentId,
+    execute_payment_json,
+  );
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -355,11 +377,16 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
     await Notification.create(notificationData);
 
     // Determine whether to update a Team or Player
+    const tipAmountAfterCharge =
+      updatedTip.amount - (updatedTip.amount * 10) / 100;
     if (updatedTip?.entityType === 'Team') {
       await Team.findByIdAndUpdate(
         updatedTip?.entityId,
         {
-          $inc: { totalTips: updatedTip.amount, dueAmount: updatedTip.amount },
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
         },
         { session },
       );
@@ -367,7 +394,10 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
       await Player.findByIdAndUpdate(
         updatedTip.entityId,
         {
-          $inc: { totalTips: updatedTip.amount, dueAmount: updatedTip.amount },
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
         },
         { session },
       );
@@ -451,6 +481,25 @@ const executePaypalTipPaymentWithApp = async (
         },
         { new: true, runValidators: true },
       );
+
+      // update player or team------------------
+      const tipAmountAfterCharge =
+        createTip.amount - (createTip.amount * 10) / 100;
+      if (createTip?.entityType === 'Team') {
+        await Team.findByIdAndUpdate(createTip?.entityId, {
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
+        });
+      } else if (createTip?.entityType === 'Player') {
+        await Player.findByIdAndUpdate(createTip.entityId, {
+          $inc: {
+            totalTips: tipAmountAfterCharge,
+            dueAmount: tipAmountAfterCharge,
+          },
+        });
+      }
       const notificationData = {
         title: `Successfully tip sent`,
         message: `Successfully tip send to ${createTip.entityType} and you got ${createTip.point} points`,
@@ -468,88 +517,6 @@ const executePaypalTipPaymentWithApp = async (
   }
 };
 
-// Get all tips
-
-// const getAllTipsFromDB = async (query: Record<string, any>) => {
-//   const tipQuery = new QueryBuilder(
-//     Tip.find({ paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS }),
-//     query,
-//   )
-//     .search(['name'])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const pipeline = [
-//     {
-//       $match: tipQuery.modelQuery.getFilter(),
-//     },
-//     {
-//       $lookup: {
-//         from: 'normalusers',
-//         let: { userId: '$user' },
-//         pipeline: [
-//           { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-//           { $project: { name: 1, email: 1, profile_image: 1 } }, // Include only required fields
-//         ],
-//         as: 'user',
-//       },
-//     },
-//     {
-//       $unwind: '$user',
-//     },
-//     {
-//       $lookup: {
-//         from: 'teams',
-//         localField: 'entityId',
-//         foreignField: '_id',
-//         as: 'teamEntity',
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'players',
-//         localField: 'entityId',
-//         foreignField: '_id',
-//         as: 'playerEntity',
-//       },
-//     },
-//     {
-//       $addFields: {
-//         entity: {
-//           $cond: {
-//             if: { $eq: ['$entityType', 'Team'] },
-//             then: {
-//               name: { $arrayElemAt: ['$teamEntity.name', 0] },
-//               team_logo: { $arrayElemAt: ['$teamEntity.team_logo', 0] },
-//             },
-//             else: {
-//               name: { $arrayElemAt: ['$playerEntity.name', 0] },
-//               position: { $arrayElemAt: ['$playerEntity.position', 0] },
-//               player_image: { $arrayElemAt: ['$playerEntity.player_image', 0] },
-//             },
-//           },
-//         },
-//       },
-//     },
-//     {
-//       $project: {
-//         teamEntity: 0,
-//         playerEntity: 0,
-//       },
-//     },
-//   ];
-
-//   // Execute the aggregation pipeline
-//   const result = await Tip.aggregate(pipeline);
-
-//   const meta = await tipQuery.countTotal(); // Count total documents for pagination
-//   return {
-//     meta,
-//     result,
-//   };
-// };
 const getAllTipsFromDB = async (query: Record<string, any>) => {
   const { searchTerm, ...otherQueryParams } = query;
 

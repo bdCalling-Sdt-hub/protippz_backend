@@ -18,6 +18,9 @@ const TeamSchema = new Schema(
     taxInfo: {
       type: taxInfoSchema,
     },
+    stripe_account_id: {
+      type: String,
+    },
   },
   {
     timestamps: true,

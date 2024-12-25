@@ -12,6 +12,7 @@ export interface ITeam {
   paidAmount: number;
   dueAmount: number;
   address: IAddress;
+  stripe_account_id: string;
 }
 
 export interface IInviteTeamPayload {

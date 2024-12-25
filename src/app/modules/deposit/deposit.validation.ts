@@ -24,7 +24,7 @@ const executePaypalDeposit = z.object({
 const depositValidations = {
   depositValidationSchema,
   executeStipeDeposit,
-  executePaypalDeposit
+  executePaypalDeposit,
 };
 
 export default depositValidations;

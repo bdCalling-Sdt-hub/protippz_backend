@@ -104,7 +104,7 @@ const depositWithPaypal = async (user: JwtPayload, payload: ITransaction) => {
     },
   );
 
-  console.log('payment', payment);
+  // console.log('payment', payment);
 
   await Transaction.create({
     ...payload,
@@ -202,7 +202,10 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
     });
 
   // Await the PayPal payment execution
-  const payment = await executePaypalPayment(paymentId, execute_payment_json);
+  const payment: any = await executePaypalPayment(
+    paymentId,
+    execute_payment_json,
+  );
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -315,7 +318,7 @@ const executeDepositPaymentWithApp = async (
       // Payment failed or was not approved
       throw new Error('Payment verification failed');
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error verifying PayPal payment:', err);
     return { status: 'error', message: err.message };
   }

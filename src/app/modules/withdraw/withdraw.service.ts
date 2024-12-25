@@ -15,7 +15,9 @@ import {
   ENUM_TRANSACTION_TYPE,
 } from '../../utilities/enum';
 import Notification from '../notification/notification.model';
-
+import Stripe from 'stripe';
+import config from '../../config';
+const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
   if (user.role === USER_ROLE.user) {
     const normalUser = await NormalUser.findById(user?.profileId);
@@ -92,29 +94,6 @@ const crateWithdrawRequest = async (user: JwtPayload, payload: IWithdraw) => {
   return result;
 };
 
-// const getAllWithdrawRequest = async (query: Record<string, any>) => {
-//   const withdrawQuery = new QueryBuilder(
-//     WithdrawalRequest.find().populate({
-//       path: 'entityId',
-//       select: 'name profile_image player_image team_logo',
-//     }),
-//     query,
-//   )
-//     .search(['entityId.name'])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const meta = await withdrawQuery.countTotal();
-//   const result = await withdrawQuery.modelQuery;
-
-//   return {
-//     meta,
-//     result,
-//   };
-// };
-
 const getAllWithdrawRequest = async (query: Record<string, any>) => {
   const { searchTerm, ...restQuery } = query;
 
@@ -185,14 +164,165 @@ const updateWithdrawRequestStatus = async (id: string, status: string) => {
   return updateWithdraw;
 };
 
+// const achWithdraw = async (user: JwtPayload, amount: number) => {
+//   if (user.role == USER_ROLE.player) {
+//     const player = await Player.findById(user.profileId);
+//     if (!player) {
+//       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+//     }
+//     // First, transfer funds from platform's account to connected account-----------------
+//     const amountInCent = Number((amount * 100).toFixed(2));
+//     const stripe_account_id = player.stripe_account_id;
+//     const transfer = await stripe.transfers.create({
+//       amount: amountInCent,
+//       currency: 'usd',
+//       destination: stripe_account_id as string,
+//     });
+//     console.log('transfer', transfer);
+//     // Initiate the payout to the connected account's bank--------------
+//     const payout = await stripe.payouts.create(
+//       {
+//         amount: amountInCent,
+//         currency: 'usd',
+//       },
+//       {
+//         stripeAccount: stripe_account_id as string,
+//       },
+//     );
+//     console.log('payout', payout);
+//   } else if (user.role == USER_ROLE.team) {
+//     const team = await Team.findById(user.profileId);
+//     if (!team) {
+//       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+//     }
+//     // First, transfer funds from platform's account to connected account-----------------
+//     const amountInCent = Number((amount * 100).toFixed(2));
+//     const stripe_account_id = team.stripe_account_id;
+//     const transfer = await stripe.transfers.create({
+//       amount: amountInCent,
+//       currency: 'usd',
+//       destination: stripe_account_id as string,
+//     });
+//     console.log('transfer', transfer);
+//     // Initiate the payout to the connected account's bank--------------
+//     const payout = await stripe.payouts.create(
+//       {
+//         amount: amountInCent,
+//         currency: 'usd',
+//       },
+//       {
+//         stripeAccount: stripe_account_id as string,
+//       },
+//     );
+//     console.log('payout', payout);
+//   }
+// };
+
 const achWithdraw = async (user: JwtPayload, amount: number) => {
-  if (user.role == USER_ROLE.player) {
+  const amountInCent = Number((amount * 100).toFixed(2));
+
+  if (user.role === USER_ROLE.player) {
     const player = await Player.findById(user.profileId);
     if (!player) {
-      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
     }
-  } else if (user.role == USER_ROLE.team) {
-    console.log('nice');
+    if (player.dueAmount > amount) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You don't have enough balance",
+      );
+    }
+
+    const stripe_account_id = player.stripe_account_id;
+
+    try {
+      // Transfer funds
+      const transfer: any = await stripe.transfers.create({
+        amount: amountInCent,
+        currency: 'usd',
+        destination: stripe_account_id as string,
+      });
+      console.log('transfer', transfer);
+
+      if (transfer.status !== 'succeeded') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Transfer failed');
+      }
+
+      // Payout to bank
+      const payout = await stripe.payouts.create(
+        {
+          amount: amountInCent,
+          currency: 'usd',
+        },
+        {
+          stripeAccount: stripe_account_id as string,
+        },
+      );
+      console.log('payout', payout);
+
+      if (payout.status !== 'paid') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Payout failed');
+      }
+
+      // Update player data in database
+      await Player.findByIdAndUpdate(user.profileId, {
+        $inc: { paidAmount: amount, dueAmount: -amount },
+      });
+    } catch (error) {
+      console.error('Error during transfer or payout:', error);
+      throw error;
+    }
+  } else if (user.role === USER_ROLE.team) {
+    const team = await Team.findById(user.profileId);
+    if (!team) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+    }
+    if (team.dueAmount > amount) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You don't have enough balance",
+      );
+    }
+
+    const stripe_account_id = team.stripe_account_id;
+
+    try {
+      // Transfer funds
+      const transfer: any = await stripe.transfers.create({
+        amount: amountInCent,
+        currency: 'usd',
+        destination: stripe_account_id as string,
+      });
+      console.log('transfer', transfer);
+
+      if (transfer.status !== 'succeeded') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Transfer failed');
+      }
+
+      // Payout to bank
+      const payout = await stripe.payouts.create(
+        {
+          amount: amountInCent,
+          currency: 'usd',
+        },
+        {
+          stripeAccount: stripe_account_id as string,
+        },
+      );
+      console.log('payout', payout);
+
+      if (payout.status !== 'paid') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Payout failed');
+      }
+
+      // Update team data in database
+      await Player.findByIdAndUpdate(user.profileId, {
+        $inc: { paidAmount: amount, dueAmount: -amount },
+      });
+    } catch (error) {
+      console.error('Error during transfer or payout:', error);
+      throw error;
+    }
   }
 };
 
@@ -200,6 +330,7 @@ const WithdrawRequestServices = {
   crateWithdrawRequest,
   getAllWithdrawRequest,
   updateWithdrawRequestStatus,
+  achWithdraw,
 };
 
 export default WithdrawRequestServices;
