@@ -340,7 +340,10 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
     });
 
   // Await the PayPal payment execution
-  const payment = await executePaypalPayment(paymentId, execute_payment_json);
+  const payment: any = await executePaypalPayment(
+    paymentId,
+    execute_payment_json,
+  );
   const session = await mongoose.startSession();
   session.startTransaction();
 
