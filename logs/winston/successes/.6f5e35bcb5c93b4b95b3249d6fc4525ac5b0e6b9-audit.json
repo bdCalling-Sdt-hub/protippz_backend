@@ -6,46 +6,6 @@
     "auditLog": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\.6f5e35bcb5c93b4b95b3249d6fc4525ac5b0e6b9-audit.json",
     "files": [
         {
-            "date": 1733907925266,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-11-15-success.log",
-            "hash": "91d338f03ecb43d9526cb92222415062020194e232ffce539bcc4fbfa2889653"
-        },
-        {
-            "date": 1733915742655,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-11-17-success.log",
-            "hash": "24d4a0df9c1b0b21f4606c17975029ce980623fde44ca171f7bfebbfec9b9d2b"
-        },
-        {
-            "date": 1733975742591,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-12-09-success.log",
-            "hash": "6ee2f7adcc06c0dc1b3d339b728ca6af0182df0db9f4e15e687737d2c77976ba"
-        },
-        {
-            "date": 1733976077228,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-12-10-success.log",
-            "hash": "a9160e0f92e4eb8bbd7f679076e93cec413a4c95d61d6f435e96a62c5ed079e7"
-        },
-        {
-            "date": 1733980616903,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-12-11-success.log",
-            "hash": "d28669784e8a50f6118965d55a4785f7d3a20558edd3b05e98155a52f8ded1e8"
-        },
-        {
-            "date": 1733983344527,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-12-12-success.log",
-            "hash": "0d5fe9724cd03a1024ac9b19b1d3cbf6a0c9722bf12f9ec64125e62e0b875a40"
-        },
-        {
-            "date": 1733991133992,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-12-14-success.log",
-            "hash": "9fb3bcfa79b2777d55caf8e9c704ba1151759b360c4f2fbe0500816a0a50ecca"
-        },
-        {
-            "date": 1734005305167,
-            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-12-18-success.log",
-            "hash": "52a8509ad7049ae5379c9c07bfa098ac131a822ac6e1044bc631390a43f394a0"
-        },
-        {
             "date": 1734146229947,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-14-09-success.log",
             "hash": "1f2932cde039324b698db96a26430b9cf80125540990b86b568babb377bb8a93"
@@ -139,6 +99,31 @@
             "date": 1735103373953,
             "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-25-11-success.log",
             "hash": "82d00f3c616cdef987f82aab387bf10e248e53679fcb3501a5a565ee7b59477b"
+        },
+        {
+            "date": 1735108434833,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-25-12-success.log",
+            "hash": "6e44fd4a55d52a89de25c5cfdc6b2c9d7e1eebff010e3f2c894e96033a2a67d5"
+        },
+        {
+            "date": 1735113903606,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-25-14-success.log",
+            "hash": "56cb743109b9caf46dcd471c41430104acf49271814dbd73d12ffbca795fbce1"
+        },
+        {
+            "date": 1735123495788,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-25-16-success.log",
+            "hash": "13cb2db8e544bfe3ec64dd4da98d05da92a3b4f5dcfeaccbc380fde5f7504c42"
+        },
+        {
+            "date": 1735280977539,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-27-12-success.log",
+            "hash": "e6b2a9eb06318885019dc9132179954cd0757fede43d170309fef2de82da615c"
+        },
+        {
+            "date": 1735293091731,
+            "name": "D:\\Solution Squed Project\\protipzz\\logs\\winston\\successes\\um-2024-12-27-15-success.log",
+            "hash": "87bd1f72840fcca97d7026050e076989cc411fe9ef01b8c33e10f507a33e30d7"
         }
     ],
     "hashType": "sha256"
