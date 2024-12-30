@@ -261,7 +261,6 @@ const executeDepositPaymentWithApp = async (
   paymentId: string,
   payerId: string,
 ) => {
-  console.log('user,payerId,paymentId', profileId, paymentId, payerId);
   try {
     // Use the payment.get method to retrieve payment details
     const payment = await new Promise<any>((resolve, reject) => {
