@@ -144,7 +144,6 @@ const updateWithdrawRequestStatus = async (id: string, status: string) => {
     { status: status },
     { new: true, runValidators: true },
   );
-
   const transactionData = {
     amount: updateWithdraw?.amount,
     transactionType: ENUM_TRANSACTION_TYPE.WITHDRAW,
