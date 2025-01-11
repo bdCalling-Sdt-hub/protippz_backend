@@ -8,6 +8,12 @@ import stripeValidations from './stripe.validation';
 const router = express.Router();
 
 router.post(
+  '/exchange-public-token',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  StripeController.exchangePublicToken,
+);
+
+router.post(
   '/link-bank-account',
   auth(USER_ROLE.player, USER_ROLE.team, USER_ROLE.user),
   validateRequest(stripeValidations.linkBankAccountValidationSchema),

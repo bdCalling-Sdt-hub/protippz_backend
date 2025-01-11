@@ -5,7 +5,23 @@ import Stripe from 'stripe';
 import config from '../../config';
 import AppError from '../../error/appError';
 import httpStatus from 'http-status';
+import plaidClient from '../../utilities/plaidClient';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
+
+const exchangePublicToken = async (payload: any) => {
+  const { public_token } = payload;
+
+  const tokenResponse = await plaidClient.itemPublicTokenExchange({
+    public_token,
+  });
+
+  const { access_token, item_id } = tokenResponse.data;
+  console.log(access_token, item_id);
+
+  // Store the access_token securely
+  return { access_token };
+};
+
 const linkBankAccount = async (userData: JwtPayload, payload: any) => {
   const { routingNumber, accountNumber } = payload;
   const user = await User.findById(userData.id);
@@ -74,6 +90,7 @@ const updateBankInfo = async (userData: JwtPayload, payload: any) => {
 };
 
 const StripeService = {
+  exchangePublicToken,
   linkBankAccount,
   updateBankInfo,
 };
