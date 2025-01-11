@@ -197,18 +197,26 @@ const resendVerifyCode = async (email: string) => {
 const getMyProfile = async (userData: JwtPayload) => {
   let result = null;
   if (userData.role === USER_ROLE.user) {
-    result = await NormalUser.findOne({ email: userData.email });
+    result = await NormalUser.findOne({ email: userData.email }).populate({
+      path: 'user',
+      select: 'role -_id',
+    });
   } else if (userData.role === USER_ROLE.player) {
-    result = await Player.findOne({
-      $or: [{ email: userData?.email }, { username: userData?.username }],
+    result = await Player.findById(userData?.profileId).populate({
+      path: 'user',
+      select: 'role -_id',
     });
   } else if (userData.role === USER_ROLE.team) {
-    result = await Team.findOne({
-      $or: [{ email: userData?.email }, { username: userData?.username }],
+    result = await Team.findById(userData?.profileId).populate({
+      path: 'user',
+      select: 'role -_id',
     });
   } else if (userData.role === USER_ROLE.superAdmin) {
     result = await SuperAdmin.findOne({
       $or: [{ email: userData?.email }, { username: userData?.username }],
+    }).populate({
+      path: 'user',
+      select: 'role -_id',
     });
   }
   return result;

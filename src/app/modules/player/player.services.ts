@@ -172,11 +172,16 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
       role: USER_ROLE.player,
       isVerified: true,
     };
-
+    console.log('userdata', userData);
     const user = await User.create([userData], { session });
+    console.log('user', user);
 
-    await Player.findByIdAndUpdate(id, { user: user[0]._id }, { session });
-
+    const updatePlayer = await Player.findByIdAndUpdate(
+      id,
+      { user: user[0]._id },
+      { session },
+    );
+    console.log('update', updatePlayer);
     // Commit the transaction
     await session.commitTransaction();
     session.endSession();

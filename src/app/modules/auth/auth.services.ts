@@ -64,6 +64,7 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
   return {
     accessToken,
     refreshToken,
+    role: user.role,
   };
 };
 
