@@ -14,6 +14,12 @@ router.post(
 );
 
 router.post(
+  '/create-connected-account',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  StripeController.createConnectedAccount,
+);
+
+router.post(
   '/link-bank-account',
   auth(USER_ROLE.player, USER_ROLE.team, USER_ROLE.user),
   validateRequest(stripeValidations.linkBankAccountValidationSchema),
