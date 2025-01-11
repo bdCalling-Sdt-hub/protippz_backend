@@ -12,6 +12,15 @@ const exchangePublicToken = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const createConnectedAccount = catchAsync(async (req, res) => {
+  const result = await StripeService.createConnectedAccount(req.user, req.body);
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Bank account added successfully',
+    data: result,
+  });
+});
 
 const linkBankAccount = catchAsync(async (req, res) => {
   const result = await StripeService.linkBankAccount(req.user, req.body);
@@ -26,6 +35,7 @@ const linkBankAccount = catchAsync(async (req, res) => {
 const StripeController = {
   linkBankAccount,
   exchangePublicToken,
+  createConnectedAccount,
 };
 
 export default StripeController;
