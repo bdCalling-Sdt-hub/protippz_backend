@@ -38,8 +38,8 @@ const linkBankAccount = async (userData: JwtPayload, payload: any) => {
     {
       external_account: {
         object: 'bank_account',
-        country: 'US', // Or use the user's country
-        currency: 'usd', // Or use the currency you support
+        country: 'US',
+        currency: 'usd',
         routing_number: routingNumber,
         account_number: accountNumber,
       },
@@ -59,12 +59,12 @@ const createConnectedAccount = async (
   userData: JwtPayload,
   access_token: string,
 ) => {
-  // Step 1: Create a Stripe account
+  // Create a Stripe account
   const account = await stripe.accounts.create({
     type: 'standard',
   });
 
-  // Step 2: Retrieve bank account information from Plaid
+  // Retrieve bank account information from Plaid
   const plaidResponse = (
     await plaidClient.authGet({
       access_token,
@@ -81,14 +81,14 @@ const createConnectedAccount = async (
     throw new Error('Bank account details not found in Plaid response.');
   }
 
-  // Step 3: Link the bank account to Stripe
+  //Link the bank account to Stripe
   const externalAccount = await stripe.accounts.createExternalAccount(
     account.id,
     {
       external_account: {
         object: 'bank_account',
-        country: 'US', // Adjust based on the country
-        currency: 'usd', // Adjust based on the currency
+        country: 'US',
+        currency: 'usd',
         routing_number: achDetails.routing,
         account_number: achDetails.account,
       },
