@@ -10,7 +10,6 @@ import { USER_ROLE } from '../user/user.constant';
 import Player from '../player/player.model';
 import Team from '../team/team.model';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
-
 const createLinkToken = async (userData: JwtPayload) => {
   console.log('crekjdfkjdkjf');
   let user;
