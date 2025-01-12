@@ -264,6 +264,17 @@ const createConnectedAccountAndOnboardingLink = async (
   return onboardingLink.url;
 };
 
+const updateOnboardingLink = async (stripAccountId: string) => {
+  const accountLink = await stripe.accountLinks.create({
+    account: stripAccountId,
+    refresh_url: 'http://localhost:3000/account-created',
+    return_url: 'http://localhost:3000/account-created',
+    type: 'account_onboarding',
+  });
+
+  return { link: accountLink.url };
+};
+
 const StripeService = {
   createLinkToken,
   exchangePublicToken,
@@ -271,6 +282,7 @@ const StripeService = {
   linkBankAccount,
   updateBankInfo,
   createConnectedAccountAndOnboardingLink,
+  updateOnboardingLink,
 };
 
 export default StripeService;
