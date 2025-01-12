@@ -193,6 +193,24 @@ const createConnectedAccountAndOnboardingLink = async (
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
+  if (userData?.role == USER_ROLE.player) {
+    const player = await Player.findById(profileId);
+    if (player?.isStripeConnected) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You already added bank information',
+      );
+    }
+  } else if (userData?.role == USER_ROLE.team) {
+    const team = await Team.findById(profileId);
+    if (team?.isStripeConnected) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You already added bank information',
+      );
+    }
+  }
+
   //  Create a connected account
   const account = await stripe.accounts.create({
     type: 'express',

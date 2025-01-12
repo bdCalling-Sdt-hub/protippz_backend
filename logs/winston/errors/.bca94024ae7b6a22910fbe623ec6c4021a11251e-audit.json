@@ -54,6 +54,11 @@
             "date": 1736650911029,
             "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-12-09-error.log",
             "hash": "eb7d4332076e10a8dc28d7b4bd747cf37cb623ca20495e9104bdba7b77c56765"
+        },
+        {
+            "date": 1736654440500,
+            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-12-10-error.log",
+            "hash": "96dbe7092262ffc8d7c6bbe5f7094d67cb714d6364606b736ad42d719bb22118"
         }
     ],
     "hashType": "sha256"
