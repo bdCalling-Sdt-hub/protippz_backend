@@ -232,8 +232,9 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       );
     }
 
-    const stripe_account_id = player.stripe_account_id;
-    if (!stripe_account_id) {
+    const stripAccountId = player.stripAccountId;
+
+    if (!player.isStripeConnected) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'For withdraw you need to connect your ach account',
@@ -245,7 +246,7 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       const transfer: any = await stripe.transfers.create({
         amount: amountInCent,
         currency: 'usd',
-        destination: stripe_account_id as string,
+        destination: stripAccountId as string,
       });
       console.log('transfer', transfer);
 
@@ -260,7 +261,7 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
           currency: 'usd',
         },
         {
-          stripeAccount: stripe_account_id as string,
+          stripeAccount: stripAccountId as string,
         },
       );
       console.log('payout', payout);
@@ -289,8 +290,8 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       );
     }
 
-    const stripe_account_id = team.stripe_account_id;
-    if (!stripe_account_id) {
+    const stripe_account_id = team.stripAccountId;
+    if (!team.isStripeConnected) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'For withdraw you need to connect your ach account',

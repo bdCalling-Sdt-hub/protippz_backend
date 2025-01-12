@@ -61,3 +61,9 @@ export const ENUM_RESIDENTIAL_STATUS = {
   RESIDENT: 'Resident',
   NON_RESIDENT: 'Non Resident',
 };
+
+export const ENUM_PAYMENT_PURPOSE = {
+  PURCHASE_SUBSCRIPTION: 'purchase-subscription',
+  RENEW_SUBSCRIPTION: 'renew-subscription',
+  COLLABRATE_PAYMENT: 'collabrate-payment',
+};

@@ -16,7 +16,19 @@ import auth from './app/middlewares/auth';
 import { USER_ROLE } from './app/modules/user/user.constant';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
 import uploadCsvWithProgress from './app/helper/uploadCsvWithProgress';
+import plaidClient from './app/utilities/plaidClient';
+import { User } from './app/modules/user/user.model';
+import AppError from './app/error/appError';
+import httpStatus from 'http-status';
+import handleWebhook from './app/stripeManager/webhook';
 const upload = multer({ dest: 'uploads/' });
+
+// web hook
+app.post(
+  '/protippz/webhook',
+  express.raw({ type: 'application/json' }),
+  handleWebhook,
+);
 // parser-----------------------
 app.use(express.json());
 app.use(cookieParser());
@@ -80,6 +92,34 @@ app.get('/upload-progress', (req, res) => {
       res.write(`data: {"progress": ${progress}}\n\n`);
     }
   }, 1000);
+});
+
+app.post('/create_link_token', async function (request, response) {
+  console.log('create link token');
+  const user = await User.findOne({ _id: '6762958e7726c39688329f90' });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const clientUserId = user._id;
+  console.log('client user id', user);
+  const request = {
+    user: {
+      // This should correspond to a unique id for the current user.
+      client_user_id: clientUserId,
+    },
+    client_name: 'Plaid Test App',
+    products: ['auth'],
+    language: 'en',
+    webhook: 'https://webhook.example.com',
+    redirect_uri: 'https://domainname.com/oauth-page.html',
+    country_codes: ['US'],
+  };
+  try {
+    const createTokenResponse = await client.linkTokenCreate(request);
+    response.json(createTokenResponse.data);
+  } catch (error) {
+    // handle error
+  }
 });
 
 // global error handler

@@ -29,4 +29,6 @@ export interface IPlayer {
   address?: IAddress;
   taxInfo?: ITaxInfo;
   stripe_account_id: string;
+  stripAccountId: string;
+  isStripeConnected: boolean;
 }

@@ -13,6 +13,8 @@ export interface ITeam {
   dueAmount: number;
   address: IAddress;
   stripe_account_id: string;
+  stripAccountId: string;
+  isStripeConnected: boolean;
 }
 
 export interface IInviteTeamPayload {

@@ -8,6 +8,11 @@ import stripeValidations from './stripe.validation';
 const router = express.Router();
 
 router.post(
+  '/create-link-token',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  StripeController.createLinkToken,
+);
+router.post(
   '/exchange-public-token',
   auth(USER_ROLE.player, USER_ROLE.team),
   StripeController.exchangePublicToken,
@@ -24,6 +29,12 @@ router.post(
   auth(USER_ROLE.player, USER_ROLE.team, USER_ROLE.user),
   validateRequest(stripeValidations.linkBankAccountValidationSchema),
   StripeController.linkBankAccount,
+);
+
+router.post(
+  '/connect-stripe',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  StripeController.createOnboardingLink,
 );
 
 export const stripeRoutes = router;

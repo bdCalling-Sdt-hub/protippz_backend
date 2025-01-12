@@ -52,6 +52,13 @@ const PlayerSchema = new Schema(
     stripe_account_id: {
       type: String,
     },
+    stripAccountId: {
+      type: String,
+    },
+    isStripeConnected: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

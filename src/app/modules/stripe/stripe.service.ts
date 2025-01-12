@@ -11,6 +11,36 @@ import Player from '../player/player.model';
 import Team from '../team/team.model';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 
+const createLinkToken = async (userData: JwtPayload) => {
+  console.log('crekjdfkjdkjf');
+  let user;
+  if (userData.role == USER_ROLE.player) {
+    user = await Player.findById(userData?.profileId);
+  }
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const clientUserId = user._id.toString();
+  const request = {
+    user: {
+      client_user_id: clientUserId,
+    },
+    client_name: 'Plaid Test App',
+    products: ['auth'],
+    language: 'en',
+    country_codes: ['US'],
+  };
+  try {
+    const createTokenResponse = await plaidClient.linkTokenCreate(request);
+    console.log('created token', createTokenResponse);
+    return createTokenResponse.data;
+  } catch (error) {
+    // handle error
+    console.log('error is ', error);
+  }
+};
+
 const exchangePublicToken = async (payload: any) => {
   const { public_token } = payload;
 
@@ -154,11 +184,73 @@ const updateBankInfo = async (userData: JwtPayload, payload: any) => {
   return { bankAccountId: newBankAccount.id };
 };
 
+const createConnectedAccountAndOnboardingLink = async (
+  userData: JwtPayload,
+  profileId: string,
+) => {
+  const user = await User.findById(userData?.id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  //  Create a connected account
+  const account = await stripe.accounts.create({
+    type: 'express',
+    email: user.email,
+    country: 'US',
+    capabilities: {
+      card_payments: { requested: true },
+      transfers: { requested: true },
+    },
+  });
+
+  // console.log('Connected Account Created:', account.id);
+
+  if (userData?.role == USER_ROLE.team) {
+    const updatedTeamProfile = await Team.findByIdAndUpdate(
+      profileId,
+      { stripAccountId: account.id },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedTeamProfile) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Server temporarily unavailable',
+      );
+    }
+  } else if (userData?.role == USER_ROLE.player) {
+    const updatedPlayerProfile = await Player.findByIdAndUpdate(
+      profileId,
+      { stripAccountId: account.id },
+      { new: true, runValidators: true },
+    );
+
+    if (!updatedPlayerProfile) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Server temporarily unavailable',
+      );
+    }
+  }
+
+  //  Create the onboarding link
+  const onboardingLink = await stripe.accountLinks.create({
+    account: account.id,
+    refresh_url: 'http://localhost:3000/account-created',
+    return_url: 'http://localhost:3000/account-created',
+    type: 'account_onboarding',
+  });
+  return onboardingLink.url;
+};
+
 const StripeService = {
+  createLinkToken,
   exchangePublicToken,
   createConnectedAccount,
   linkBankAccount,
   updateBankInfo,
+  createConnectedAccountAndOnboardingLink,
 };
 
 export default StripeService;
