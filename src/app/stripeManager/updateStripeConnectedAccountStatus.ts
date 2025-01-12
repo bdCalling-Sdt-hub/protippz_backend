@@ -31,7 +31,7 @@ const updateStripeConnectedAccountStatus = async (accountId: string) => {
         );
       }
     } else if (team) {
-      const updatedTeam = await Player.findOneAndUpdate(
+      const updatedTeam = await Team.findOneAndUpdate(
         { stripAccountId: accountId },
         { isStripeConnected: true },
         { new: true, runValidators: true },
