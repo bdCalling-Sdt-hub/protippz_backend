@@ -188,10 +188,13 @@ const createConnectedAccountAndOnboardingLink = async (
   userData: JwtPayload,
   profileId: string,
 ) => {
+  console.log('user', userData);
   const user = await User.findById(userData?.id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
+
+  console.log('profileid ', profileId);
 
   if (userData?.role == USER_ROLE.player) {
     const player = await Player.findById(profileId);
