@@ -37,4 +37,10 @@ router.post(
   StripeController.createOnboardingLink,
 );
 
+router.post(
+  '/update-connected-accout',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  StripeController.updateOnboardingLink,
+);
+
 export const stripeRoutes = router;
