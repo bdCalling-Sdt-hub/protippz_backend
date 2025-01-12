@@ -225,7 +225,7 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
     if (!player) {
       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
     }
-    if (player.dueAmount > amount) {
+    if (player.dueAmount < amount) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "You don't have enough balance",
@@ -255,20 +255,20 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       }
 
       // Payout to bank
-      const payout = await stripe.payouts.create(
-        {
-          amount: amountInCent,
-          currency: 'usd',
-        },
-        {
-          stripeAccount: stripAccountId as string,
-        },
-      );
-      console.log('payout', payout);
+      // const payout = await stripe.payouts.create(
+      //   {
+      //     amount: amountInCent,
+      //     currency: 'usd',
+      //   },
+      //   {
+      //     stripeAccount: stripAccountId as string,
+      //   },
+      // );
+      // console.log('payout', payout);
 
-      if (payout.status !== 'paid') {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Payout failed');
-      }
+      // if (payout.status !== 'paid') {
+      //   throw new AppError(httpStatus.BAD_REQUEST, 'Payout failed');
+      // }
 
       // Update player data in database
       await Player.findByIdAndUpdate(user.profileId, {
@@ -283,7 +283,7 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
     if (!team) {
       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
     }
-    if (team.dueAmount > amount) {
+    if (team.dueAmount < amount) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "You don't have enough balance",
@@ -312,20 +312,20 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       }
 
       // Payout to bank
-      const payout = await stripe.payouts.create(
-        {
-          amount: amountInCent,
-          currency: 'usd',
-        },
-        {
-          stripeAccount: stripe_account_id as string,
-        },
-      );
-      console.log('payout', payout);
+      // const payout = await stripe.payouts.create(
+      //   {
+      //     amount: amountInCent,
+      //     currency: 'usd',
+      //   },
+      //   {
+      //     stripeAccount: stripe_account_id as string,
+      //   },
+      // );
+      // console.log('payout', payout);
 
-      if (payout.status !== 'paid') {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Payout failed');
-      }
+      // if (payout.status !== 'paid') {
+      //   throw new AppError(httpStatus.BAD_REQUEST, 'Payout failed');
+      // }
 
       // Update team data in database
       await Player.findByIdAndUpdate(user.profileId, {
