@@ -54,12 +54,25 @@ const createOnboardingLink = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateOnboardingLink = catchAsync(async (req, res) => {
+  const result = await StripeService.updateOnboardingLink(
+    req.body.stripAccountId,
+  );
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Link created successfully',
+    data: result,
+  });
+});
 const StripeController = {
   createLinkToken,
   linkBankAccount,
   exchangePublicToken,
   createConnectedAccount,
   createOnboardingLink,
+  updateOnboardingLink,
 };
 
 export default StripeController;
