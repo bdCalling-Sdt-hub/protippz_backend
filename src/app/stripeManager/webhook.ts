@@ -7,8 +7,7 @@ import updateStripeConnectedAccountStatus from './updateStripeConnectedAccountSt
 
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleWebhook = async (req: Request, res: Response) => {
-  const endpointSecret =
-    'whsec_f05875eb42dd8051fbc20bcdb538e22c499ecd114bde7eea65bb0602b1730562';
+  const endpointSecret = config.webhook_endpoint_secret as string;
   const sig = req.headers['stripe-signature'];
 
   try {
@@ -31,7 +30,6 @@ const handleWebhook = async (req: Request, res: Response) => {
         );
         await handlePaymentSuccess(userId, paymentPurpose);
         // Update subscription status in your database
-        // E.g., Activate the subscription for the user
 
         break;
       }

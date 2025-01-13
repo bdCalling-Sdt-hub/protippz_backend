@@ -19,6 +19,7 @@ export default {
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
   super_admin_email: process.env.SUPER_ADMIN_EMAIL,
   super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
+  webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
   stripe: {
     stripe_secret_key: process.env.STRIPE_SECRET_KEY,
   },
