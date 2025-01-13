@@ -31,7 +31,9 @@ const createLinkToken = async (userData: JwtPayload) => {
     country_codes: ['US'],
   };
   try {
-    const createTokenResponse = await plaidClient.linkTokenCreate(request);
+    const createTokenResponse = await plaidClient.linkTokenCreate(
+      request as any,
+    );
     console.log('created token', createTokenResponse);
     return createTokenResponse.data;
   } catch (error) {
