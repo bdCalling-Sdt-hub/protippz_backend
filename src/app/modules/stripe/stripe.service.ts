@@ -167,9 +167,9 @@ const updateBankInfo = async (userData: JwtPayload, payload: any) => {
   );
 
   // You can optionally delete the previous bank account (if needed)
-  const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+  const customer: any = await stripe.customers.retrieve(user.stripeCustomerId);
   const oldBankAccount = customer.sources.data.find(
-    (source) => source.object === 'bank_account',
+    (source: any) => source.object === 'bank_account',
   );
   if (oldBankAccount) {
     await stripe.customers.deleteSource(
@@ -225,8 +225,6 @@ const createConnectedAccountAndOnboardingLink = async (
       transfers: { requested: true },
     },
   });
-
-  // console.log('Connected Account Created:', account.id);
 
   if (userData?.role == USER_ROLE.team) {
     const updatedTeamProfile = await Team.findByIdAndUpdate(
