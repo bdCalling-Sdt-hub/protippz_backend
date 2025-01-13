@@ -189,13 +189,10 @@ const createConnectedAccountAndOnboardingLink = async (
   userData: JwtPayload,
   profileId: string,
 ) => {
-  console.log('user', userData);
   const user = await User.findById(userData?.id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-
-  console.log('profileid ', profileId);
 
   if (userData?.role == USER_ROLE.player) {
     const player = await Player.findById(profileId);
@@ -257,7 +254,7 @@ const createConnectedAccountAndOnboardingLink = async (
   //  Create the onboarding link
   const onboardingLink = await stripe.accountLinks.create({
     account: account.id,
-    refresh_url: 'http://localhost:3000/account-created',
+    refresh_url: `${config.onboarding_refresh_url}?accountId=${account?.id}`,
     return_url: 'http://localhost:3000/account-created',
     type: 'account_onboarding',
   });
@@ -267,8 +264,8 @@ const createConnectedAccountAndOnboardingLink = async (
 const updateOnboardingLink = async (stripAccountId: string) => {
   const accountLink = await stripe.accountLinks.create({
     account: stripAccountId,
-    refresh_url: 'http://localhost:3000/account-created',
-    return_url: 'http://localhost:3000/account-created',
+    refresh_url: `${config.onboarding_refresh_url}?accountId=${stripAccountId}`,
+    return_url: config.onboarding_return_url,
     type: 'account_onboarding',
   });
 

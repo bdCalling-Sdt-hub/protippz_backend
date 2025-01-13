@@ -20,6 +20,8 @@ export default {
   super_admin_email: process.env.SUPER_ADMIN_EMAIL,
   super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
   webhook_endpoint_secret: process.env.WEBHOOK_ENDPOINT_SECRET,
+  onboarding_return_url: process.env.ONBOARDING_RETURN_URL,
+  onboarding_refresh_url: process.env.ONBOARDING_REFRESH_URL,
   stripe: {
     stripe_secret_key: process.env.STRIPE_SECRET_KEY,
   },

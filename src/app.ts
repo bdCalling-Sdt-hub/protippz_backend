@@ -21,8 +21,10 @@ import { User } from './app/modules/user/user.model';
 import AppError from './app/error/appError';
 import httpStatus from 'http-status';
 import handleWebhook from './app/stripeManager/webhook';
+import Stripe from 'stripe';
+import config from './app/config';
 const upload = multer({ dest: 'uploads/' });
-
+const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 // web hook
 app.post(
   '/protippz/webhook',
@@ -94,31 +96,27 @@ app.get('/upload-progress', (req, res) => {
   }, 1000);
 });
 
-app.post('/create_link_token', async function (request, response) {
-  console.log('create link token');
-  const user = await User.findOne({ _id: '6762958e7726c39688329f90' });
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-  }
-  const clientUserId = user._id;
-  console.log('client user id', user);
-  const request = {
-    user: {
-      // This should correspond to a unique id for the current user.
-      client_user_id: clientUserId,
-    },
-    client_name: 'Plaid Test App',
-    products: ['auth'],
-    language: 'en',
-    webhook: 'https://webhook.example.com',
-    redirect_uri: 'https://domainname.com/oauth-page.html',
-    country_codes: ['US'],
-  };
+// onboarding refresh url
+router.get('/stripe/onboarding/refresh', async (req, res, next) => {
   try {
-    const createTokenResponse = await client.linkTokenCreate(request);
-    response.json(createTokenResponse.data);
+    const { accountId } = req.query;
+
+    if (!accountId) {
+      return res.status(400).send('Missing accountId');
+    }
+
+    // Generate a new onboarding link
+    const accountLink = await stripe.accountLinks.create({
+      account: accountId as string,
+      refresh_url: `${config.onboarding_refresh_url}?accountId=${accountId}`,
+      return_url: config.onboarding_return_url,
+      type: 'account_onboarding',
+    });
+
+    // Redirect the user to the new onboarding link
+    res.redirect(accountLink.url);
   } catch (error) {
-    // handle error
+    next(error); // Pass errors to error handling middleware
   }
 });
 
