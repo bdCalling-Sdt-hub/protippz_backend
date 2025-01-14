@@ -260,9 +260,17 @@ const createConnectedAccountAndOnboardingLink = async (
   return onboardingLink.url;
 };
 
-const updateOnboardingLink = async (stripAccountId: string) => {
+const updateOnboardingLink = async (userData: JwtPayload) => {
+  let stripAccountId;
+  if (userData.role == USER_ROLE.player) {
+    const player = await Player.findById(userData.profileId);
+    stripAccountId = player?.stripAccountId;
+  } else if (userData.role == USER_ROLE.team) {
+    const player = await Player.findById(userData.profileId);
+    stripAccountId = player?.stripAccountId;
+  }
   const accountLink = await stripe.accountLinks.create({
-    account: stripAccountId,
+    account: stripAccountId as string,
     refresh_url: `${config.onboarding_refresh_url}?accountId=${stripAccountId}`,
     return_url: config.onboarding_return_url,
     type: 'account_onboarding',
