@@ -35,9 +35,6 @@ const handleWebhook = async (req: Request, res: Response) => {
       }
       case 'account.updated': {
         const account = event.data.object as Stripe.Account;
-
-        console.log('accoutn update');
-        console.log('accoutn id', account);
         // Check if the account onboarding is complete
         if (account.details_submitted) {
           try {

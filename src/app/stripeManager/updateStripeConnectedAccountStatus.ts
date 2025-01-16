@@ -15,9 +15,6 @@ const updateStripeConnectedAccountStatus = async (accountId: string) => {
   try {
     const player = await Player.findOne({ stripAccountId: accountId });
     const team = await Team.findOne({ stripAccountId: accountId });
-
-    console.log('player', player);
-    console.log('team', team);
     if (player) {
       const updatedPlayer = await Player.findOneAndUpdate(
         { stripAccountId: accountId },
