@@ -220,6 +220,13 @@ const createConnectedAccountAndOnboardingLink = async (
       card_payments: { requested: true },
       transfers: { requested: true },
     },
+    settings: {
+      payouts: {
+        schedule: {
+          interval: 'manual', // Sets payouts to manual
+        },
+      },
+    },
   });
 
   if (userData?.role == USER_ROLE.team) {
@@ -266,8 +273,8 @@ const updateOnboardingLink = async (userData: JwtPayload) => {
     const player = await Player.findById(userData.profileId);
     stripAccountId = player?.stripAccountId;
   } else if (userData.role == USER_ROLE.team) {
-    const player = await Player.findById(userData.profileId);
-    stripAccountId = player?.stripAccountId;
+    const team = await Team.findById(userData.profileId);
+    stripAccountId = team?.stripAccountId;
   }
   const accountLink = await stripe.accountLinks.create({
     account: stripAccountId as string,

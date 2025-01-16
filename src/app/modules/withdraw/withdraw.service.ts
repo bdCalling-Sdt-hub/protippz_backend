@@ -225,7 +225,10 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       });
     } catch (error) {
       console.error('Error during transfer or payout:', error);
-      throw error;
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Transfer failed update your bank info',
+      );
     }
   } else if (user.role === USER_ROLE.team) {
     const team = await Team.findById(user.profileId);
@@ -287,7 +290,10 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       });
     } catch (error) {
       console.error('Error during transfer or payout:', error);
-      throw error;
+      throw new AppError(
+        httpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+        'Transfer failed update your bank info',
+      );
     }
   }
 };

@@ -38,7 +38,7 @@ router.post(
 );
 
 router.post(
-  '/update-connected-accout',
+  '/update-connected-account',
   auth(USER_ROLE.player, USER_ROLE.team),
   StripeController.updateOnboardingLink,
 );
