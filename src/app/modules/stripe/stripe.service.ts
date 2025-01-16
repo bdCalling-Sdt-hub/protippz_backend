@@ -223,7 +223,7 @@ const createConnectedAccountAndOnboardingLink = async (
     settings: {
       payouts: {
         schedule: {
-          interval: 'manual', // Sets payouts to manual
+          interval: 'manual',
         },
       },
     },
