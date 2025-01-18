@@ -215,18 +215,18 @@ const createConnectedAccountAndOnboardingLink = async (
   const account = await stripe.accounts.create({
     type: 'express',
     email: user.email,
-    country: 'US',
+    country: 'GB',
     capabilities: {
       card_payments: { requested: true },
       transfers: { requested: true },
     },
-    settings: {
-      payouts: {
-        schedule: {
-          interval: 'manual',
-        },
-      },
-    },
+    // settings: {
+    //   payouts: {
+    //     schedule: {
+    //       interval: 'manual',
+    //     },
+    //   },
+    // },
   });
 
   if (userData?.role == USER_ROLE.team) {
