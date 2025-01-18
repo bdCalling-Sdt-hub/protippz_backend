@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import fs, { PathLike } from 'fs';
@@ -76,7 +77,7 @@ const uploadCsvFile = async (req: Request, res: Response) => {
         fs.unlinkSync(filePath as PathLike);
 
         res.status(200).send('Data successfully uploaded and saved.');
-      } catch (error) {
+      } catch (error: any) {
         res.status(500).send(`Error processing data ${error.message}`);
       }
     });
