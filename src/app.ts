@@ -53,6 +53,8 @@ app.use(
       'http://192.168.10.25:3000',
       'http://18.218.23.153:4173',
       'http://18.218.23.153:3000',
+      'https://www.protippz.com',
+      'https://admin.protippz.com',
     ],
     credentials: true,
   }),
