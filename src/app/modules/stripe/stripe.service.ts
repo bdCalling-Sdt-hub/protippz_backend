@@ -220,13 +220,13 @@ const createConnectedAccountAndOnboardingLink = async (
       card_payments: { requested: true },
       transfers: { requested: true },
     },
-    // settings: {
-    //   payouts: {
-    //     schedule: {
-    //       interval: 'manual',
-    //     },
-    //   },
-    // },
+    settings: {
+      payouts: {
+        schedule: {
+          interval: 'manual',
+        },
+      },
+    },
   });
 
   if (userData?.role == USER_ROLE.team) {
