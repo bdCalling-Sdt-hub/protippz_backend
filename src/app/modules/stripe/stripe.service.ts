@@ -215,7 +215,7 @@ const createConnectedAccountAndOnboardingLink = async (
   const account = await stripe.accounts.create({
     type: 'express',
     email: user.email,
-    country: 'GB',
+    country: 'US',
     capabilities: {
       card_payments: { requested: true },
       transfers: { requested: true },
@@ -261,7 +261,7 @@ const createConnectedAccountAndOnboardingLink = async (
   const onboardingLink = await stripe.accountLinks.create({
     account: account.id,
     refresh_url: `${config.onboarding_refresh_url}?accountId=${account?.id}`,
-    return_url: `${config.onboarding_return_url}/account-created`,
+    return_url: `${config.onboarding_return_url}`,
     type: 'account_onboarding',
   });
   return onboardingLink.url;
