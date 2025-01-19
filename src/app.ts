@@ -25,7 +25,7 @@ import Stripe from 'stripe';
 import config from './app/config';
 const upload = multer({ dest: 'uploads/' });
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
-// web hook
+// web hook---------------
 app.post(
   '/protippz/webhook',
   express.raw({ type: 'application/json' }),
