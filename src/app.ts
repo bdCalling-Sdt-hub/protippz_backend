@@ -55,6 +55,8 @@ app.use(
       'http://18.218.23.153:3000',
       'https://www.protippz.com',
       'https://admin.protippz.com',
+      'http://www.protippz.com',
+      'http://admin.protippz.com',
     ],
     credentials: true,
   }),
