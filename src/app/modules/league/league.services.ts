@@ -7,8 +7,6 @@ import League from './league.model';
 import Team from '../team/team.model';
 import Player from '../player/player.model';
 import mongoose from 'mongoose';
-import path from 'path';
-import fs from 'fs/promises';
 import unlinkFile from '../../utilities/unlinkFile';
 const createLeagueIntoDB = async (payload: ILeague) => {
   const result = await League.create(payload);
@@ -72,17 +70,18 @@ const deleteLeagueFromDB = async (id: string) => {
 
     await session.commitTransaction();
     session.endSession();
-    const rootPath = process.cwd();
-    const leagueImagePath = path.join(rootPath, league.league_image);
+    // const rootPath = process.cwd();
+    // const leagueImagePath = path.join(rootPath, league.league_image);
 
-    try {
-      await fs.unlink(leagueImagePath);
-    } catch (error) {
-      throw new AppError(
-        httpStatus.INTERNAL_SERVER_ERROR,
-        `Error deleting associated file`,
-      );
-    }
+    // try {
+    //   unlinkFile(leagueImagePath);
+    // } catch (error) {
+    //   throw new AppError(
+    //     httpStatus.INTERNAL_SERVER_ERROR,
+    //     `Error deleting associated file`,
+    //   );
+    // }
+    unlinkFile(league.league_image);
     return league;
   } catch (error) {
     await session.abortTransaction();

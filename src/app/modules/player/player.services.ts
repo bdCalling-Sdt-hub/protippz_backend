@@ -11,8 +11,6 @@ import { IInviteTeamPayload } from '../team/team.interface';
 import mongoose from 'mongoose';
 import { User } from '../user/user.model';
 import { USER_ROLE } from '../user/user.constant';
-import path from 'path';
-import fs from 'fs/promises';
 import unlinkFile from '../../utilities/unlinkFile';
 const createPlayerIntoDB = async (payload: IPlayer) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
@@ -126,19 +124,21 @@ const deletePlayerFromDB = async (id: string) => {
   }
   const result = await Player.findByIdAndDelete(id);
   await PlayerBookmark.deleteMany({ player: id });
-  const rootPath = process.cwd();
-  const playerImagePath = path.join(rootPath, player.player_image);
-  const playerBgImagePath = path.join(rootPath, player.player_bg_image);
+  // const rootPath = process.cwd();
+  // const playerImagePath = path.join(rootPath, player.player_image);
+  // const playerBgImagePath = path.join(rootPath, player.player_bg_image);
 
-  try {
-    await fs.unlink(playerImagePath);
-    await fs.unlink(playerBgImagePath);
-  } catch (error) {
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      `Error deleting associated file`,
-    );
-  }
+  // try {
+  //   await fs.unlink(playerImagePath);
+  //   await fs.unlink(playerBgImagePath);
+  // } catch (error) {
+  //   throw new AppError(
+  //     httpStatus.INTERNAL_SERVER_ERROR,
+  //     `Error deleting associated file`,
+  //   );
+  // }
+  unlinkFile(player.player_bg_image);
+  unlinkFile(player.player_image);
   return result;
 };
 
