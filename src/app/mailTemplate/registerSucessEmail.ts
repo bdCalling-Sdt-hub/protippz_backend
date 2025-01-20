@@ -104,7 +104,7 @@ const registrationSuccessEmailBody = (name: string, activationCode: number) => `
             <div class="activation-code">${activationCode || 'XXXXXX'}</div>
             <p>Enter this code on the activation page within the next 10 minutes. If you don't your account will be deleted from the database and you will need to register again.</p>
             <div class="button-container">
-              <a href="https://yourwebsite.com/activate" class="button">
+              <a href="" class="button">
                 <span class="activate-btn">Activate Now</span>
               </a>
             </div>
@@ -114,7 +114,7 @@ const registrationSuccessEmailBody = (name: string, activationCode: number) => `
         </div>
         <div class="footer">
           <p>&copy; ${new Date().getFullYear()} Protipzz. All rights reserved.</p>
-          <p><a href="https://yourwebsite.com/privacy">Privacy Policy</a> | <a href="https://yourwebsite.com/contact">Contact Us</a></p>
+          <p><a href="https://www.protippz.com/privacy">Privacy Policy</a> | <a href="https://www.protippz.com/contact">Contact Us</a></p>
         </div>
       </div>
     </body>

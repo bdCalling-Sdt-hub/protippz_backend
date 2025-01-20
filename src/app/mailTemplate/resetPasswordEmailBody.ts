@@ -1,4 +1,4 @@
-const resetPasswordEmailBody = (name:string, resetCode:number) => `
+const resetPasswordEmailBody = (name: string, resetCode: number) => `
   <html>
     <head>
       <style>
@@ -83,14 +83,14 @@ const resetPasswordEmailBody = (name:string, resetCode:number) => `
 
           <p>We received a request to reset your password. Please use the code below to proceed with resetting your password:</p>
           <div class="reset-code">
-            ${resetCode || "XXXXXX"}
+            ${resetCode || 'XXXXXX'}
           </div>
           <p>Enter this code on the password reset page within the next 10 minutes. If you didn't request a password reset, you can ignore this email.</p>
           <p>If you have any questions, feel free to contact us at <a href="mailto:maniksarker265@gmail.com">maniksarker265@gmail.com</a>.</p>
         </div>
         <div class="footer">
           <p>&copy; ${new Date().getFullYear()} Protipzz. All rights reserved.</p>
-          <p><a href="https://yourwebsite.com/privacy">Privacy Policy</a> | <a href="https://yourwebsite.com/contact">Contact Us</a></p>
+          <p><a href="https://www.protippz.com/privacy">Privacy Policy</a> | <a href="https://www.protippz.com/contact">Contact Us</a></p>
         </div>
       </div>
     </body>
