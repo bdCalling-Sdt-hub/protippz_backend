@@ -11,8 +11,8 @@ import { IInviteTeamPayload } from '../team/team.interface';
 import mongoose from 'mongoose';
 import { User } from '../user/user.model';
 import { USER_ROLE } from '../user/user.constant';
-import TeamBookmark from '../teamBookmark/team.bookmark.model';
-
+import path from 'path';
+import fs from 'fs/promises';
 const createPlayerIntoDB = async (payload: IPlayer) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
     throw new AppError(
@@ -118,7 +118,21 @@ const deletePlayerFromDB = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
   }
   const result = await Player.findByIdAndDelete(id);
-  await TeamBookmark.deleteMany({ team: id });
+  await PlayerBookmark.deleteMany({ player: id });
+  const rootPath = process.cwd();
+  const playerImagePath = path.join(rootPath, player.player_image);
+  const playerBgImagePath = path.join(rootPath, player.player_bg_image);
+
+  try {
+    await fs.unlink(playerImagePath);
+    await fs.unlink(playerBgImagePath);
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `Error deleting associated file`,
+    );
+  }
+
   return result;
 };
 

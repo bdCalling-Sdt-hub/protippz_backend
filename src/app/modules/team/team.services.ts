@@ -10,7 +10,8 @@ import mongoose from 'mongoose';
 import TeamBookmark from '../teamBookmark/team.bookmark.model';
 import { User } from '../user/user.model';
 import { USER_ROLE } from '../user/user.constant';
-
+import path from 'path';
+import fs from 'fs/promises';
 const createTeamIntoDB = async (payload: ITeam) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
     throw new AppError(
@@ -101,6 +102,19 @@ const deleteTeamFromDB = async (id: string) => {
     await TeamBookmark.deleteMany({ team: id }).session(session);
     await session.commitTransaction();
     session.endSession();
+    const rootPath = process.cwd();
+    const teamLogoPath = path.join(rootPath, team.team_logo);
+    const teamBgImagePath = path.join(rootPath, team.team_bg_image);
+
+    try {
+      await fs.unlink(teamLogoPath);
+      await fs.unlink(teamBgImagePath);
+    } catch (error) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        `Error deleting associated file`,
+      );
+    }
     return team;
   } catch (error) {
     await session.abortTransaction();
