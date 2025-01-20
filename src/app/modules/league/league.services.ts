@@ -9,6 +9,7 @@ import Player from '../player/player.model';
 import mongoose from 'mongoose';
 import path from 'path';
 import fs from 'fs/promises';
+import unlinkFile from '../../utilities/unlinkFile';
 const createLeagueIntoDB = async (payload: ILeague) => {
   const result = await League.create(payload);
   return result;
@@ -49,6 +50,9 @@ const updateLeagueIntoDB = async (id: string, payload: Partial<ILeague>) => {
     new: true,
     runValidators: true,
   });
+  if (payload.league_image) {
+    unlinkFile(league.league_image);
+  }
   return result;
 };
 

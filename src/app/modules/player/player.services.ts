@@ -13,6 +13,7 @@ import { User } from '../user/user.model';
 import { USER_ROLE } from '../user/user.constant';
 import path from 'path';
 import fs from 'fs/promises';
+import unlinkFile from '../../utilities/unlinkFile';
 const createPlayerIntoDB = async (payload: IPlayer) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
     throw new AppError(
@@ -109,6 +110,12 @@ const updatePlayerIntoDB = async (id: string, payload: Partial<IPlayer>) => {
     new: true,
     runValidators: true,
   });
+  if (payload.player_image) {
+    unlinkFile(player.player_image);
+  }
+  if (payload.player_bg_image) {
+    unlinkFile(player.player_bg_image);
+  }
   return result;
 };
 
@@ -132,7 +139,6 @@ const deletePlayerFromDB = async (id: string) => {
       `Error deleting associated file`,
     );
   }
-
   return result;
 };
 

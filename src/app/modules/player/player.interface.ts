@@ -21,8 +21,8 @@ export interface IPlayer {
   league: Types.ObjectId;
   team: Types.ObjectId;
   position: string;
-  image: string;
-  bgImage: string;
+  player_image: string;
+  player_bg_image: string;
   totalTips: number;
   paidAmount: number;
   dueAmount: number;

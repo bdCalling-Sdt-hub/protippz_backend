@@ -12,6 +12,7 @@ import { User } from '../user/user.model';
 import { USER_ROLE } from '../user/user.constant';
 import path from 'path';
 import fs from 'fs/promises';
+import unlinkFile from '../../utilities/unlinkFile';
 const createTeamIntoDB = async (payload: ITeam) => {
   if (payload.dueAmount || payload.totalTips || payload.paidAmount) {
     throw new AppError(
@@ -85,6 +86,12 @@ const updateTeamIntoDB = async (id: string, payload: Partial<ITeam>) => {
     new: true,
     runValidators: true,
   });
+  if (payload.team_logo) {
+    unlinkFile(team.team_logo);
+  }
+  if (payload.team_bg_image) {
+    unlinkFile(team.team_bg_image);
+  }
   return result;
 };
 
