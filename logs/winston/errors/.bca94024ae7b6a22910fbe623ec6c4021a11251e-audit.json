@@ -6,11 +6,6 @@
     "auditLog": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\.bca94024ae7b6a22910fbe623ec6c4021a11251e-audit.json",
     "files": [
         {
-            "date": 1736135897064,
-            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-06-09-error.log",
-            "hash": "4ac81e685c26e209f337d76b9e6cfa1318d7c9f4874403d49d65f34878208e6a"
-        },
-        {
             "date": 1736565654139,
             "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-11-09-error.log",
             "hash": "e7e2b35c918d8f16e3be1910b62c41e5bbddfd5fbb5c6928bd3a6b988842d09f"
@@ -229,6 +224,21 @@
             "date": 1737288032650,
             "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-19-18-error.log",
             "hash": "a6325f3beaa5013d4640de330c131b340188f1390c016923942540a852ab56fa"
+        },
+        {
+            "date": 1737344480943,
+            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-20-09-error.log",
+            "hash": "7d425e97e21afd332a2a3477b4279fe9aa0ff8db8bb5bad74634e96649459f24"
+        },
+        {
+            "date": 1737345976604,
+            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-20-10-error.log",
+            "hash": "684e8b40ad6bf06d66598ce53bc896326204753a6714a05a175696a2dab7f18d"
+        },
+        {
+            "date": 1737369141870,
+            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-20-16-error.log",
+            "hash": "527b587e5185052a0e961816f2508189d56b346b690506db316ab8c440b8f4d4"
         }
     ],
     "hashType": "sha256"
