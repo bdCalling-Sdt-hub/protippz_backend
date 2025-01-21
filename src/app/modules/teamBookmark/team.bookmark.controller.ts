@@ -11,7 +11,9 @@ const createBookmark = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Bookmark created successfully',
+    message: result
+      ? 'Bookmark created successfully'
+      : 'Bookmark deleted successfully',
     data: result,
   });
 });

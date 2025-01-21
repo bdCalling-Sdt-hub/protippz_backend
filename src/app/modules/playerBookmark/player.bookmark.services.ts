@@ -16,17 +16,18 @@ const createPlayerBookmarkIntoDB = async (
     user: normalUserId,
   });
   if (isExists) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You already added this player in bookmark',
-    );
+    await PlayerBookmark.findOneAndDelete({
+      player: playerId,
+      user: normalUserId,
+    });
+    return null;
+  } else {
+    const result = await PlayerBookmark.create({
+      player: playerId,
+      user: normalUserId,
+    });
+    return result;
   }
-
-  const result = await PlayerBookmark.create({
-    player: playerId,
-    user: normalUserId,
-  });
-  return result;
 };
 
 // Get bookmarks from the database

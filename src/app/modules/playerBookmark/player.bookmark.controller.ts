@@ -11,7 +11,9 @@ const createPlayerBookmark = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Player bookmark created successfully',
+    message: result
+      ? 'Player bookmark created successfully'
+      : 'Player bookmark deleted successfully',
     data: result,
   });
 });

@@ -249,6 +249,16 @@
             "date": 1737374586087,
             "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-20-18-error.log",
             "hash": "6128d1609fd32430712244be02bb0d6efaf1b57541c078b5ef65cbbb4b656cfc"
+        },
+        {
+            "date": 1737435596845,
+            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-21-10-error.log",
+            "hash": "b0bd0dd4f408e65bdb54e77efd859bd6b650aa05b9eac125efe98624f4b3f8a4"
+        },
+        {
+            "date": 1737436030497,
+            "name": "D:\\Solution Squad Projects\\protippz_backend\\logs\\winston\\errors\\um-2025-01-21-11-error.log",
+            "hash": "4647c568c8c590c898d8d8f199def27dccd065f6738eb2500ced011f47ad4022"
         }
     ],
     "hashType": "sha256"

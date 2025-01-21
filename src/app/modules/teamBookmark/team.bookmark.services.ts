@@ -13,16 +13,18 @@ const createBookmarkIntoDB = async (teamId: string, normalUserId: string) => {
     user: normalUserId,
   });
   if (isExists) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You already add this shop in bookmark',
-    );
+    await TeamBookmark.findOneAndDelete({
+      team: teamId,
+      user: normalUserId,
+    });
+    return null;
+  } else {
+    const result = await TeamBookmark.create({
+      team: teamId,
+      user: normalUserId,
+    });
+    return result;
   }
-  const result = await TeamBookmark.create({
-    team: teamId,
-    user: normalUserId,
-  });
-  return result;
 };
 
 // get bookmark from db
