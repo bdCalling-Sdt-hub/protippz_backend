@@ -31,7 +31,7 @@ async function main() {
       }
     });
 
-    // Global termination signal handler
+    // Global termination signal handler-------------
     process.on('SIGTERM', () => {
       logger.info('SIGTERM signal received');
       if (myServer) {
