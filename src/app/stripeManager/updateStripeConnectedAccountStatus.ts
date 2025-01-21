@@ -4,7 +4,6 @@ import Player from '../modules/player/player.model';
 import Team from '../modules/team/team.model';
 
 const updateStripeConnectedAccountStatus = async (accountId: string) => {
-  console.log('nice to meet you in update stripe');
   if (!accountId) {
     throw new AppError(
       httpStatus.BAD_REQUEST,

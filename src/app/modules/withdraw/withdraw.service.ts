@@ -285,7 +285,7 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       // }
 
       // Update team data in database
-      await Player.findByIdAndUpdate(user.profileId, {
+      await Team.findByIdAndUpdate(user.profileId, {
         $inc: { paidAmount: amount, dueAmount: -amount },
       });
     } catch (error) {
