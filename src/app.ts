@@ -24,7 +24,9 @@ import handleWebhook from './app/stripeManager/webhook';
 import Stripe from 'stripe';
 import config from './app/config';
 const upload = multer({ dest: 'uploads/' });
-const stripe = new Stripe(config.stripe.stripe_secret_key as string);
+const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
+  apiVersion: '2024-09-30.acacia',
+});
 // web hook---------------
 app.post(
   '/protippz/webhook',

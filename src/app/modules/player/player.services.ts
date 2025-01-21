@@ -128,6 +128,7 @@ const deletePlayerFromDB = async (id: string) => {
   }
   const result = await Player.findByIdAndDelete(id);
   await PlayerBookmark.deleteMany({ player: id });
+  await User.findByIdAndDelete(player.user);
   // const rootPath = process.cwd();
   // const playerImagePath = path.join(rootPath, player.player_image);
   // const playerBgImagePath = path.join(rootPath, player.player_bg_image);

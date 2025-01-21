@@ -109,6 +109,7 @@ const deleteTeamFromDB = async (id: string) => {
     await Team.findByIdAndDelete(id).session(session);
     await Player.deleteMany({ team: id }).session(session);
     await TeamBookmark.deleteMany({ team: id }).session(session);
+    await User.findByIdAndDelete(team.user).session(session);
     await session.commitTransaction();
     session.endSession();
     // const rootPath = process.cwd();
