@@ -11,7 +11,7 @@ const getAminDashboardMetaData = catchAsync(async (req, res) => {
     data: result,
   });
 });
-// okey perfect
+// okey perfect------------------
 const getTipChartData = catchAsync(async (req, res) => {
   const result = await metaServices.getChartDataForTips(Number(req.query.year));
   sendResponse(res, {
