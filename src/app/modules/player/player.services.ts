@@ -40,6 +40,10 @@ const getAllPlayersFromDB = async (
   userId: string,
   query: Record<string, any>,
 ) => {
+  if (query.searchTerm) {
+    delete query.page;
+    delete query.limit;
+  }
   const playerQuery = new QueryBuilder(
     Player.find()
       .populate({ path: 'league', select: 'name sport' })
