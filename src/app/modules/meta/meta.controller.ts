@@ -11,8 +11,8 @@ const getAminDashboardMetaData = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
-const getTipChartData = catchAsync(async(req,res)=>{
+// okey perfect
+const getTipChartData = catchAsync(async (req, res) => {
   const result = await metaServices.getChartDataForTips(Number(req.query.year));
   sendResponse(res, {
     statusCode: 200,
@@ -20,8 +20,8 @@ const getTipChartData = catchAsync(async(req,res)=>{
     message: 'Tip chart data retrieved successfully',
     data: result,
   });
-})
-const getUserChartData = catchAsync(async(req,res)=>{
+});
+const getUserChartData = catchAsync(async (req, res) => {
   const result = await metaServices.getUserChartData(Number(req.query.year));
   sendResponse(res, {
     statusCode: 200,
@@ -29,13 +29,12 @@ const getUserChartData = catchAsync(async(req,res)=>{
     message: 'User chart data retrieved successfully',
     data: result,
   });
-})
-
+});
 
 const metaController = {
   getAminDashboardMetaData,
   getTipChartData,
-  getUserChartData
+  getUserChartData,
 };
 
 export default metaController;
