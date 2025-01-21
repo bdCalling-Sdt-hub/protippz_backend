@@ -12,6 +12,7 @@ export const generateToken = async (
   _res: Response,
   next: NextFunction,
 ) => {
+  // changes in generate payment token
   const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY as string;
   const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET as string;
   const URL =
