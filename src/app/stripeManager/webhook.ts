@@ -64,6 +64,12 @@ const handleWebhook = async (req: Request, res: Response) => {
         // Notify the user about the failure
         break;
       }
+      // nice case
+      case 'account.external_account.created': {
+        console.log('Connected account created');
+
+        break;
+      }
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
