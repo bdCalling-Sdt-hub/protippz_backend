@@ -59,6 +59,12 @@ const PlayerSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    jerceyNumber: {
+      type: Number,
+    },
+    experience: {
+      type: String,
+    },
   },
   {
     timestamps: true,

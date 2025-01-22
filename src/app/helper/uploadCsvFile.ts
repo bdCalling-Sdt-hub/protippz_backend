@@ -27,6 +27,8 @@ const uploadCsvFile = async (req: Request, res: Response) => {
             playerPosition,
             playerBgImage,
             playerImage,
+            playerNumber,
+            experience,
           } = row;
 
           // Find or create League
@@ -58,7 +60,6 @@ const uploadCsvFile = async (req: Request, res: Response) => {
             position: playerPosition,
             team: team._id,
           });
-
           if (!player) {
             // Create Player
             player = new Player({
@@ -68,6 +69,8 @@ const uploadCsvFile = async (req: Request, res: Response) => {
               position: playerPosition,
               player_image: playerImage,
               player_bg_image: playerBgImage,
+              jerceyNumber: playerNumber,
+              experience: experience,
             });
             await player.save();
           }

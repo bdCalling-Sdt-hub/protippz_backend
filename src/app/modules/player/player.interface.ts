@@ -31,4 +31,6 @@ export interface IPlayer {
   stripe_account_id: string;
   stripAccountId: string;
   isStripeConnected: boolean;
+  jerceyNumber: string;
+  experience: string;
 }

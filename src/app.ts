@@ -28,11 +28,7 @@ const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
   apiVersion: '2024-09-30.acacia',
 });
 // web hook---------------
-app.post(
-  '/protippz/webhook',
-  express.raw({ type: 'application/json' }),
-  handleWebhook,
-);
+app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 // parser-----------------------
 app.use(express.json());
 app.use(cookieParser());
