@@ -11,6 +11,7 @@ const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
 });
 const handleWebhook = async (req: Request, res: Response) => {
   const endpointSecret = config.webhook_endpoint_secret as string;
+  console.log('webhook endpoint secret ', endpointSecret);
   const sig = req.headers['stripe-signature'];
   try {
     // Verify the event
@@ -23,6 +24,7 @@ const handleWebhook = async (req: Request, res: Response) => {
     // Handle different event types
     switch (event.type) {
       case 'payment_intent.succeeded': {
+        console.log('payment intent success');
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         console.log(paymentIntent.metadata);
         const { userId, paymentPurpose } = paymentIntent.metadata;
@@ -36,7 +38,9 @@ const handleWebhook = async (req: Request, res: Response) => {
         break;
       }
       case 'account.updated': {
+        console.log('web hook account update');
         const account = event.data.object as Stripe.Account;
+        console.log('acount', account);
         if (account.details_submitted) {
           try {
             await updateStripeConnectedAccountStatus(account.id);

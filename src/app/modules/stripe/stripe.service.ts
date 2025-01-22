@@ -9,7 +9,9 @@ import plaidClient from '../../utilities/plaidClient';
 import { USER_ROLE } from '../user/user.constant';
 import Player from '../player/player.model';
 import Team from '../team/team.model';
-const stripe = new Stripe(config.stripe.stripe_secret_key as string);
+const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
+  apiVersion: '2024-09-30.acacia',
+});
 const createLinkToken = async (userData: JwtPayload) => {
   let user;
   if (userData.role == USER_ROLE.player) {
@@ -188,6 +190,7 @@ const createConnectedAccountAndOnboardingLink = async (
   userData: JwtPayload,
   profileId: string,
 ) => {
+  console.log('okey okey okey');
   const user = await User.findById(userData?.id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -228,6 +231,8 @@ const createConnectedAccountAndOnboardingLink = async (
       },
     },
   });
+
+  console.log('account is created', account);
 
   if (userData?.role == USER_ROLE.team) {
     const updatedTeamProfile = await Team.findByIdAndUpdate(

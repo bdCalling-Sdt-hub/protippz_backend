@@ -46,7 +46,6 @@ const createOnboardingLink = catchAsync(async (req, res) => {
     req.user,
     req.user.profileId,
   );
-
   sendResponse(res, {
     statusCode: 201,
     success: true,

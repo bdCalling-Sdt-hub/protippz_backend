@@ -15,7 +15,9 @@ import httpStatus from 'http-status';
 import NormalUser from '../normalUser/normalUser.model';
 import mongoose from 'mongoose';
 import Notification from '../notification/notification.model';
-const stripe = new Stripe(config.stripe.stripe_secret_key as string);
+const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
+  apiVersion: '2024-09-30.acacia',
+});
 
 paypal.configure({
   mode: process.env.PAYPAL_MODE as string,
