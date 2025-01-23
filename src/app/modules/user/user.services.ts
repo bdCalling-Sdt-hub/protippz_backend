@@ -21,6 +21,7 @@ import Stripe from 'stripe';
 import config from '../../config';
 import { createToken } from './user.utils';
 import SuperAdmin from '../superAdmin/superAdmin.model';
+import addEmailVerifiedCode from '../../mailTemplate/addEmailVerification';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
@@ -255,6 +256,11 @@ const addEmailAddress = async (userData: JwtPayload, email: string) => {
     },
     { new: true, runValidators: true },
   );
+  sendEmail({
+    email: email,
+    subject: 'Verify your email',
+    html: addEmailVerifiedCode(result?.username as string, verifyCode),
+  });
   return result;
 };
 
