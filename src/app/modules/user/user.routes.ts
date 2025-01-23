@@ -45,4 +45,18 @@ router.delete(
   userControllers.deleteUserAccount,
 );
 
+router.post(
+  '/add-email-address',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  validateRequest(userValidations.addEmailAddressValidationSchema),
+  userControllers.addEmailAddress,
+);
+
+router.post(
+  '/verify-add-email',
+  auth(USER_ROLE.player, USER_ROLE.team),
+  validateRequest(userValidations.verifyCodeValidationSchema),
+  userControllers.verifyAddEmail,
+);
+
 export const userRoutes = router;

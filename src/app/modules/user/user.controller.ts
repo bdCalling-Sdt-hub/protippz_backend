@@ -74,6 +74,27 @@ const deleteUserAccount = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const addEmailAddress = catchAsync(async (req, res) => {
+  const result = await userServices.addEmailAddress(req.user, req.body.email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Email address added successfully , please check your email for verification`,
+    data: result,
+  });
+});
+const verifyAddEmail = catchAsync(async (req, res) => {
+  const result = await userServices.verifyAddEmail(
+    req.body.email,
+    req.body.verifyCode,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Email verified successfully`,
+    data: result,
+  });
+});
 
 const userController = {
   registerUser,
@@ -82,5 +103,7 @@ const userController = {
   getMyProfile,
   changeUserStatus,
   deleteUserAccount,
+  addEmailAddress,
+  verifyAddEmail,
 };
 export default userController;

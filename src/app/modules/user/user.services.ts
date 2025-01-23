@@ -202,15 +202,19 @@ const getMyProfile = async (userData: JwtPayload) => {
       select: 'role -_id',
     });
   } else if (userData.role === USER_ROLE.player) {
-    result = await Player.findById(userData?.profileId).populate({
-      path: 'user',
-      select: 'role -_id',
-    });
+    result = await Player.findById(userData?.profileId)
+      .populate({
+        path: 'user',
+        select: 'role -_id',
+      })
+      .populate({ path: 'team', select: 'name' });
   } else if (userData.role === USER_ROLE.team) {
-    result = await Team.findById(userData?.profileId).populate({
-      path: 'user',
-      select: 'role -_id',
-    });
+    result = await Team.findById(userData?.profileId)
+      .populate({
+        path: 'user',
+        select: 'role -_id',
+      })
+      .populate({ path: 'league', select: 'name' });
   } else if (userData.role === USER_ROLE.superAdmin) {
     result = await SuperAdmin.findOne({
       $or: [{ email: userData?.email }, { username: userData?.username }],
@@ -237,6 +241,34 @@ const deleteUserAccount = async (user: JwtPayload, password: string) => {
   await User.findByIdAndDelete(user.id);
 
   return null;
+};
+
+// add email for account
+const addEmailAddress = async (userData: JwtPayload, email: string) => {
+  const verifyCode = generateVerifyCode();
+  const result = await User.findByIdAndUpdate(
+    userData.id,
+    {
+      email: email,
+      addEmailVerifiedCode: verifyCode,
+      codeExpireIn: new Date(Date.now() + 5 * 60000),
+    },
+    { new: true, runValidators: true },
+  );
+  return result;
+};
+
+// verify add email
+const verifyAddEmail = async (email: string, verifyCode: number) => {
+  const user = await User.findOne({ email: email });
+  if (user?.addEmailVerifiedCode !== verifyCode) {
+    throw new AppError(httpStatus.NO_CONTENT, 'Verify code do not match');
+  }
+  await User.findOneAndUpdate(
+    { email: email },
+    { isAddEmailVerified: true },
+    { new: true, runValidators: true },
+  );
 };
 
 // all cron jobs for users
@@ -276,6 +308,34 @@ cron.schedule('*/2 * * * *', async () => {
   }
 });
 
+// crone for remove email
+cron.schedule('*/2 * * * *', async () => {
+  try {
+    const now = new Date();
+
+    // Find unverified users whose expiration time has passed
+    const expiredUsers = await User.find({
+      isAddEmailVerified: false,
+      codeExpireIn: { $lte: now },
+    });
+
+    if (expiredUsers.length > 0) {
+      const expiredUserIds = expiredUsers.map((user) => user._id);
+
+      // Remove email field from the expired users
+      const updateResult = await User.updateMany(
+        { _id: { $in: expiredUserIds } },
+        { $unset: { email: '' } },
+      );
+      console.log(
+        `Updated ${updateResult.modifiedCount} user(s) by removing the email field.`,
+      );
+    }
+  } catch (error) {
+    console.log('Error updating expired users:', error);
+  }
+});
+
 const changeUserStatus = async (id: string, status: string) => {
   const user = await User.findById(id);
   if (!user) {
@@ -296,6 +356,8 @@ const userServices = {
   getMyProfile,
   changeUserStatus,
   deleteUserAccount,
+  addEmailAddress,
+  verifyAddEmail,
 };
 
 export default userServices;

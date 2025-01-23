@@ -83,6 +83,12 @@ const deleteUserAccountValidationSchema = z.object({
   }),
 });
 
+const addEmailAddressValidationSchema = z.object({
+  body: z.object({
+    email: z.string({ required_error: 'Email addres required' }),
+  }),
+});
+
 const userValidations = {
   registerUserValidationSchema,
   loginValidationSchema,
@@ -94,6 +100,7 @@ const userValidations = {
   resendVerifyCodeSchema,
   changeUserStatus,
   deleteUserAccountValidationSchema,
+  addEmailAddressValidationSchema,
 };
 
 export default userValidations;

@@ -35,4 +35,5 @@ export interface IPlayer {
   experience: string;
   username: string;
   invitedPassword: string;
+  // email?:string;
 }

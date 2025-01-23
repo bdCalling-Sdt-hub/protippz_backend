@@ -14,6 +14,8 @@ export interface TUser {
   verifyCode: number;
   resetCode: number;
   isVerified: boolean;
+  isAddEmailVerified: boolean;
+  addEmailVerifiedCode: number;
   isResetVerified: boolean;
   codeExpireIn: Date;
   isActive: boolean;

@@ -20,6 +20,7 @@ const userSchema = new Schema<TUser>(
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         'Please provide a valid email address',
       ],
+      unique: true,
     },
     phone: {
       type: String,
@@ -55,6 +56,13 @@ const userSchema = new Schema<TUser>(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    isAddEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    addEmailVerifiedCode: {
+      type: Number,
     },
     isResetVerified: {
       type: Boolean,
