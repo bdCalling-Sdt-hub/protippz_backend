@@ -33,4 +33,6 @@ export interface IPlayer {
   isStripeConnected: boolean;
   jerceyNumber: string;
   experience: string;
+  username: string;
+  invitedPassword: string;
 }

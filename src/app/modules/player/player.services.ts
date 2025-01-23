@@ -203,7 +203,11 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
 
     const updatePlayer = await Player.findByIdAndUpdate(
       id,
-      { user: user[0]._id },
+      {
+        user: user[0]._id,
+        username: payload.username,
+        invitedPassword: payload.password,
+      },
       { session },
     );
     console.log('update', updatePlayer);

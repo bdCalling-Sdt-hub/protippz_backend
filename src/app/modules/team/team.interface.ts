@@ -15,6 +15,8 @@ export interface ITeam {
   stripe_account_id: string;
   stripAccountId: string;
   isStripeConnected: boolean;
+  username: string;
+  invitedPassword: string;
 }
 
 export interface IInviteTeamPayload {

@@ -28,6 +28,12 @@ const TeamSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    username: {
+      type: String,
+    },
+    invitedPassword: {
+      type: String,
+    },
   },
   {
     timestamps: true,

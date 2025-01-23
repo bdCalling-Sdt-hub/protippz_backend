@@ -212,8 +212,15 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
 
     const user = await User.create([userData], { session });
 
-    await Team.findByIdAndUpdate(id, { user: user[0]._id }, { session });
-
+    await Team.findByIdAndUpdate(
+      id,
+      {
+        user: user[0]._id,
+        username: payload.username,
+        invitedPassword: payload.password,
+      },
+      { session },
+    );
     // Commit the transaction
     await session.commitTransaction();
     session.endSession();

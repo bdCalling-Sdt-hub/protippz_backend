@@ -65,6 +65,12 @@ const PlayerSchema = new Schema(
     experience: {
       type: String,
     },
+    username: {
+      type: String,
+    },
+    invitedPassword: {
+      type: String,
+    },
   },
   {
     timestamps: true,
