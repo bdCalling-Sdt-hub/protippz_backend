@@ -27,7 +27,7 @@ export const taxInfoSchema = new Schema<ITaxInfo>({
   residentialStatus: {
     type: String,
     enum: Object.values(ENUM_RESIDENTIAL_STATUS),
-    required: true,
+    // required: true,
   },
 });
 
