@@ -180,6 +180,9 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
     if (!player) {
       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
     }
+    if (player.username) {
+      throw new AppError(httpStatus.CONFLICT, 'This player already invited');
+    }
 
     const isExistUser = await User.findOne({
       username: payload.username,

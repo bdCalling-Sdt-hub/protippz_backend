@@ -192,7 +192,9 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
     if (!team) {
       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
     }
-
+    if (team.username) {
+      throw new AppError(httpStatus.CONFLICT, 'This team already invited');
+    }
     const isExistUser = await User.findOne({
       username: payload.username,
     }).session(session);
