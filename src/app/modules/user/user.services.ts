@@ -206,14 +206,14 @@ const getMyProfile = async (userData: JwtPayload) => {
     result = await Player.findById(userData?.profileId)
       .populate({
         path: 'user',
-        select: 'role -_id',
+        select: 'role email -_id',
       })
       .populate({ path: 'team', select: 'name' });
   } else if (userData.role === USER_ROLE.team) {
     result = await Team.findById(userData?.profileId)
       .populate({
         path: 'user',
-        select: 'role -_id',
+        select: 'role email -_id',
       })
       .populate({ path: 'league', select: 'name' });
   } else if (userData.role === USER_ROLE.superAdmin) {
@@ -247,6 +247,10 @@ const deleteUserAccount = async (user: JwtPayload, password: string) => {
 // add email for account
 const addEmailAddress = async (userData: JwtPayload, email: string) => {
   const verifyCode = generateVerifyCode();
+  const user = await User.findOne({ email: email });
+  if (user) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'This email already exits');
+  }
   const result = await User.findByIdAndUpdate(
     userData.id,
     {
@@ -270,11 +274,12 @@ const verifyAddEmail = async (email: string, verifyCode: number) => {
   if (user?.addEmailVerifiedCode !== verifyCode) {
     throw new AppError(httpStatus.NO_CONTENT, 'Verify code do not match');
   }
-  await User.findOneAndUpdate(
+  const result = await User.findOneAndUpdate(
     { email: email },
     { isAddEmailVerified: true },
     { new: true, runValidators: true },
   );
+  return result;
 };
 
 // all cron jobs for users
