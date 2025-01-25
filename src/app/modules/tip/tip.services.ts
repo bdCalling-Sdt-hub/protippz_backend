@@ -90,7 +90,13 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
 
     await NormalUser.findByIdAndUpdate(
       userId,
-      { $inc: { totalAmount: -payload.amount, totalPoint: totalPoint } },
+      {
+        $inc: {
+          totalAmount: -payload.amount,
+          totalPoint: totalPoint,
+          totalTipSent: payload.amount,
+        },
+      },
       { session },
     );
 
@@ -271,7 +277,7 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
     }
     const updatedUser = await NormalUser.findByIdAndUpdate(
       tip.user,
-      { $inc: { totalPoint: tip.point } },
+      { $inc: { totalPoint: tip.point, totalTipSent: tip.amount } },
       { new: true, runValidators: true, session },
     );
 
@@ -365,7 +371,7 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
     }
     const updatedUser = await NormalUser.findByIdAndUpdate(
       tip.user,
-      { $inc: { totalPoint: tip.point } },
+      { $inc: { totalPoint: tip.point, totalTipSent: tip.amount } },
       { new: true, runValidators: true, session },
     );
     const notificationData = {
@@ -470,13 +476,13 @@ const executePaypalTipPaymentWithApp = async (
         tipBy: ENUM_TIP_BY.PAYPAL,
         point: payment.transactions[0].amount.total * pointPerAmountTip,
       });
-
       await NormalUser.findByIdAndUpdate(
         profileId,
         {
           $inc: {
             totalPoint:
               payment.transactions[0].amount.total * pointPerAmountTip,
+            totalTipSent: payment.transactions[0].amount.total,
           },
         },
         { new: true, runValidators: true },

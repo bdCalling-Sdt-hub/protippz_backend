@@ -244,7 +244,6 @@ const editTeamAddressTax = async (profileId: string, payload: any) => {
   const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingPlayerData,
   };
-
   if (address && Object.keys(address).length) {
     for (const [key, value] of Object.entries(address)) {
       modifiedUpdatedData[`address.${key}`] = value;

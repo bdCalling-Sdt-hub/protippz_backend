@@ -45,6 +45,10 @@ const NormalUserSchema = new Schema<INormalUser>(
       required: true,
       default: 0,
     },
+    totalTipSent: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

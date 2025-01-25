@@ -200,9 +200,7 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
       role: USER_ROLE.player,
       isVerified: true,
     };
-    console.log('userdata', userData);
     const user = await User.create([userData], { session });
-    console.log('user', user);
 
     const updatePlayer = await Player.findByIdAndUpdate(
       id,
