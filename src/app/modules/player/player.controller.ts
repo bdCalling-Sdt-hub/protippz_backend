@@ -72,6 +72,15 @@ const deletePlayer = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const deletePlayersFromDB = catchAsync(async (req, res) => {
+  const result = await PlayerServices.deletePlayersFromDB(req.body.ids);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `${result} player deleted successfully`,
+    data: result,
+  });
+});
 
 const sendMoneyToPlayer = catchAsync(async (req, res) => {
   const result = await PlayerServices.sendMoneyToPlayer(
@@ -119,6 +128,7 @@ const PlayerController = {
   sendMoneyToPlayer,
   invitePlayer,
   editTeamAddressTax,
+  deletePlayersFromDB,
 };
 
 export default PlayerController;

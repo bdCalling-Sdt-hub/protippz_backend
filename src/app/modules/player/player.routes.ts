@@ -63,4 +63,9 @@ router.patch(
   auth(USER_ROLE.player),
   PlayerController.editTeamAddressTax,
 );
+router.delete(
+  '/delete-players',
+  auth(USER_ROLE.superAdmin),
+  PlayerController.deletePlayersFromDB,
+);
 export const playerRoutes = router;

@@ -129,22 +129,46 @@ const deletePlayerFromDB = async (id: string) => {
   const result = await Player.findByIdAndDelete(id);
   await PlayerBookmark.deleteMany({ player: id });
   await User.findByIdAndDelete(player.user);
-  // const rootPath = process.cwd();
-  // const playerImagePath = path.join(rootPath, player.player_image);
-  // const playerBgImagePath = path.join(rootPath, player.player_bg_image);
-
-  // try {
-  //   await fs.unlink(playerImagePath);
-  //   await fs.unlink(playerBgImagePath);
-  // } catch (error) {
-  //   throw new AppError(
-  //     httpStatus.INTERNAL_SERVER_ERROR,
-  //     `Error deleting associated file`,
-  //   );
-  // }
   unlinkFile(player.player_bg_image);
   unlinkFile(player.player_image);
   return result;
+};
+
+const deletePlayersFromDB = async (ids: string[]) => {
+  const players = await Player.find({ _id: { $in: ids } });
+  if (!players || players.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No players found');
+  }
+
+  // Collect related data for cleanup
+  const playerIdsToDelete = players.map((player) => player._id);
+  const userIdsToDelete = players.map((player) => player.user);
+  const playerBgImagesToDelete = players.map(
+    (player) => player.player_bg_image,
+  );
+  const playerImagesToDelete = players.map((player) => player.player_image);
+
+  // Delete players and related data
+  const deletePlayerPromises = [
+    Player.deleteMany({ _id: { $in: playerIdsToDelete } }),
+    PlayerBookmark.deleteMany({ player: { $in: playerIdsToDelete } }),
+    User.deleteMany({ _id: { $in: userIdsToDelete } }),
+  ];
+
+  await Promise.all(deletePlayerPromises);
+
+  const unlinkPromises = [
+    ...playerBgImagesToDelete.map((image) => unlinkFile(image)),
+    ...playerImagesToDelete.map((image) => unlinkFile(image)),
+  ];
+
+  try {
+    await Promise.all(unlinkPromises);
+  } catch (error) {
+    console.error('Error unlinking files:', error);
+  }
+
+  return players.length;
 };
 
 const sendMoneyToPlayer = async (id: string, amount: number) => {
@@ -263,6 +287,7 @@ const PlayerServices = {
   sendMoneyToPlayer,
   invitePlayer,
   editTeamAddressTax,
+  deletePlayersFromDB,
 };
 
 export default PlayerServices;
