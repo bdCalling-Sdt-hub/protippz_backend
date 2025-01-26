@@ -107,6 +107,16 @@ const editTeamAddressTax = catchAsync(async (req, res) => {
   });
 });
 
+const deleteTeams = catchAsync(async (req, res) => {
+  const result = await TeamServices.deleteTeams(req.body.ids);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `${result} team deleted successfully`,
+    data: result,
+  });
+});
+
 const TeamController = {
   createTeam,
   getAllTeams,
@@ -116,6 +126,7 @@ const TeamController = {
   sendMoneyToTeam,
   inviteTeam,
   editTeamAddressTax,
+  deleteTeams,
 };
 
 export default TeamController;

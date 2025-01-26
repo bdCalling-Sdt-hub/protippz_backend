@@ -135,6 +135,41 @@ const deleteTeamFromDB = async (id: string) => {
   }
 };
 
+const deleteTeams = async (ids: string[]) => {
+  const teams = await Team.find({ _id: { $in: ids } });
+  if (!teams || teams.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No teams found');
+  }
+
+  // Collect related data for cleanup
+  const teamIdsToDelete = teams.map((team) => team._id);
+  const userIdsToDelete = teams.map((team) => team.user);
+  const teamBgImagesToDelete = teams.map((team) => team.team_bg_image);
+  const teamImagesToDelete = teams.map((team) => team.team_logo);
+
+  // Delete players and related data
+  const deleteTeamPromises = [
+    Team.deleteMany({ _id: { $in: teamIdsToDelete } }),
+    TeamBookmark.deleteMany({ team: { $in: teamIdsToDelete } }),
+    User.deleteMany({ _id: { $in: userIdsToDelete } }),
+  ];
+
+  await Promise.all(deleteTeamPromises);
+
+  const unlinkPromises = [
+    ...teamBgImagesToDelete.map((image) => unlinkFile(image)),
+    ...teamImagesToDelete.map((image) => unlinkFile(image)),
+  ];
+
+  try {
+    await Promise.all(unlinkPromises);
+  } catch (error) {
+    console.error('Error unlinking files:', error);
+  }
+
+  return teams.length;
+};
+
 const sendMoneyToTeam = async (id: string, amount: number) => {
   const team = await Team.findById(id);
   if (!team) {
@@ -270,6 +305,7 @@ const TeamServices = {
   sendMoneyToTeam,
   inviteTeam,
   editTeamAddressTax,
+  deleteTeams,
 };
 
 export default TeamServices;

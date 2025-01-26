@@ -56,4 +56,9 @@ router.patch(
   auth(USER_ROLE.team),
   TeamController.editTeamAddressTax,
 );
+router.delete(
+  '/delete-teams',
+  auth(USER_ROLE.superAdmin),
+  TeamController.deleteTeams,
+);
 export const teamRoutes = router;
