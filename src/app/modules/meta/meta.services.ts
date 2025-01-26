@@ -62,11 +62,23 @@ const getChartDataForTips = async (year: number) => {
   ];
 
   // Map the month number from aggregation result to month name and merge
+  // const result = allMonths.map((monthData, index) => {
+  //   const monthResult = monthlyTips.find((tip) => tip.month === index + 1);
+  //   return {
+  //     month: monthData.month,
+  //     totalAmount: monthResult ? monthResult.totalAmount : 0,
+  //   };
+  // });
+
+  // return result;
   const result = allMonths.map((monthData, index) => {
     const monthResult = monthlyTips.find((tip) => tip.month === index + 1);
+    const totalAmount = monthResult ? monthResult.totalAmount : 0;
+    const profit = totalAmount * 0.1; // Calculate 10% profit
     return {
       month: monthData.month,
-      totalAmount: monthResult ? monthResult.totalAmount : 0,
+      totalAmount,
+      profit,
     };
   });
 
@@ -118,7 +130,9 @@ const getUserChartData = async (year: number) => {
 
   // Map the month number from aggregation result to month name and merge
   const result = allMonths.map((monthData, index) => {
-    const monthResult = monthlyUserCounts.find((user) => user.month === index + 1);
+    const monthResult = monthlyUserCounts.find(
+      (user) => user.month === index + 1,
+    );
     return {
       month: monthData.month,
       userCount: monthResult ? monthResult.userCount : 0,
@@ -128,12 +142,10 @@ const getUserChartData = async (year: number) => {
   return result;
 };
 
-
-
 const metaServices = {
   getAdminDashboardMetaDataFromDB,
   getChartDataForTips,
-  getUserChartData
+  getUserChartData,
 };
 
 export default metaServices;
