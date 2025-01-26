@@ -11,6 +11,7 @@ import { WithdrawalRequest } from './withdraw.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import Transaction from '../transaction/transaction.model';
 import {
+  ENUM_PAYMENT_BY,
   ENUM_PAYMENT_STATUS,
   ENUM_TRANSACTION_TYPE,
 } from '../../utilities/enum';
@@ -223,6 +224,14 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       await Player.findByIdAndUpdate(user.profileId, {
         $inc: { paidAmount: amount, dueAmount: -amount },
       });
+
+      await Transaction.create({
+        amount: amount,
+        transactionType: ENUM_TRANSACTION_TYPE.WITHDRAW,
+        paymentBy: ENUM_PAYMENT_BY.ACH,
+        entityId: player._id,
+        entityType: 'Player',
+      });
     } catch (error) {
       console.error('Error during transfer or payout:', error);
       throw new AppError(
@@ -287,6 +296,13 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
       // Update team data in database
       await Team.findByIdAndUpdate(user.profileId, {
         $inc: { paidAmount: amount, dueAmount: -amount },
+      });
+      await Transaction.create({
+        amount: amount,
+        transactionType: ENUM_TRANSACTION_TYPE.WITHDRAW,
+        paymentBy: ENUM_PAYMENT_BY.ACH,
+        entityId: team._id,
+        entityType: 'Team',
       });
     } catch (error) {
       console.error('Error during transfer or payout:', error);
