@@ -204,6 +204,15 @@ const createConnectedAccountAndOnboardingLink = async (
         'You already added bank information',
       );
     }
+    if (player?.stripAccountId) {
+      const onboardingLink = await stripe.accountLinks.create({
+        account: player.stripAccountId,
+        refresh_url: `${config.onboarding_refresh_url}?accountId=${player.stripAccountId}`,
+        return_url: `${config.onboarding_return_url}`,
+        type: 'account_onboarding',
+      });
+      return onboardingLink.url;
+    }
   } else if (userData?.role == USER_ROLE.team) {
     const team = await Team.findById(profileId);
     if (team?.isStripeConnected) {
@@ -211,6 +220,15 @@ const createConnectedAccountAndOnboardingLink = async (
         httpStatus.BAD_REQUEST,
         'You already added bank information',
       );
+    }
+    if (team?.stripAccountId) {
+      const onboardingLink = await stripe.accountLinks.create({
+        account: team.stripAccountId,
+        refresh_url: `${config.onboarding_refresh_url}?accountId=${team.stripAccountId}`,
+        return_url: `${config.onboarding_return_url}`,
+        type: 'account_onboarding',
+      });
+      return onboardingLink.url;
     }
   }
 
@@ -220,7 +238,7 @@ const createConnectedAccountAndOnboardingLink = async (
     email: user.email,
     country: 'US',
     capabilities: {
-      card_payments: { requested: true },
+      // card_payments: { requested: true },
       transfers: { requested: true },
     },
     settings: {
