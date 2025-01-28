@@ -125,7 +125,6 @@ const verifyCode = async (email: string, verifyCode: number) => {
     { new: true, runValidators: true },
   );
   //=====================================
-
   if (result?.inviteToken) {
     const invite = await Invite.findOne({ inviteToken: result.inviteToken });
     console.log('Invite token', invite);
