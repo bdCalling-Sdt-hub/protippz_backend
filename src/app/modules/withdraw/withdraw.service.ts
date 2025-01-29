@@ -307,7 +307,7 @@ const achWithdraw = async (user: JwtPayload, amount: number) => {
     } catch (error) {
       console.error('Error during transfer or payout:', error);
       throw new AppError(
-        httpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+        httpStatus.BAD_REQUEST,
         'Transfer failed update your bank info',
       );
     }
