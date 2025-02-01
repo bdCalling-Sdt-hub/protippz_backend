@@ -238,7 +238,7 @@ const createConnectedAccountAndOnboardingLink = async (
     email: user.email,
     country: 'US',
     capabilities: {
-      card_payments: { requested: true },
+      // card_payments: { requested: true },
       transfers: { requested: true },
     },
     settings: {
