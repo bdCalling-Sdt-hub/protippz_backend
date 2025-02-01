@@ -9,11 +9,22 @@ const getAdminDashboardMetaDataFromDB = async () => {
   const totalLeague = await League.countDocuments();
   const totalTeam = await Team.countDocuments();
   const totalPlayer = await Player.countDocuments();
+  const result = await Tip.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalTip: { $sum: '$amount' },
+      },
+    },
+  ]);
+
+  const totalTip = result.length ? result[0].totalTip : 0;
   return {
     totalUser,
     totalLeague,
     totalTeam,
     totalPlayer,
+    totalTip,
   };
 };
 

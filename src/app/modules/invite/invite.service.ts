@@ -6,7 +6,7 @@ const generateInviteLink = async (inviterId: string) => {
   await Invite.create({ inviter: inviterId, inviteToken });
 
   return {
-    link: `http://localhost:3000/sign-up?invite=${inviteToken}`,
+    link: `https://www.protippz.com/sign-up?invite=${inviteToken}`,
     token: inviteToken,
   };
 };
