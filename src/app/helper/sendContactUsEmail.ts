@@ -17,9 +17,8 @@ const sendContactUsEmail = async (req: Request, res: Response) => {
     contactUsValidationSchema.parse(req);
 
     const { name, phone, email, message } = req.body;
-
     await sendEmail({
-      email: 'devsmanik@gmail.com',
+      email: 'cory@protippz.com',
       subject: 'Contact Us Info',
       html: `
         <h2>New Contact Us Message</h2>
