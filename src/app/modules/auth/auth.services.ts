@@ -187,15 +187,18 @@ const changePasswordIntoDB = async (
     confirmNewPassword: string;
   },
 ) => {
+  console.log('userdata', userData);
   if (payload.newPassword !== payload.confirmNewPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "Password and confirm password doesn't match",
     );
   }
-  const user = await User.findOne({
-    $or: [{ email: userData?.email }, { username: userData.username }],
-  });
+  // const user = await User.findOne({
+  //   $or: [{ email: userData?.email }, { username: userData.username }],
+  // });
+  const user = await User.findById(userData.id);
+  console.log('user', user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }

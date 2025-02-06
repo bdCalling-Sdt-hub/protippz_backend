@@ -248,7 +248,6 @@ const inviteTeam = async (id: string, payload: IInviteTeamPayload) => {
     };
 
     const user = await User.create([userData], { session });
-
     await Team.findByIdAndUpdate(
       id,
       {
