@@ -66,7 +66,7 @@ app.use('/', router);
 app.post('/contact-us', sendContactUsEmail);
 
 app.get('/nice', async (req, res) => {
-  res.send({ message: 'nice to meet you man' });
+  res.send({ message: 'nice to meet you man protippz' });
 });
 
 app.post(

@@ -258,6 +258,74 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
   }
 };
 
+// const executeDepositPaymentWithApp = async (
+//   profileId: string,
+//   paymentId: string,
+//   payerId: string,
+// ) => {
+//   try {
+//     // Use the payment.get method to retrieve payment details
+//     const payment = await new Promise<any>((resolve, reject) => {
+//       paypal.payment.get(paymentId, (error, payment) => {
+//         if (error) {
+//           reject(error);
+//         } else {
+//           resolve(payment);
+//         }
+//       });
+//     });
+
+//     // Verify if the payer_id matches and the payment status is 'approved'
+//     if (
+//       payment.payer.payer_info.payer_id === payerId &&
+//       payment.state === 'approved'
+//     ) {
+//       const isExistTransaction = await Transaction.findOne({
+//         transactionId: payment.id,
+//       });
+//       if (isExistTransaction) {
+//         throw new AppError(
+//           httpStatus.BAD_REQUEST,
+//           'This payment already execute',
+//         );
+//       }
+
+//       console.log('pyametn maount', payment.transactions[0].amount.total);
+
+//       await NormalUser.findByIdAndUpdate(
+//         profileId,
+//         {
+//           $inc: { totalAmount: payment.transactions[0].amount.total },
+//         },
+//         { new: true, runValidators: true },
+//       );
+//       // Payment is successful
+//       const transaction = await Transaction.create({
+//         entityId: profileId,
+//         entityType: 'NormalUser',
+//         amount: payment.transactions[0].amount.total,
+//         transactionId: payment?.id,
+//         paymentBy: ENUM_PAYMENT_BY.PAYPAL,
+//         status: ENUM_TRANSACTION_STATUS.SUCCESS,
+//         transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
+//       });
+//       const notificationData = {
+//         title: 'Successfully deposit amount',
+//         message:
+//           'Your deposit is successful with paypal. Check your account balance',
+//         receiver: profileId,
+//       };
+//       await Notification.create(notificationData);
+//       return transaction;
+//     } else {
+//       // Payment failed or was not approved
+//       throw new Error('Payment verification failed');
+//     }
+//   } catch (err: any) {
+//     console.error('Error verifying PayPal payment:', err);
+//     return { status: 'error', message: err.message };
+//   }
+// };
 const executeDepositPaymentWithApp = async (
   profileId: string,
   paymentId: string,
@@ -268,10 +336,16 @@ const executeDepositPaymentWithApp = async (
     const payment = await new Promise<any>((resolve, reject) => {
       paypal.payment.get(paymentId, (error, payment) => {
         if (error) {
-          reject(error);
-        } else {
-          resolve(payment);
+          return reject(
+            new AppError(
+              httpStatus.UNAUTHORIZED,
+              `PayPal API Error: ${
+                error.response?.error_description || error.message
+              }`,
+            ),
+          );
         }
+        resolve(payment);
       });
     });
 
@@ -286,42 +360,63 @@ const executeDepositPaymentWithApp = async (
       if (isExistTransaction) {
         throw new AppError(
           httpStatus.BAD_REQUEST,
-          'This payment already execute',
+          'This payment has already been executed.',
         );
       }
+
+      console.log('Payment amount:', payment.transactions[0].amount.total);
 
       await NormalUser.findByIdAndUpdate(
         profileId,
         {
-          $inc: { totalAmount: payment.transactions[0].amount.total },
+          $inc: {
+            totalAmount: parseFloat(payment.transactions[0].amount.total),
+          },
         },
         { new: true, runValidators: true },
       );
+
       // Payment is successful
       const transaction = await Transaction.create({
         entityId: profileId,
         entityType: 'NormalUser',
-        amount: payment.transactions[0].amount.total,
-        transactionId: payment?.id,
+        amount: parseFloat(payment.transactions[0].amount.total),
+        transactionId: payment.id,
         paymentBy: ENUM_PAYMENT_BY.PAYPAL,
         status: ENUM_TRANSACTION_STATUS.SUCCESS,
         transactionType: ENUM_TRANSACTION_TYPE.DEPOSIT,
       });
+
       const notificationData = {
-        title: 'Successfully deposit amount',
+        title: 'Deposit Successful',
         message:
-          'Your deposit is successful with paypal. Check your account balance',
+          'Your deposit via PayPal was successful. Check your account balance.',
         receiver: profileId,
       };
       await Notification.create(notificationData);
+
       return transaction;
     } else {
-      // Payment failed or was not approved
-      throw new Error('Payment verification failed');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Payment verification failed. The payment state is not approved.',
+      );
     }
   } catch (err: any) {
     console.error('Error verifying PayPal payment:', err);
-    return { status: 'error', message: err.message };
+
+    // Handle PayPal-specific errors
+    if (err.response?.httpStatusCode === 401) {
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        'PayPal Authentication Error: Invalid Client ID or Secret.',
+      );
+    }
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `Payment processing error: ${err.message}`,
+    );
   }
 };
 

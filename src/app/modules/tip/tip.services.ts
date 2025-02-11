@@ -420,6 +420,109 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
   }
 };
 
+// const executePaypalTipPaymentWithApp = async (
+//   profileId: string,
+//   paymentId: string,
+//   payerId: string,
+//   entityId: string,
+//   entityType: 'Team' | 'Player',
+// ) => {
+//   if (entityType === 'Team') {
+//     const team = await Team.findById(entityId);
+//     if (!team) {
+//       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+//     }
+//   } else if (entityType === 'Player') {
+//     const player = await Player.findById(entityId);
+//     if (!player) {
+//       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+//     }
+//   }
+//   try {
+//     // Use the payment.get method to retrieve payment details
+//     const payment = await new Promise<any>((resolve, reject) => {
+//       paypal.payment.get(paymentId, (error, payment) => {
+//         if (error) {
+//           reject(error);
+//         } else {
+//           resolve(payment);
+//         }
+//       });
+//     });
+
+//     // console.log('payment in tip', payment);
+
+//     // Verify if the payer_id matches and the payment status is 'approved'
+//     if (
+//       payment.payer.payer_info.payer_id === payerId &&
+//       payment.state === 'approved'
+//     ) {
+//       const isExistTransaction = await Tip.findOne({
+//         transactionId: payment.id,
+//       });
+//       if (isExistTransaction) {
+//         throw new AppError(
+//           httpStatus.BAD_REQUEST,
+//           'This payment already execute',
+//         );
+//       }
+//       const createTip = await Tip.create({
+//         user: profileId,
+//         entityId: entityId,
+//         entityType: entityType,
+//         amount: payment.transactions[0].amount.total,
+//         transactionId: paymentId,
+//         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+//         tipBy: ENUM_TIP_BY.PAYPAL,
+//         point: payment.transactions[0].amount.total * pointPerAmountTip,
+//       });
+//       await NormalUser.findByIdAndUpdate(
+//         profileId,
+//         {
+//           $inc: {
+//             totalPoint:
+//               payment.transactions[0].amount.total * pointPerAmountTip,
+//             totalTipSent: payment.transactions[0].amount.total,
+//           },
+//         },
+//         { new: true, runValidators: true },
+//       );
+
+//       // update player or team------------------
+//       const tipAmountAfterCharge =
+//         createTip.amount - (createTip.amount * 10) / 100;
+//       if (createTip?.entityType === 'Team') {
+//         await Team.findByIdAndUpdate(createTip?.entityId, {
+//           $inc: {
+//             totalTips: tipAmountAfterCharge,
+//             dueAmount: tipAmountAfterCharge,
+//           },
+//         });
+//       } else if (createTip?.entityType === 'Player') {
+//         await Player.findByIdAndUpdate(createTip.entityId, {
+//           $inc: {
+//             totalTips: tipAmountAfterCharge,
+//             dueAmount: tipAmountAfterCharge,
+//           },
+//         });
+//       }
+//       const notificationData = {
+//         title: `Successfully tip sent`,
+//         message: `Successfully tip send to ${createTip.entityType} and you got ${createTip.point} points`,
+//         receiver: profileId,
+//       };
+
+//       await Notification.create(notificationData);
+//       return createTip;
+//     } else {
+//       // Payment failed or was not approved
+//       throw new AppError(httpStatus.BAD_REQUEST, 'Payment verification failed');
+//     }
+//   } catch (err) {
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Tip payment not successful');
+//   }
+// };
+
 const executePaypalTipPaymentWithApp = async (
   profileId: string,
   paymentId: string,
@@ -427,32 +530,38 @@ const executePaypalTipPaymentWithApp = async (
   entityId: string,
   entityType: 'Team' | 'Player',
 ) => {
-  if (entityType === 'Team') {
-    const team = await Team.findById(entityId);
-    if (!team) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
-    }
-  } else if (entityType === 'Player') {
-    const player = await Player.findById(entityId);
-    if (!player) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
-    }
-  }
   try {
-    // Use the payment.get method to retrieve payment details
+    // Check if entity exists
+    if (entityType === 'Team') {
+      const team = await Team.findById(entityId);
+      if (!team) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+      }
+    } else if (entityType === 'Player') {
+      const player = await Player.findById(entityId);
+      if (!player) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+      }
+    }
+
+    // Retrieve PayPal payment details
     const payment = await new Promise<any>((resolve, reject) => {
       paypal.payment.get(paymentId, (error, payment) => {
         if (error) {
-          reject(error);
-        } else {
-          resolve(payment);
+          return reject(
+            new AppError(
+              httpStatus.UNAUTHORIZED,
+              `PayPal API Error: ${
+                error.response?.error_description || error.message
+              }`,
+            ),
+          );
         }
+        resolve(payment);
       });
     });
 
-    // console.log('payment in tip', payment);
-
-    // Verify if the payer_id matches and the payment status is 'approved'
+    // Verify PayPal response
     if (
       payment.payer.payer_info.payer_id === payerId &&
       payment.state === 'approved'
@@ -460,66 +569,88 @@ const executePaypalTipPaymentWithApp = async (
       const isExistTransaction = await Tip.findOne({
         transactionId: payment.id,
       });
+
       if (isExistTransaction) {
         throw new AppError(
           httpStatus.BAD_REQUEST,
-          'This payment already execute',
+          'This payment has already been executed.',
         );
       }
+
+      const tipAmount = parseFloat(payment.transactions[0].amount.total);
+      const pointEarned = tipAmount * pointPerAmountTip;
+      const tipAmountAfterCharge = tipAmount - (tipAmount * 10) / 100;
+
+      // Create a Tip record
       const createTip = await Tip.create({
         user: profileId,
-        entityId: entityId,
-        entityType: entityType,
-        amount: payment.transactions[0].amount.total,
+        entityId,
+        entityType,
+        amount: tipAmount,
         transactionId: paymentId,
         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
         tipBy: ENUM_TIP_BY.PAYPAL,
-        point: payment.transactions[0].amount.total * pointPerAmountTip,
+        point: pointEarned,
       });
+
+      // Update user points and total tips sent
       await NormalUser.findByIdAndUpdate(
         profileId,
         {
           $inc: {
-            totalPoint:
-              payment.transactions[0].amount.total * pointPerAmountTip,
-            totalTipSent: payment.transactions[0].amount.total,
+            totalPoint: pointEarned,
+            totalTipSent: tipAmount,
           },
         },
         { new: true, runValidators: true },
       );
 
-      // update player or team------------------
-      const tipAmountAfterCharge =
-        createTip.amount - (createTip.amount * 10) / 100;
-      if (createTip?.entityType === 'Team') {
-        await Team.findByIdAndUpdate(createTip?.entityId, {
+      // Update Team or Player's earnings
+      if (entityType === 'Team') {
+        await Team.findByIdAndUpdate(entityId, {
           $inc: {
             totalTips: tipAmountAfterCharge,
             dueAmount: tipAmountAfterCharge,
           },
         });
-      } else if (createTip?.entityType === 'Player') {
-        await Player.findByIdAndUpdate(createTip.entityId, {
+      } else if (entityType === 'Player') {
+        await Player.findByIdAndUpdate(entityId, {
           $inc: {
             totalTips: tipAmountAfterCharge,
             dueAmount: tipAmountAfterCharge,
           },
         });
       }
+
+      // Send notification to user
       const notificationData = {
-        title: `Successfully tip sent`,
-        message: `Successfully tip send to ${createTip.entityType} and you got ${createTip.point} points`,
+        title: `Tip Successfully Sent`,
+        message: `You successfully tipped ${entityType} and earned ${pointEarned} points.`,
         receiver: profileId,
       };
-
       await Notification.create(notificationData);
+
       return createTip;
     } else {
-      // Payment failed or was not approved
-      throw new AppError(httpStatus.BAD_REQUEST, 'Payment verification failed');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Payment verification failed. Payment state is not approved.',
+      );
     }
-  } catch (err) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Tip payment not successful');
+  } catch (err: any) {
+    console.error('PayPal Tip Payment Error:', err);
+
+    if (err.response?.httpStatusCode === 401) {
+      throw new AppError(
+        httpStatus.UNAUTHORIZED,
+        'PayPal Authentication Error: Invalid Client ID or Secret.',
+      );
+    }
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `Tip payment failed: ${err.message}`,
+    );
   }
 };
 
