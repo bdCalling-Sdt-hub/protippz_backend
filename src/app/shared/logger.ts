@@ -39,7 +39,7 @@ export const logger = createLogger({
 
 export const errorLogger = createLogger({
   level: 'error',
-  format: combine(label({ label: 'Food Delivery' }), timestamp(), myFormat),
+  format: combine(label({ label: 'Protippz' }), timestamp(), myFormat),
   transports: [
     new transports.Console(),
     new DailyRotateFile({
