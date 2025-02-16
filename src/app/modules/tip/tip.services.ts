@@ -88,7 +88,7 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
       session,
     });
 
-    await NormalUser.findByIdAndUpdate(
+    const updatedUser = await NormalUser.findByIdAndUpdate(
       userId,
       {
         $inc: {
@@ -129,6 +129,19 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
     await session.commitTransaction();
     session.endSession();
 
+    let playerTeamInfo;
+    if (result[0].entityType === 'Player') {
+      playerTeamInfo = await Player.findById(result[0].entityId);
+    } else if (result[0].entityType === 'Team') {
+      playerTeamInfo = await Team.findById(result[0].entityId);
+    }
+
+    const notificationData = {
+      title: `Tip sent successfully.`,
+      message: `You have successfully sent a tip to ${playerTeamInfo?.name} and earned ${result[0].point} points.`,
+      receiver: updatedUser?._id,
+    };
+    await Notification.create(notificationData);
     return result[0];
   } catch (error) {
     await session.abortTransaction();
@@ -172,7 +185,7 @@ const tipByCreditCard = async (userId: string, payload: ITip) => {
   });
   return {
     clientSecret: paymentIntent.client_secret,
-    transactionId: paymentIntent.id,
+    // transactionId: paymentIntent.id,
   };
 };
 
@@ -281,9 +294,16 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
       { new: true, runValidators: true, session },
     );
 
+    let playerTeamInfo;
+    if (tip.entityType === 'Player') {
+      playerTeamInfo = await Player.findById(tip.entityId);
+    } else if (tip.entityType === 'Team') {
+      playerTeamInfo = await Team.findById(tip.entityId);
+    }
+
     const notificationData = {
-      title: `Successfully tip sent`,
-      message: `Successfully tip send to ${tip.entityType} and you got ${tip.point} points`,
+      title: `Tip sent successfully.`,
+      message: `You have successfully sent a tip to ${playerTeamInfo?.name} and earned ${tip.point} points.`,
       receiver: updatedUser?._id,
     };
 
@@ -374,9 +394,16 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
       { $inc: { totalPoint: tip.point, totalTipSent: tip.amount } },
       { new: true, runValidators: true, session },
     );
+    let playerTeamInfo;
+    if (tip.entityType === 'Player') {
+      playerTeamInfo = await Player.findById(tip.entityId);
+    } else if (tip.entityType === 'Team') {
+      playerTeamInfo = await Team.findById(tip.entityId);
+    }
+
     const notificationData = {
       title: `Successfully tip sent`,
-      message: `Successfully tip send to ${tip.entityType} and you got ${tip.point} points`,
+      message: `You have successfully sent a tip to ${playerTeamInfo?.name} and earned ${tip.point} points.`,
       receiver: updatedUser?._id,
     };
 
@@ -622,10 +649,17 @@ const executePaypalTipPaymentWithApp = async (
         });
       }
 
+      let playerTeamInfo;
+      if (createTip.entityType === 'Player') {
+        playerTeamInfo = await Player.findById(createTip.entityId);
+      } else if (createTip.entityType === 'Team') {
+        playerTeamInfo = await Team.findById(createTip.entityId);
+      }
+
       // Send notification to user
       const notificationData = {
         title: `Tip Successfully Sent`,
-        message: `You successfully tipped ${entityType} and earned ${pointEarned} points.`,
+        message: `You have successfully sent a tip to ${playerTeamInfo?.name} and earned ${createTip.point} points.`,
         receiver: profileId,
       };
       await Notification.create(notificationData);
