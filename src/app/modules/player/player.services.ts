@@ -217,7 +217,6 @@ const invitePlayer = async (id: string, payload: IInviteTeamPayload) => {
         'This username already exists',
       );
     }
-
     const userData = {
       username: payload.username,
       password: payload.password,

@@ -109,7 +109,7 @@ const registrationSuccessEmailBody = (name: string, activationCode: number) => `
               </a>
             </div>
             <p>If you didn't register, ignore this email.</p>
-          <p>If you have any questions, feel free to contact us at <a href="cory@protippz.com">cory@protippz.com</a>.</p>
+          <p>If you have any questions, feel free to contact us at <a href="contact@protippz.com">contact@protippz.com</a>.</p>
         </div>
         <div class="footer">
           <p>&copy; ${new Date().getFullYear()} Protipzz. All rights reserved.</p>
