@@ -326,9 +326,9 @@ cron.schedule('*/2 * * * *', async () => {
     // Find unverified users whose expiration time has passed
     const expiredUsers = await User.find({
       isAddEmailVerified: false,
+      $or: [{ role: USER_ROLE.player }, { role: USER_ROLE.team }],
       codeExpireIn: { $lte: now },
     });
-
     if (expiredUsers.length > 0) {
       const expiredUserIds = expiredUsers.map((user) => user._id);
 
