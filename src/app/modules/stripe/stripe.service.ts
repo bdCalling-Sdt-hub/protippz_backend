@@ -190,7 +190,6 @@ const createConnectedAccountAndOnboardingLink = async (
   userData: JwtPayload,
   profileId: string,
 ) => {
-  console.log('okey okey okey');
   const user = await User.findById(userData?.id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -238,9 +237,10 @@ const createConnectedAccountAndOnboardingLink = async (
     email: user.email,
     country: 'US',
     capabilities: {
-      // card_payments: { requested: true },
+      card_payments: { requested: true },
       transfers: { requested: true },
     },
+    business_type: 'individual',
     settings: {
       payouts: {
         schedule: {
