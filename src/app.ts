@@ -24,9 +24,7 @@ import handleWebhook from './app/stripeManager/webhook';
 import Stripe from 'stripe';
 import config from './app/config';
 const upload = multer({ dest: 'uploads/' });
-const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
-  apiVersion: '2024-09-30.acacia',
-});
+const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 // web hook---------------
 app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 // parser-----------------------
