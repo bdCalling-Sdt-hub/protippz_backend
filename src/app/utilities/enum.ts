@@ -32,6 +32,7 @@ export const ENUM_REDEEM_STATUS = {
 export const ENUM_TRANSACTION_TYPE = {
   DEPOSIT: 'Deposit',
   WITHDRAW: 'Withdraw',
+  TIP: 'Tip',
 };
 
 export const ENUM_PAYMENT_BY = {

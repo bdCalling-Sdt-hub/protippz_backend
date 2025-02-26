@@ -7,7 +7,12 @@ import Tip from './tip.model';
 import { ITip } from './tip.interface';
 import NormalUser from '../normalUser/normalUser.model';
 import mongoose from 'mongoose';
-import { ENUM_PAYMENT_STATUS, ENUM_TIP_BY } from '../../utilities/enum';
+import {
+  ENUM_PAYMENT_BY,
+  ENUM_PAYMENT_STATUS,
+  ENUM_TIP_BY,
+  ENUM_TRANSACTION_TYPE,
+} from '../../utilities/enum';
 import Stripe from 'stripe';
 import config from '../../config';
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
@@ -335,6 +340,15 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
       );
     }
 
+    await Transaction.create({
+      entityId: tip.user,
+      entityType: 'NormalUser',
+      transactionId: transactionId,
+      transactionType: ENUM_TRANSACTION_TYPE.TIP,
+      paymentBy: ENUM_PAYMENT_BY.CREDIT_CARD,
+      status: ENUM_PAYMENT_STATUS.SUCCESS,
+      amount: tip.amount,
+    });
     await session.commitTransaction();
     session.endSession();
 
@@ -435,6 +449,16 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
         { session },
       );
     }
+
+    await Transaction.create({
+      entityId: tip.user,
+      entityType: 'NormalUser',
+      transactionId: payment?.id,
+      transactionType: ENUM_TRANSACTION_TYPE.TIP,
+      paymentBy: ENUM_PAYMENT_BY.PAYPAL,
+      status: ENUM_PAYMENT_STATUS.SUCCESS,
+      amount: updatedTip.amount,
+    });
 
     await session.commitTransaction();
     session.endSession();
@@ -618,6 +642,18 @@ const executePaypalTipPaymentWithApp = async (
         paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
         tipBy: ENUM_TIP_BY.PAYPAL,
         point: pointEarned,
+      });
+
+      // new work ---------
+
+      await Transaction.create({
+        entityId: profileId,
+        entityType: 'NormalUser',
+        transactionId: payment?.paymentId,
+        transactionType: ENUM_TRANSACTION_TYPE.TIP,
+        paymentBy: ENUM_PAYMENT_BY.PAYPAL,
+        status: ENUM_PAYMENT_STATUS.SUCCESS,
+        amount: tipAmount,
       });
 
       // Update user points and total tips sent
