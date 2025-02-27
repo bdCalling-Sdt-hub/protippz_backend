@@ -23,12 +23,18 @@ import httpStatus from 'http-status';
 import handleWebhook from './app/stripeManager/webhook';
 import Stripe from 'stripe';
 import config from './app/config';
+import handleWebhook2 from './app/stripeManager/webhook2';
 const upload = multer({ dest: 'uploads/' });
 const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
   apiVersion: '2024-09-30.acacia',
 });
 // web hook---------------
 app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+app.post(
+  '/webhook/your-account',
+  express.raw({ type: 'application/json' }),
+  handleWebhook2,
+);
 // parser-----------------------
 app.use(express.json());
 app.use(cookieParser());
