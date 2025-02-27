@@ -31,7 +31,7 @@ const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
 // web hook---------------
 app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 app.post(
-  '/webhook/your-account',
+  '/webhook/connected-account',
   express.raw({ type: 'application/json' }),
   handleWebhook2,
 );

@@ -8,7 +8,8 @@ import updateStripeConnectedAccountStatus from './updateStripeConnectedAccountSt
 // const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleWebhook2 = async (req: Request, res: Response) => {
-  const endpointSecret = config.webhook_endpoint_secret_for_platform as string;
+  const endpointSecret =
+    config.webhook_endpoint_secret_for_connected_account as string;
   //   console.log('webhook endpoint secret ', endpointSecret);
   const sig = req.headers['stripe-signature'];
   try {
