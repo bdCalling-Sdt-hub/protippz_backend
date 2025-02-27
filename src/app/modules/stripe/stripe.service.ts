@@ -250,7 +250,7 @@ const createConnectedAccountAndOnboardingLink = async (
     },
   });
 
-  console.log('account is created', account);
+  // console.log('account is created', account);
 
   if (userData?.role == USER_ROLE.team) {
     const updatedTeamProfile = await Team.findByIdAndUpdate(

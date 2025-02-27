@@ -39,13 +39,6 @@ const updateStripeConnectedAccountStatus = async (accountId: string) => {
         );
       }
     }
-
-    // return {
-    //   success: true,
-    //   statusCode: httpStatus.OK,
-    //   message: `Client  successfully connected to Stripe.`,
-    //   //   data: updatedClient,
-    // };
   } catch (err) {
     return {
       success: false,
