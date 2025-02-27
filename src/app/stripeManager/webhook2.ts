@@ -6,12 +6,10 @@ import handlePaymentSuccess from './handlePaymentSuccess';
 import updateStripeConnectedAccountStatus from './updateStripeConnectedAccountStatus';
 
 // const stripe = new Stripe(config.stripe.stripe_secret_key as string);
-const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
-  apiVersion: '2024-09-30.acacia',
-});
+const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const handleWebhook2 = async (req: Request, res: Response) => {
   const endpointSecret = config.webhook_endpoint_secret_for_platform as string;
-  console.log('webhook endpoint secret ', endpointSecret);
+  //   console.log('webhook endpoint secret ', endpointSecret);
   const sig = req.headers['stripe-signature'];
   try {
     // Verify the event
