@@ -2,7 +2,6 @@
 import Stripe from 'stripe';
 import config from '../config';
 import { Request, Response } from 'express';
-import handlePaymentSuccess from './handlePaymentSuccess';
 import updateStripeConnectedAccountStatus from './updateStripeConnectedAccountStatus';
 
 // const stripe = new Stripe(config.stripe.stripe_secret_key as string);
@@ -20,21 +19,10 @@ const handleWebhook = async (req: Request, res: Response) => {
       sig as string,
       endpointSecret,
     );
-
     // Handle different event types
     switch (event.type) {
       case 'payment_intent.succeeded': {
-        console.log('payment intent success');
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log(paymentIntent.metadata);
-        const { userId, paymentPurpose } = paymentIntent.metadata;
-
-        console.log(
-          `Payment successful for user ${userId}, subscription ${userId}`,
-        );
-        await handlePaymentSuccess(userId, paymentPurpose);
         // Update subscription status in your database
-
         break;
       }
       case 'account.updated': {
