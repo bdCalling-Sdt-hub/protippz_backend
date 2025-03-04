@@ -204,6 +204,7 @@ const createConnectedAccountAndOnboardingLink = async (
       );
     }
     if (player?.stripAccountId) {
+      console.log('connect for player account id :', player.stripAccountId);
       const onboardingLink = await stripe.accountLinks.create({
         account: player.stripAccountId,
         refresh_url: `${config.onboarding_refresh_url}?accountId=${player.stripAccountId}`,
@@ -221,6 +222,7 @@ const createConnectedAccountAndOnboardingLink = async (
       );
     }
     if (team?.stripAccountId) {
+      console.log('connect for team account id :', team.stripAccountId);
       const onboardingLink = await stripe.accountLinks.create({
         account: team.stripAccountId,
         refresh_url: `${config.onboarding_refresh_url}?accountId=${team.stripAccountId}`,
