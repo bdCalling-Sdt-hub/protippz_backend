@@ -159,8 +159,7 @@ const executeStripeDeposit = async (transactionId: string) => {
 
     const notificationData = {
       title: 'Successfully deposit amount',
-      message:
-        'Your deposit is successful with credit card . Check your account balance',
+      message: `Your deposit of $${updatedTransaction.amount} was successfull`,
       receiver: updatedUser?._id,
     };
 
@@ -240,8 +239,7 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
 
     const notificationData = {
       title: 'Successfully deposit amount',
-      message:
-        'Your deposit is successful with credit card . Check your account balance',
+      message: `Your deposit of $${transaction.amount} was successfull`,
       receiver: updatedUser?._id,
     };
 
@@ -389,8 +387,7 @@ const executeDepositPaymentWithApp = async (
 
       const notificationData = {
         title: 'Deposit Successful',
-        message:
-          'Your deposit via PayPal was successful. Check your account balance.',
+        message: `Your deposit of $${transaction.amount} was successfull`,
         receiver: profileId,
       };
       await Notification.create(notificationData);
