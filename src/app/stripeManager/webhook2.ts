@@ -26,7 +26,7 @@ const handleWebhook2 = async (req: Request, res: Response) => {
         console.log('web hook account update');
         const account = event.data.object as Stripe.Account;
         console.log('acount', account);
-        if (account.details_submitted) {
+        if (account?.details_submitted) {
           try {
             await updateStripeConnectedAccountStatus(account.id);
           } catch (err) {
@@ -37,9 +37,9 @@ const handleWebhook2 = async (req: Request, res: Response) => {
           }
         }
         await Log.create({
-          accountId: account.id, // `id` এর পরিবর্তে `accountId` করা ভালো
+          accountId: account?.id, // `id` এর পরিবর্তে `accountId` করা ভালো
           message: `Webhook event received for updated account: ${
-            account.details_submitted
+            account?.details_submitted
               ? 'Details submitted: TRUE'
               : 'Details submitted: FALSE'
           }`,
@@ -59,9 +59,9 @@ const handleWebhook2 = async (req: Request, res: Response) => {
             await updateStripeConnectedAccountStatus(account.id);
           }
           await Log.create({
-            accountId: account.id,
+            accountId: account?.id,
             message: `Webhook event received for updated account: ${
-              account.details_submitted
+              account?.details_submitted
                 ? 'Details submitted: TRUE'
                 : 'Details submitted: FALSE'
             }`,
