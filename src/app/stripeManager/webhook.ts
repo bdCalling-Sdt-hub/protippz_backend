@@ -26,7 +26,7 @@ const handleWebhook = async (req: Request, res: Response) => {
         break;
       }
       case 'account.updated': {
-        console.log('web hook account update');
+        console.log('web hook account update 2');
         const account = event.data.object as Stripe.Account;
         console.log('acount', account);
         if (account.details_submitted) {
