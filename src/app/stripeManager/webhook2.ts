@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import config from '../config';
 import { Request, Response } from 'express';
 import updateStripeConnectedAccountStatus from './updateStripeConnectedAccountStatus';
+import Log from '../modules/log/log.model';
 
 // const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const stripe = new Stripe(config.stripe.stripe_secret_key as string, {
@@ -21,10 +22,6 @@ const handleWebhook2 = async (req: Request, res: Response) => {
     );
     // Handle different event types
     switch (event.type) {
-      case 'payment_intent.succeeded': {
-        console.log(`Payment successful for user`);
-        break;
-      }
       case 'account.updated': {
         console.log('web hook account update');
         const account = event.data.object as Stripe.Account;
@@ -39,17 +36,42 @@ const handleWebhook2 = async (req: Request, res: Response) => {
             );
           }
         }
+        await Log.create({
+          accountId: account.id, // `id` এর পরিবর্তে `accountId` করা ভালো
+          message: `Webhook event received for updated account: ${
+            account.details_submitted
+              ? 'Details submitted: TRUE'
+              : 'Details submitted: FALSE'
+          }`,
+        });
         break;
       }
-      case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        const { userId, subscriptionId } = paymentIntent.metadata;
+      case 'account.external_account.updated': {
+        console.log('Webhook: External account updated');
+        const externalAccount = event.data.object;
+        console.log('External Account:', externalAccount);
 
-        console.log(
-          `Payment failed for user ${userId}, subscription ${subscriptionId}`,
-        );
-
-        // Notify the user about the failure
+        try {
+          const account = await stripe.accounts.retrieve(
+            externalAccount.account as string,
+          );
+          if (account.details_submitted) {
+            await updateStripeConnectedAccountStatus(account.id);
+          }
+          await Log.create({
+            accountId: account.id,
+            message: `Webhook event received for updated account: ${
+              account.details_submitted
+                ? 'Details submitted: TRUE'
+                : 'Details submitted: FALSE'
+            }`,
+          });
+        } catch (err) {
+          console.error(
+            `Failed to fetch account details for ${externalAccount.account}`,
+            err,
+          );
+        }
         break;
       }
       // nice case

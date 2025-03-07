@@ -257,7 +257,7 @@ const createConnectedAccountAndOnboardingLink = async (
   if (userData?.role == USER_ROLE.team) {
     const updatedTeamProfile = await Team.findByIdAndUpdate(
       profileId,
-      { stripAccountId: account.id },
+      { stripAccountId: account.id, isStripeConnected: true },
       { new: true, runValidators: true },
     );
 
@@ -270,10 +270,9 @@ const createConnectedAccountAndOnboardingLink = async (
   } else if (userData?.role == USER_ROLE.player) {
     const updatedPlayerProfile = await Player.findByIdAndUpdate(
       profileId,
-      { stripAccountId: account.id },
+      { stripAccountId: account.id, isStripeConnected: true },
       { new: true, runValidators: true },
     );
-
     if (!updatedPlayerProfile) {
       throw new AppError(
         httpStatus.INTERNAL_SERVER_ERROR,
