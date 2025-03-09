@@ -23,9 +23,7 @@ const handleWebhook2 = async (req: Request, res: Response) => {
     // Handle different event types
     switch (event.type) {
       case 'account.updated': {
-        console.log('web hook account update');
         const account = event.data.object as Stripe.Account;
-        console.log('acount', account);
         if (account?.details_submitted) {
           try {
             await updateStripeConnectedAccountStatus(account.id);
@@ -47,10 +45,7 @@ const handleWebhook2 = async (req: Request, res: Response) => {
         break;
       }
       case 'account.external_account.updated': {
-        console.log('Webhook: External account updated');
         const externalAccount = event.data.object;
-        console.log('External Account:', externalAccount);
-
         try {
           const account = await stripe.accounts.retrieve(
             externalAccount.account as string,
@@ -60,7 +55,7 @@ const handleWebhook2 = async (req: Request, res: Response) => {
           }
           await Log.create({
             accountId: account?.id,
-            message: `Webhook event received for updated account: ${
+            message: `Webhook event received for updated external account account: ${
               account?.details_submitted
                 ? 'Details submitted: TRUE'
                 : 'Details submitted: FALSE'
@@ -76,8 +71,6 @@ const handleWebhook2 = async (req: Request, res: Response) => {
       }
       // nice case
       case 'account.external_account.created': {
-        console.log('Connected account created');
-
         break;
       }
       default:

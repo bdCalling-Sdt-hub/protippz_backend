@@ -198,7 +198,6 @@ const changePasswordIntoDB = async (
   //   $or: [{ email: userData?.email }, { username: userData.username }],
   // });
   const user = await User.findById(userData.id);
-  console.log('user', user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
   }

@@ -19,7 +19,6 @@ const handleSubcriptionPurchaseSuccess = async (userId: string) => {
   if (!normalUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-
   await NormalUser.findByIdAndUpdate(
     userId,
     {

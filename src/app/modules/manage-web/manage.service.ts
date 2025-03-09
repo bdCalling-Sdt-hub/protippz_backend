@@ -66,10 +66,7 @@ const addPartner = async (payload: any) => {
 const getPartner = async () => {
   return await Partner.findOne();
 };
-const editPartner = async (
-  id: string,
-  payload: { description: string },
-) => {
+const editPartner = async (id: string, payload: { description: string }) => {
   const isExist = await Partner.findById(id);
   if (!isExist) {
     throw new AppError(404, 'Partner not found');
@@ -298,5 +295,5 @@ export const ManageService = {
   addPartner,
   editPartner,
   getPartner,
-  deletePartner
+  deletePartner,
 };

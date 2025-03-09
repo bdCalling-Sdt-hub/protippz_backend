@@ -33,10 +33,6 @@ interface PayPalLink {
   method: string;
 }
 
-interface PayPalPayment {
-  id: string;
-  links: PayPalLink[];
-}
 // PayPal configuration-----------------------------------
 paypal.configure({
   mode: process.env.PAYPAL_MODE as string,
@@ -106,7 +102,9 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
     );
 
     // Determine whether to update a Team or Player
-    const tipAmountAfterCharge = payload.amount - (payload.amount * 10) / 100;
+    // const tipAmountAfterCharge = payload.amount - (payload.amount * 10) / 100;
+    const tipAmountAfterCharge =
+      payload.amount - (payload.amount * 10) / 100 - 0.3;
     if (payload.entityType === 'Team') {
       await Team.findByIdAndUpdate(
         payload.entityId,
@@ -130,6 +128,13 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
         { session },
       );
     }
+    await Tip.create(
+      {
+        ...payload,
+        user: userId,
+      },
+      { session },
+    );
 
     await session.commitTransaction();
     session.endSession();
@@ -298,7 +303,6 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
       { $inc: { totalPoint: tip.point, totalTipSent: tip.amount } },
       { new: true, runValidators: true, session },
     );
-
     let playerTeamInfo;
     if (tip.entityType === 'Player') {
       playerTeamInfo = await Player.findById(tip.entityId);
@@ -314,8 +318,10 @@ const paymentSuccessWithStripe = async (transactionId: string) => {
 
     await Notification.create(notificationData);
     // Determine whether to update a Team or Player
+    // const tipAmountAfterCharge =
+    //   updatedTip.amount - (updatedTip.amount * 10) / 100;
     const tipAmountAfterCharge =
-      updatedTip.amount - (updatedTip.amount * 10) / 100;
+      updatedTip.amount - (updatedTip.amount * 10) / 100 - 0.3;
     if (updatedTip?.entityType === 'Team') {
       await Team.findByIdAndUpdate(
         updatedTip?.entityId,
@@ -424,8 +430,10 @@ const executePaymentWithPaypal = async (paymentId: string, payerId: string) => {
     await Notification.create(notificationData);
 
     // Determine whether to update a Team or Player
+    // const tipAmountAfterCharge =
+    //   updatedTip.amount - (updatedTip.amount * 10) / 100;
     const tipAmountAfterCharge =
-      updatedTip.amount - (updatedTip.amount * 10) / 100;
+      updatedTip.amount - (updatedTip.amount * 10) / 100 - 0.3;
     if (updatedTip?.entityType === 'Team') {
       await Team.findByIdAndUpdate(
         updatedTip?.entityId,
@@ -630,7 +638,8 @@ const executePaypalTipPaymentWithApp = async (
 
       const tipAmount = parseFloat(payment.transactions[0].amount.total);
       const pointEarned = tipAmount * pointPerAmountTip;
-      const tipAmountAfterCharge = tipAmount - (tipAmount * 10) / 100;
+      // const tipAmountAfterCharge = tipAmount - (tipAmount * 10) / 100;
+      const tipAmountAfterCharge = tipAmount - (tipAmount * 10) / 100 - 0.3;
 
       // Create a Tip record
       const createTip = await Tip.create({
@@ -655,7 +664,6 @@ const executePaypalTipPaymentWithApp = async (
         status: ENUM_PAYMENT_STATUS.SUCCESS,
         amount: tipAmount,
       });
-
       // Update user points and total tips sent
       await NormalUser.findByIdAndUpdate(
         profileId,

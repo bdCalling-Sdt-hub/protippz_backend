@@ -13,16 +13,13 @@ const updateStripeConnectedAccountStatus = async (accountId: string) => {
 
   try {
     const player = await Player.findOne({ stripAccountId: accountId });
-    console.log('player', player);
     const team = await Team.findOne({ stripAccountId: accountId });
-    console.log('team', team);
     if (player) {
       const updatedPlayer = await Player.findOneAndUpdate(
         { stripAccountId: accountId },
         { isStripeConnected: true },
         { new: true, runValidators: true },
       );
-      console.log('updated player', updatedPlayer);
       if (!updatedPlayer) {
         throw new AppError(
           httpStatus.NOT_FOUND,
@@ -35,7 +32,6 @@ const updateStripeConnectedAccountStatus = async (accountId: string) => {
         { isStripeConnected: true },
         { new: true, runValidators: true },
       );
-      console.log('updated team', updatedTeam);
       if (!updatedTeam) {
         throw new AppError(
           httpStatus.NOT_FOUND,
