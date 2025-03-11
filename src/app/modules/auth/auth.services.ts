@@ -109,7 +109,7 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
       username: payload.username,
       email: payload.email,
       phone: payload?.phone,
-      password: 'password',
+      password: 'paswwordpassword',
       role: USER_ROLE.user,
       inviteToken: payload.inviteToken || '',
       isVerified: true,
