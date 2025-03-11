@@ -151,9 +151,10 @@ const executeStripeDeposit = async (transactionId: string) => {
       );
     }
 
+    const amount = updatedTransaction?.amount - 0.3;
     const updatedUser = await NormalUser.findByIdAndUpdate(
       updatedTransaction.entityId,
-      { $inc: { totalAmount: updatedTransaction.amount } },
+      { $inc: { totalAmount: amount } },
       { new: true, runValidators: true, session },
     );
 
@@ -225,9 +226,10 @@ const executePaypalDeposit = async (paymentId: string, payerId: string) => {
       { new: true, runValidators: true, session },
     );
 
+    const amount = transaction.amount - 0.3;
     const updatedUser = await NormalUser.findByIdAndUpdate(
       transaction.entityId,
-      { $inc: { totalAmount: transaction.amount } },
+      { $inc: { totalAmount: amount } },
       { new: true, runValidators: true, session },
     );
     if (!updatedUser) {
@@ -362,13 +364,14 @@ const executeDepositPaymentWithApp = async (
         );
       }
 
-      console.log('Payment amount:', payment.transactions[0].amount.total);
+      // console.log('Payment amount:', payment.transactions[0].amount.total);
 
+      const amount = parseFloat(payment.transactions[0].amount.total) - 0.3;
       await NormalUser.findByIdAndUpdate(
         profileId,
         {
           $inc: {
-            totalAmount: parseFloat(payment.transactions[0].amount.total),
+            totalAmount: amount,
           },
         },
         { new: true, runValidators: true },
