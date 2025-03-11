@@ -121,6 +121,8 @@ const loginWithGoogle = async (payload: ILoginWithGoogle) => {
       email: payload.email,
       username: payload.username,
       profile_image: payload.profile_image,
+      phone: payload?.phone,
+      address: payload?.address,
       user: createUser[0]._id,
     };
 

@@ -11,25 +11,25 @@ export const createNormalUserSchema = z.object({
     userData: z.object({
       name: z.string().nonempty('Name is required'),
       username: z.string().nonempty('Username is required'),
-      phone: z
-        .string().optional(),
+      phone: z.string({ required_error: 'Phone number is required' }),
       email: z.string().email('Invalid email format'),
-      address: z.string().nonempty('Address is required').optional(),
+      address: z
+        .string({ required_error: 'Address is required' })
+        .nonempty('Address is required'),
     }),
   }),
 });
 export const updateNormalUserData = z.object({
   body: z.object({
     name: z.string().nonempty('Name is required').optional(),
-    phone: z
-      .string().optional(),
+    phone: z.string().optional(),
     address: z.string().optional(),
   }),
 });
 
 const normalUserValidations = {
   createNormalUserSchema,
-  updateNormalUserData
+  updateNormalUserData,
 };
 
 export default normalUserValidations;

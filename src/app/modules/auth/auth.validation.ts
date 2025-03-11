@@ -14,6 +14,8 @@ const googleSignUpValidationSchema = z.object({
     name: z.string({ required_error: 'Name is required' }),
     email: z.string({ required_error: 'Email is required' }),
     profile_image: z.string().optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
   }),
 });
 

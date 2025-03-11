@@ -36,6 +36,7 @@ export interface ILoginWithGoogle {
   inviteToken?: string;
   username?: string;
   phone?: string;
+  address?: string;
 }
 
 export interface UserModel extends Model<TUser> {
