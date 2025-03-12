@@ -128,13 +128,11 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
         { session },
       );
     }
-    await Tip.create(
-      {
-        ...payload,
-        user: userId,
-      },
-      { session },
-    );
+    await Tip.create({
+      ...payload,
+      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
+      user: userId,
+    });
 
     await session.commitTransaction();
     session.endSession();
