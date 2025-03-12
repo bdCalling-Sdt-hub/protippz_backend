@@ -130,7 +130,6 @@ const tipByProfileBalance = async (userId: string, payload: ITip) => {
     }
     await Tip.create({
       ...payload,
-      paymentStatus: ENUM_PAYMENT_STATUS.SUCCESS,
       user: userId,
     });
 
