@@ -3,12 +3,22 @@ import NormalUser from '../normalUser/normalUser.model';
 import Player from '../player/player.model';
 import Team from '../team/team.model';
 import Tip from '../tip/tip.model';
+import { USER_ROLE } from '../user/user.constant';
+import { User } from '../user/user.model';
 
 const getAdminDashboardMetaDataFromDB = async () => {
   const totalUser = await NormalUser.countDocuments();
   const totalLeague = await League.countDocuments();
   const totalTeam = await Team.countDocuments();
   const totalPlayer = await Player.countDocuments();
+  const totalPlayerSignIn = await User.countDocuments({
+    role: USER_ROLE.player,
+    email: { $nin: [null, ''] },
+  });
+  const totalTeamSignIn = await User.countDocuments({
+    role: USER_ROLE.team,
+    email: { $nin: [null, ''] },
+  });
   const result = await Tip.aggregate([
     {
       $group: {
@@ -25,6 +35,8 @@ const getAdminDashboardMetaDataFromDB = async () => {
     totalTeam,
     totalPlayer,
     totalTip,
+    totalPlayerSignIn,
+    totalTeamSignIn,
   };
 };
 
