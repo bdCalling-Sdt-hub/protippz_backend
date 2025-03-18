@@ -13,8 +13,6 @@ import Player from '../modules/player/player.model';
 import Team from '../modules/team/team.model';
 import SuperAdmin from '../modules/superAdmin/superAdmin.model';
 
-// make costume interface
-
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // check if the token is sent from client -----

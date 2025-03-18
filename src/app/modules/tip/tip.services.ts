@@ -55,107 +55,220 @@ const createTipIntoDB = async (userId: string, payload: ITip) => {
 
 // tip by account balance---------------------------------
 
+// const tipByProfileBalance = async (userId: string, payload: ITip) => {
+//   const normalUser = await NormalUser.findById(userId);
+//   if (!normalUser) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+//   }
+//   if (normalUser.totalAmount < payload.amount) {
+//     throw new AppError(
+//       httpStatus.BAD_REQUEST,
+//       "You don't have enough amount in you account",
+//     );
+//   }
+//   if (payload.entityType === 'Team') {
+//     const team = await Team.findById(payload.entityId);
+//     if (!team) {
+//       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
+//     }
+//   } else if (payload.entityType === 'Player') {
+//     const player = await Player.findById(payload.entityId);
+//     if (!player) {
+//       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
+//     }
+//   }
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const totalPoint = Math.ceil(payload.amount * 10);
+//     payload.point = totalPoint;
+//     payload.paymentStatus = ENUM_PAYMENT_STATUS.SUCCESS;
+
+//     const result = await Tip.create([{ ...payload, user: userId }], {
+//       session,
+//     });
+
+//     const updatedUser = await NormalUser.findByIdAndUpdate(
+//       userId,
+//       {
+//         $inc: {
+//           totalAmount: -payload.amount,
+//           totalPoint: totalPoint,
+//           totalTipSent: payload.amount,
+//         },
+//       },
+//       { session },
+//     );
+
+//     // Determine whether to update a Team or Player
+//     // const tipAmountAfterCharge = payload.amount - (payload.amount * 10) / 100;
+//     const tipAmountAfterCharge =
+//       payload.amount - (payload.amount * 10) / 100 - 0.3;
+//     if (payload.entityType === 'Team') {
+//       await Team.findByIdAndUpdate(
+//         payload.entityId,
+//         {
+//           $inc: {
+//             totalTips: tipAmountAfterCharge,
+//             dueAmount: tipAmountAfterCharge,
+//           },
+//         },
+//         { session },
+//       );
+//     } else if (payload.entityType === 'Player') {
+//       await Player.findByIdAndUpdate(
+//         payload.entityId,
+//         {
+//           $inc: {
+//             totalTips: tipAmountAfterCharge,
+//             dueAmount: tipAmountAfterCharge,
+//           },
+//         },
+//         { session },
+//       );
+//     }
+//     await Tip.create({
+//       ...payload,
+//       user: userId,
+//     });
+
+//     await session.commitTransaction();
+//     session.endSession();
+
+//     let playerTeamInfo;
+//     if (result[0].entityType === 'Player') {
+//       playerTeamInfo = await Player.findById(result[0].entityId);
+//     } else if (result[0].entityType === 'Team') {
+//       playerTeamInfo = await Team.findById(result[0].entityId);
+//     }
+
+//     const notificationData = {
+//       title: `Tip sent successfully.`,
+//       message: `You have successfully sent a tip to ${playerTeamInfo?.name} and earned ${result[0].point} points.`,
+//       receiver: updatedUser?._id,
+//     };
+//     await Notification.create(notificationData);
+//     return result[0];
+//   } catch (error) {
+//     await session.abortTransaction();
+//     session.endSession();
+
+//     throw error;
+//   }
+// };
+
 const tipByProfileBalance = async (userId: string, payload: ITip) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  // Find the normal user to validate balance and account
   const normalUser = await NormalUser.findById(userId);
   if (!normalUser) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    throw new Error('User not found');
   }
+
+  // Check if user has enough balance
   if (normalUser.totalAmount < payload.amount) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "You don't have enough amount in you account",
+      "You don't have enough amount in your account",
     );
   }
+
+  // Check if the entity is a Team or Player and ensure it exists
+  let entity;
   if (payload.entityType === 'Team') {
-    const team = await Team.findById(payload.entityId);
-    if (!team) {
+    entity = await Team.findById(payload.entityId);
+    if (!entity) {
       throw new AppError(httpStatus.NOT_FOUND, 'Team not found');
     }
   } else if (payload.entityType === 'Player') {
-    const player = await Player.findById(payload.entityId);
-    if (!player) {
+    entity = await Player.findById(payload.entityId);
+    if (!entity) {
       throw new AppError(httpStatus.NOT_FOUND, 'Player not found');
     }
   }
-  const session = await mongoose.startSession();
-  session.startTransaction();
 
-  try {
-    const totalPoint = Math.ceil(payload.amount * 10);
-    payload.point = totalPoint;
-    payload.paymentStatus = ENUM_PAYMENT_STATUS.SUCCESS;
+  // Calculate total points for the tip
+  const totalPoint = Math.ceil(payload.amount * 10);
+  payload.point = totalPoint;
+  payload.paymentStatus = ENUM_PAYMENT_STATUS.SUCCESS;
 
-    const result = await Tip.create([{ ...payload, user: userId }], {
-      session,
-    });
+  // Create the tip in the database
+  const result = await Tip.create([{ ...payload, user: userId }], {
+    session,
+  });
 
-    const updatedUser = await NormalUser.findByIdAndUpdate(
-      userId,
+  // Update the user account (decrease balance and increase points)
+  const updatedUser = await NormalUser.findByIdAndUpdate(
+    userId,
+    {
+      $inc: {
+        totalAmount: -payload.amount, // Deduct the amount
+        totalPoint: totalPoint, // Add the points
+        totalTipSent: payload.amount, // Track the total tip sent
+      },
+    },
+    { new: true, session }, // `new: true` to get the updated document
+  );
+
+  if (!updatedUser) {
+    throw new AppError(httpStatus.FAILED_DEPENDENCY, 'Failed to update user');
+  }
+
+  // Calculate tip amount after charge (10% + $0.30 fee)
+  const tipAmountAfterCharge = payload.amount - (payload.amount * 10) / 100;
+
+  // Update the respective Team or Player
+  if (payload.entityType === 'Team') {
+    await Team.findByIdAndUpdate(
+      payload.entityId,
       {
         $inc: {
-          totalAmount: -payload.amount,
-          totalPoint: totalPoint,
-          totalTipSent: payload.amount,
+          totalTips: tipAmountAfterCharge,
+          dueAmount: tipAmountAfterCharge,
         },
       },
       { session },
     );
-
-    // Determine whether to update a Team or Player
-    // const tipAmountAfterCharge = payload.amount - (payload.amount * 10) / 100;
-    const tipAmountAfterCharge =
-      payload.amount - (payload.amount * 10) / 100 - 0.3;
-    if (payload.entityType === 'Team') {
-      await Team.findByIdAndUpdate(
-        payload.entityId,
-        {
-          $inc: {
-            totalTips: tipAmountAfterCharge,
-            dueAmount: tipAmountAfterCharge,
-          },
+  } else if (payload.entityType === 'Player') {
+    await Player.findByIdAndUpdate(
+      payload.entityId,
+      {
+        $inc: {
+          totalTips: tipAmountAfterCharge,
+          dueAmount: tipAmountAfterCharge,
         },
-        { session },
-      );
-    } else if (payload.entityType === 'Player') {
-      await Player.findByIdAndUpdate(
-        payload.entityId,
-        {
-          $inc: {
-            totalTips: tipAmountAfterCharge,
-            dueAmount: tipAmountAfterCharge,
-          },
-        },
-        { session },
-      );
-    }
-    await Tip.create({
-      ...payload,
-      user: userId,
-    });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    let playerTeamInfo;
-    if (result[0].entityType === 'Player') {
-      playerTeamInfo = await Player.findById(result[0].entityId);
-    } else if (result[0].entityType === 'Team') {
-      playerTeamInfo = await Team.findById(result[0].entityId);
-    }
-
-    const notificationData = {
-      title: `Tip sent successfully.`,
-      message: `You have successfully sent a tip to ${playerTeamInfo?.name} and earned ${result[0].point} points.`,
-      receiver: updatedUser?._id,
-    };
-    await Notification.create(notificationData);
-    return result[0];
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-
-    throw error;
+      },
+      { session },
+    );
   }
+
+  // Create a notification for the user
+  let playerTeamInfo;
+  if (result[0].entityType === 'Player') {
+    playerTeamInfo = await Player.findById(result[0].entityId);
+  } else if (result[0].entityType === 'Team') {
+    playerTeamInfo = await Team.findById(result[0].entityId);
+  }
+
+  if (!playerTeamInfo) {
+    throw new Error('Unable to find entity for notification');
+  }
+
+  const notificationData = {
+    title: 'Tip sent successfully.',
+    message: `You have successfully sent a tip to ${playerTeamInfo.name} and earned ${result[0].point} points.`,
+    receiver: updatedUser._id,
+  };
+
+  await Notification.create(notificationData);
+
+  // Commit the transaction
+  await session.commitTransaction();
+  session.endSession();
+
+  return result[0];
 };
 
 const tipByCreditCard = async (userId: string, payload: ITip) => {
@@ -960,6 +1073,8 @@ cron.schedule('*/30 * * * *', async () => {
     console.error('Error deleting old pending tips:', error);
   }
 });
+
+// try to profile balance tip
 
 const TipServices = {
   createTipIntoDB,
