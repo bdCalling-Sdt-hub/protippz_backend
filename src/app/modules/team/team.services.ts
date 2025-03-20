@@ -45,8 +45,9 @@ const getAllTeamsFromDB = async (
   //   .paginate()
   //   .fields();
   let filterQuery = {};
-  if (query.signIn == true) {
+  if (query.signIn) {
     filterQuery = { email: { $nin: [null, ''] } };
+    delete query.signIn;
   }
 
   const teamQuery = new QueryBuilder(

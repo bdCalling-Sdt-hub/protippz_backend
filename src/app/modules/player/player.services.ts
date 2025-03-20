@@ -45,8 +45,9 @@ const getAllPlayersFromDB = async (
     delete query.limit;
   }
   let filterQuery = {};
-  if (query.signIn == true) {
+  if (query.signIn) {
     filterQuery = { email: { $nin: [null, ''] } };
+    delete query.signIn;
   }
   const playerQuery = new QueryBuilder(
     Player.find({ ...filterQuery })
