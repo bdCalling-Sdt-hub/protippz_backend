@@ -255,7 +255,7 @@ const addEmailAddress = async (userData: JwtPayload, email: string) => {
     {
       email: email,
       addEmailVerifiedCode: verifyCode,
-      codeExpireIn: new Date(Date.now() + 5 * 60000),
+      codeExpireIn: new Date(Date.now() + 2 * 60000),
     },
     { new: true, runValidators: true },
   );
