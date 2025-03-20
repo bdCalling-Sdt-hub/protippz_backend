@@ -35,8 +35,24 @@ const getAllTeamsFromDB = async (
     delete query.page;
     delete query.limit;
   }
+  // const teamQuery = new QueryBuilder(
+  //   Team.find().populate({ path: 'league', select: 'name sport' }).lean(),
+  //   query,
+  // )
+  //   .search(['name', 'sport'])
+  //   .filter()
+  //   .sort()
+  //   .paginate()
+  //   .fields();
+  let filterQuery = {};
+  if (query.signIn == true) {
+    filterQuery = { email: { $nin: [null, ''] } };
+  }
+
   const teamQuery = new QueryBuilder(
-    Team.find().populate({ path: 'league', select: 'name sport' }).lean(),
+    Team.find({ ...filterQuery })
+      .populate({ path: 'league', select: 'name sport' })
+      .lean(),
     query,
   )
     .search(['name', 'sport'])

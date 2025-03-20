@@ -44,8 +44,12 @@ const getAllPlayersFromDB = async (
     delete query.page;
     delete query.limit;
   }
+  let filterQuery = {};
+  if (query.signIn == true) {
+    filterQuery = { email: { $nin: [null, ''] } };
+  }
   const playerQuery = new QueryBuilder(
-    Player.find()
+    Player.find({ ...filterQuery })
       .populate({ path: 'league', select: 'name sport' })
       .populate({ path: 'team', select: 'name' })
       .lean(), // Ensures the result is plain JavaScript objects
