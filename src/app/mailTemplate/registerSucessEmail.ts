@@ -102,7 +102,7 @@ const registrationSuccessEmailBody = (name: string, activationCode: number) => `
 
           <p>Thank you for registering with Protipzz. To activate your account, please use the following activation code:</p>
             <div class="activation-code">${activationCode || 'XXXXXX'}</div>
-            <p>Enter this code on the activation page within the next 10 minutes. If you don't your account will be deleted from the database and you will need to register again.</p>
+            <p>Enter this code on the activation page within the next 5 minutes. If you don't your account will be deleted from the database and you will need to register again.</p>
             <div class="button-container">
               <a href="" class="button">
                 <span class="activate-btn">Activate Now</span>

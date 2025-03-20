@@ -102,14 +102,13 @@ const addEmailVerifiedCode = (name: string, activationCode: number) => `
 
           <p>Thank you for added email. For verify your email, please use the following verification  code:</p>
             <div class="activation-code">${activationCode || 'XXXXXX'}</div>
-            <p>Enter this code on the activation page within the next 10 minutes. If you don't your email will be deleted from the database and you will need to add email again.</p>
+            <p>Enter this code on the activation page within the next 5 minutes. If you don't your email will be deleted from the database and you will need to add email again.</p>
             <div class="button-container">
               <a href="" class="button">
                 <span class="activate-btn">Activate Now</span>
               </a>
             </div>
             <p>If you didn't register, ignore this email.</p>
-            /* TODO: set client email here  */
           <p>If you have any questions, feel free to contact us at <a href="contact@protippz.com">contact@protippz.com</a>.</p>
         </div>
         <div class="footer">

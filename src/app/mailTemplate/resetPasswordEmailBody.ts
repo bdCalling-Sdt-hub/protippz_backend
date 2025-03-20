@@ -85,7 +85,7 @@ const resetPasswordEmailBody = (name: string, resetCode: number) => `
           <div class="reset-code">
             ${resetCode || 'XXXXXX'}
           </div>
-          <p>Enter this code on the password reset page within the next 10 minutes. If you didn't request a password reset, you can ignore this email.</p>
+          <p>Enter this code on the password reset page within the next 5 minutes. If you didn't request a password reset, you can ignore this email.</p>
           <p>If you have any questions, feel free to contact us at <a href="contact@protippz.com">contact@protippz.com</a>.</p>
         </div>
         <div class="footer">

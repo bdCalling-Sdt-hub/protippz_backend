@@ -66,7 +66,7 @@ const registerUser = async (
       password: password,
       role: USER_ROLE.user,
       verifyCode,
-      codeExpireIn: new Date(Date.now() + 2 * 60000),
+      codeExpireIn: new Date(Date.now() + 5 * 60000),
       inviteToken: userData.inviteToken ? userData.inviteToken : '',
     };
 
@@ -255,7 +255,7 @@ const addEmailAddress = async (userData: JwtPayload, email: string) => {
     {
       email: email,
       addEmailVerifiedCode: verifyCode,
-      codeExpireIn: new Date(Date.now() + 2 * 60000),
+      codeExpireIn: new Date(Date.now() + 5 * 60000),
     },
     { new: true, runValidators: true },
   );
@@ -286,6 +286,9 @@ const verifyAddEmail = async (email: string, verifyCode: number) => {
   if (user?.addEmailVerifiedCode !== verifyCode) {
     throw new AppError(httpStatus.NO_CONTENT, 'Verify code do not match');
   }
+  if (user.codeExpireIn < new Date(Date.now())) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Verify code is expired');
+  }
   const result = await User.findOneAndUpdate(
     { email: email },
     { isAddEmailVerified: true },
@@ -296,7 +299,7 @@ const verifyAddEmail = async (email: string, verifyCode: number) => {
 
 // all cron jobs for users
 
-cron.schedule('*/2 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   try {
     const now = new Date();
 
@@ -359,7 +362,7 @@ cron.schedule('*/2 * * * *', async () => {
 //   }
 // });
 
-cron.schedule('*/2 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   try {
     const now = new Date();
 
