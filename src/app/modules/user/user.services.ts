@@ -17,12 +17,12 @@ import Team from '../team/team.model';
 import Invite from '../invite/invite.model';
 import { inviteRewardPoint } from '../../constant';
 import Notification from '../notification/notification.model';
-import Stripe from 'stripe';
+// import Stripe from 'stripe';
 import config from '../../config';
 import { createToken } from './user.utils';
 import SuperAdmin from '../superAdmin/superAdmin.model';
 import addEmailVerifiedCode from '../../mailTemplate/addEmailVerification';
-const stripe = new Stripe(config.stripe.stripe_secret_key as string);
+// const stripe = new Stripe(config.stripe.stripe_secret_key as string);
 const generateVerifyCode = (): number => {
   return Math.floor(10000 + Math.random() * 90000);
 };
@@ -114,16 +114,16 @@ const verifyCode = async (email: string, verifyCode: number) => {
   );
 
   // for create stripe customer ================
-  const customer = await stripe.customers.create({
-    email: result?.email,
-  });
-  await User.findByIdAndUpdate(
-    result?.id,
-    {
-      stripeCustomerId: customer.id,
-    },
-    { new: true, runValidators: true },
-  );
+  // const customer = await stripe.customers.create({
+  //   email: result?.email,
+  // });
+  // await User.findByIdAndUpdate(
+  //   result?.id,
+  //   {
+  //     stripeCustomerId: customer.id,
+  //   },
+  //   { new: true, runValidators: true },
+  // );
   //=====================================
   if (result?.inviteToken) {
     const invite = await Invite.findOne({ inviteToken: result.inviteToken });
