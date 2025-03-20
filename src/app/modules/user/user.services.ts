@@ -259,6 +259,19 @@ const addEmailAddress = async (userData: JwtPayload, email: string) => {
     },
     { new: true, runValidators: true },
   );
+  if (userData.role == USER_ROLE.team) {
+    await Team.findByIdAndUpdate(
+      userData?.profileId,
+      { email: email },
+      { new: true, runValidators: true },
+    );
+  } else if (userData.role == USER_ROLE.player) {
+    await Player.findByIdAndUpdate(
+      userData?.profileId,
+      { email: email },
+      { new: true, runValidators: true },
+    );
+  }
   sendEmail({
     email: email,
     subject: 'Verify your email',
@@ -319,27 +332,79 @@ cron.schedule('*/2 * * * *', async () => {
 });
 
 // crone for remove email
+// cron.schedule('*/2 * * * *', async () => {
+//   try {
+//     const now = new Date();
+
+//     // Find unverified users whose expiration time has passed
+//     const expiredUsers = await User.find({
+//       isAddEmailVerified: false,
+//       $or: [{ role: USER_ROLE.player }, { role: USER_ROLE.team }],
+//       codeExpireIn: { $lte: now },
+//     });
+//     if (expiredUsers.length > 0) {
+//       const expiredUserIds = expiredUsers.map((user) => user._id);
+
+//       // Remove email field from the expired users
+//       const updateResult = await User.updateMany(
+//         { _id: { $in: expiredUserIds } },
+//         { $unset: { email: '' } },
+//       );
+//       console.log(
+//         `Updated ${updateResult.modifiedCount} user(s) by removing the email field.`,
+//       );
+//     }
+//   } catch (error) {
+//     console.log('Error updating expired users:', error);
+//   }
+// });
+
 cron.schedule('*/2 * * * *', async () => {
   try {
     const now = new Date();
 
-    // Find unverified users whose expiration time has passed
+    // Find unverified users whose verification code has expired
     const expiredUsers = await User.find({
       isAddEmailVerified: false,
       $or: [{ role: USER_ROLE.player }, { role: USER_ROLE.team }],
       codeExpireIn: { $lte: now },
     });
+
     if (expiredUsers.length > 0) {
       const expiredUserIds = expiredUsers.map((user) => user._id);
+      const expiredUsersData = expiredUsers.map((user) => ({
+        id: user._id,
+        role: user.role,
+      }));
 
-      // Remove email field from the expired users
+      // Remove email field from the expired users in the User collection
       const updateResult = await User.updateMany(
         { _id: { $in: expiredUserIds } },
         { $unset: { email: '' } },
       );
+
       console.log(
         `Updated ${updateResult.modifiedCount} user(s) by removing the email field.`,
       );
+
+      // Iterate through expired users and remove email from Player or Team
+      for (const userData of expiredUsersData) {
+        if (userData.role === USER_ROLE.team) {
+          await Team.findOneAndUpdate(
+            { user: userData.id },
+            { $unset: { email: '' } }, // Remove email field
+            { new: true },
+          );
+          console.log(`Removed email from Team id: ${userData.id}`);
+        } else if (userData.role === USER_ROLE.player) {
+          await Player.findByIdAndUpdate(
+            { user: userData.id },
+            { $unset: { email: '' } }, // Remove email field
+            { new: true },
+          );
+          console.log(`Removed email from Player id: ${userData.id}`);
+        }
+      }
     }
   } catch (error) {
     console.log('Error updating expired users:', error);

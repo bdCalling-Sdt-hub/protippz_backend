@@ -17,7 +17,7 @@ export interface ITeam {
   isStripeConnected: boolean;
   username: string;
   invitedPassword: string;
-  // email?:string;
+  email?: string;
 }
 
 export interface IInviteTeamPayload {

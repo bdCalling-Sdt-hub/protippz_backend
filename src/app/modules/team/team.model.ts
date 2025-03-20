@@ -34,10 +34,10 @@ const TeamSchema = new Schema(
     invitedPassword: {
       type: String,
     },
-    // email: {
-    //   type: String,
-    //   default: '',
-    // },
+    email: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
