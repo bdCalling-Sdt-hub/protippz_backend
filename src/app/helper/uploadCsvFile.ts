@@ -175,7 +175,7 @@ const uploadCsvFile = async (req: Request, res: Response) => {
               position: playerPosition,
               player_image: playerImage,
               player_bg_image: playerBgImage,
-              jerceyNumber: playerNumber,
+              jerceyNumber: Number(playerNumber),
               experience: experience,
             },
             { upsert: true, new: true },
