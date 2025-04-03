@@ -114,7 +114,21 @@ const uploadCsvFile = async (req: Request, res: Response) => {
 
   fs.createReadStream(filePath as PathLike)
     .pipe(csv())
-    .on('data', (data) => results.push(data))
+    // .on('data', (data) => results.push(data))
+    // for solve strine quotes in key
+    .on('data', (data) => {
+      // Normalize the keys by removing any leading/trailing quotes or spaces around keys
+      const normalizedData = Object.keys(data).reduce((acc: any, key) => {
+        // Clean the key: remove any quotes or leading/trailing spaces
+        const cleanedKey = key.replace(/^['"]|['"]$/g, '').trim();
+
+        // Add the cleaned key-value pair to the accumulator
+        acc[cleanedKey] = data[key];
+        return acc;
+      }, {});
+
+      results.push(normalizedData);
+    })
     .on('end', async () => {
       try {
         let count = 0;
@@ -175,7 +189,7 @@ const uploadCsvFile = async (req: Request, res: Response) => {
               position: playerPosition,
               player_image: playerImage,
               player_bg_image: playerBgImage,
-              jerceyNumber: Number(playerNumber),
+              jerceyNumber: playerNumber && Number(playerNumber),
               experience: experience,
             },
             { upsert: true, new: true },
