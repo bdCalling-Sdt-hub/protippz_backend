@@ -16,6 +16,8 @@ const initializeSocket = (server: HTTPServer) => {
           'http://localhost:3000',
           'http://192.168.10.25:7585',
           'http://10.0.60.137:3001',
+          "https://admin.protippz.com",
+          "http://admin.protippz.com",
         ],
       },
     });
