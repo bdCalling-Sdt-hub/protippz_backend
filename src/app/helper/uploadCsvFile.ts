@@ -99,11 +99,19 @@ import Player from '../modules/player/player.model';
 import { getIO } from '../socket/socketManager';
 import unlinkFile from '../utilities/unlinkFile';
 
+let uploadCanceled = false;
+
+export const stopCsvUpload = async (req: Request, res: Response) => {
+  uploadCanceled = true;
+  res.send({ stop: true });
+};
+
 const uploadCsvFile = async (req: Request, res: Response) => {
+  uploadCanceled = false;
   const filePath = req?.file?.path;
   const results: any[] = [];
-  console.log('manik', results);
   const io = getIO();
+
   fs.createReadStream(filePath as PathLike)
     .pipe(csv())
     .on('data', (data) => results.push(data))
@@ -111,6 +119,9 @@ const uploadCsvFile = async (req: Request, res: Response) => {
       try {
         let count = 0;
         for (const row of results) {
+          if (uploadCanceled) {
+            break;
+          }
           const {
             leagueName,
             leagueImage,
@@ -170,7 +181,6 @@ const uploadCsvFile = async (req: Request, res: Response) => {
             { upsert: true, new: true },
           );
           count++;
-          console.log('count', count);
           io.emit('upload-progress', {
             total: results?.length,
             completed: count,
@@ -181,9 +191,14 @@ const uploadCsvFile = async (req: Request, res: Response) => {
         // fs.unlinkSync(filePath as PathLike);
         unlinkFile(filePath as string);
 
-        res.status(200).send('Data successfully uploaded and saved.');
+        res.status(200).send({
+          success: true,
+          message: 'Data successfully uploaded and saved.',
+        });
       } catch (error: any) {
-        res.status(500).send(`Error processing data: ${error.message}`);
+        res
+          .status(500)
+          .send({ message: `Error processing data: ${error.message}` });
       }
     });
 };

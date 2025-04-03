@@ -11,7 +11,7 @@ import router from './app/routes';
 import notFound from './app/middlewares/notFound';
 const app: Application = express();
 import multer from 'multer';
-import uploadCsvFile from './app/helper/uploadCsvFile';
+import uploadCsvFile, { stopCsvUpload } from './app/helper/uploadCsvFile';
 import auth from './app/middlewares/auth';
 import { USER_ROLE } from './app/modules/user/user.constant';
 import sendContactUsEmail from './app/helper/sendContactUsEmail';
@@ -70,6 +70,8 @@ app.post('/contact-us', sendContactUsEmail);
 app.get('/nice', async (req, res) => {
   res.send({ message: 'nice to meet you man protippz' });
 });
+
+app.post('/stop-csv-upload', stopCsvUpload);
 
 app.post(
   '/upload-csv',
