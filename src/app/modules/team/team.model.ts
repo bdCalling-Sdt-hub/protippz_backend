@@ -44,6 +44,9 @@ const TeamSchema = new Schema(
   },
 );
 
+TeamSchema.index({ name: 1 }, { background: true });
+TeamSchema.index({ sport: 1 }, { background: true });
+
 const Team = model('Team', TeamSchema);
 
 export default Team;

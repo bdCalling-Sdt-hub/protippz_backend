@@ -81,6 +81,9 @@ const PlayerSchema = new Schema(
   },
 );
 
+PlayerSchema.index({ name: 1 }, { background: true });
+PlayerSchema.index({ position: 1 }, { background: true });
+
 const Player = model('Player', PlayerSchema);
 
 export default Player;
