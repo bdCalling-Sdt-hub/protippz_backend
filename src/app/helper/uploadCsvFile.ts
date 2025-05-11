@@ -179,8 +179,8 @@ const uploadCsvFile = async (req: Request, res: Response) => {
           await Player.findOneAndUpdate(
             {
               name: playerName,
-              position: playerPosition,
-              team: team._id,
+              // position: playerPosition,
+              // team: team._id,
             },
             {
               name: playerName,
