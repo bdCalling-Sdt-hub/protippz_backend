@@ -164,7 +164,10 @@ const uploadCsvFile = async (req: Request, res: Response) => {
 
           // Upsert Team
           const team = await Team.findOneAndUpdate(
-            { name: teamName, league: league._id },
+            {
+              name: teamName,
+              //  league: league._id
+            },
             {
               name: teamName,
               team_logo: teamLogo,
