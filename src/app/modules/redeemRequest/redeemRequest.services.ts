@@ -60,6 +60,12 @@ const createRedeemRequestIntoDB = async (
       "You don't have enough point for redeem this reward",
     );
   }
+  if (user?.totalTipSent < 25) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You must have tipped a minimum of $25 for redeem request',
+    );
+  }
 
   payload.redeemedPoint = reward.pointRequired;
   payload.isVerified = payload.email && !payload.state ? false : true;
